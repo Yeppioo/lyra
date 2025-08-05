@@ -2,15 +2,31 @@
   <div class="y-navbar" :class="{ 'y-navbar--scrolled': isScrolled }">
     <section class="content">
       <div class="left">
-        <div class="y-navbar__logo">Z-Player</div>
-        <a-menu
-          v-model:selectedKeys="current"
-          mode="horizontal"
-          @select="handleMenuSelect"
-          :items="items"
-        />
+        <div class="y-navbar__logo">
+          <img src="../assets/logo.svg" alt="Z-Player Logo" class="logo-img" />
+        </div>
       </div>
-      <div class="right"></div>
+      <a-menu
+        v-model:selectedKeys="current"
+        mode="horizontal"
+        @select="handleMenuSelect"
+        :items="items"
+        class="center-menu"
+      />
+      <div class="right">
+        <a-dropdown>
+          <a-avatar :size="32">
+            <template #icon><UserOutlined /></template>
+          </a-avatar>
+          <template #overlay>
+            <a-menu>
+              <a-menu-item key="0">
+                <a href="#">未登录</a>
+              </a-menu-item>
+            </a-menu>
+          </template>
+        </a-dropdown>
+      </div>
     </section>
   </div>
 </template>
@@ -45,14 +61,21 @@ onUnmounted(() => {
 .content {
   max-width: 1200px;
   margin: 0 auto;
-  display: flex;
-  justify-content: space-between; /* 使左右两边对齐 */
+  display: grid; /* 使用 grid 布局 */
+  grid-template-columns: auto 1fr auto; /* 左侧、中间自适应、右侧 */
   align-items: center; /* 垂直居中 */
   height: 54px;
 }
 .left {
   display: flex;
-  align-items: center; /* 垂直居中 logo 和菜单 */
+  align-items: center; /* 垂直居中 logo */
+}
+.center-menu {
+  justify-self: center; /* 菜单在中间列中水平居中 */
+  width: 100%; /* 确保菜单占据中间列的全部宽度 */
+}
+.right {
+  justify-self: end; /* 右侧头像靠右对齐 */
 }
 .y-navbar {
   align-items: center;
@@ -91,10 +114,43 @@ onUnmounted(() => {
   font-size: 18px;
   margin-right: 20px;
 }
+.logo-img {
+  height: 32px; /* 调整 logo 大小 */
+  width: auto;
+}
 
-/* 确保菜单不换行，并在溢出时隐藏 */
+/* 确保菜单可以完全展开并居中 */
 .ant-menu-horizontal {
-  overflow: hidden;
-  white-space: nowrap;
+  /* 移除可能限制菜单展开的样式 */
+  /* overflow: hidden; */
+  /* white-space: nowrap; */
+  justify-content: center; /* 尝试让菜单项居中 */
+}
+
+/* 隐藏 Ant Design Vue 菜单选中项下方的蓝色边框 */
+.y-navbar :deep(.ant-menu-item::after) {
+  border-bottom-width: 0 !important;
+}
+
+.ant-menu {
+  border: 0;
+}
+
+/* 设置选中菜单项的底色块高度并居中 */
+.y-navbar :deep(.ant-menu-item) {
+  height: 38px !important;
+  user-select: none;
+  line-height: 38px !important; /* 确保文本垂直居中 */
+  display: flex !important; /* 使用 flex 布局 */
+  align-items: center !important; /* 垂直居中 */
+  justify-content: center !important; /* 水平居中 */
+  border-radius: var(--y-com-radius); /* 添加圆角，使色块更美观 */
+  transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.y-navbar :deep(.ant-menu-item-selected) {
+  background-color: #d2e5fe !important; /* 用户指定的背景颜色 */
+}
+.y-navbar :deep(.ant-menu-item-selected > span) {
+  color: #1677ff !important; /* 用户指定的文本颜色 */
 }
 </style>
