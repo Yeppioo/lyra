@@ -1,41 +1,36 @@
 <template>
   <div class="y-navbar" :class="{ 'y-navbar--scrolled': isScrolled }">
     <section class="content">
-      <div class="y-navbar__logo">Z-Player</div>
-      <a-menu
-        mode="horizontal"
-        :selectedKeys="[selectedKey]"
-        @click="onMenuClick"
-        class="y-navbar__menu"
-      >
-        <a-menu-item class="y-navbar__menu-item" v-for="item in navConfig" :key="item.path">
-          <router-link :to="item.path">
-            <i :class="item.icon" />
-            {{ item.name }}
-          </router-link>
-        </a-menu-item>
-      </a-menu>
+      <div class="left">
+        <div class="y-navbar__logo">Z-Player</div>
+        <a-menu
+          v-model:selectedKeys="current"
+          mode="horizontal"
+          @select="handleMenuSelect"
+          :items="items"
+        />
+      </div>
+      <div class="right"></div>
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import type { MenuProps } from 'ant-design-vue'
 import { navConfig } from '../router/nav.config'
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const route = useRoute()
-const selectedKey = ref(route.path)
-
+const current = ref<string[]>(['/'])
+const items = ref<MenuProps['items']>(navConfig)
 const isScrolled = ref(false)
-
-const onMenuClick = (e: any) => {
-  router.push(e.key)
-}
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 0
+}
+const handleMenuSelect = ({ key }: { key: string }) => {
+  router.push(key as string)
 }
 
 onMounted(() => {
@@ -51,9 +46,13 @@ onUnmounted(() => {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
+  justify-content: space-between; /* 使左右两边对齐 */
+  align-items: center; /* 垂直居中 */
   height: 54px;
-  flex-wrap: wrap;
-  align-content: center;
+}
+.left {
+  display: flex;
+  align-items: center; /* 垂直居中 logo 和菜单 */
 }
 .y-navbar {
   align-items: center;
@@ -90,14 +89,12 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   font-size: 18px;
-  margin-right: 32px;
-  margin-top: -4px;
-}
-.y-navbar__menu {
-  flex: 1;
-}
-.y-navbar__menu-item { 
-  user-select: none;
   margin-right: 20px;
+}
+
+/* 确保菜单不换行，并在溢出时隐藏 */
+.ant-menu-horizontal {
+  overflow: hidden;
+  white-space: nowrap;
 }
 </style>

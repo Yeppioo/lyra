@@ -1,23 +1,17 @@
-export interface NavItem {
-  name: string
-  path: string
-  icon: string[]
-}
+import type { MenuProps } from 'ant-design-vue'
+import { h } from 'vue'
 
-export const navConfig: NavItem[] = [
+export const navConfig: MenuProps['items'] = [
   {
-    name: '推荐',
-    path: '/',
-    icon: ['fas fa-compass'],
+    key: '/',
+    icon: () => h('i', { class: 'fas fa-compass' }),
+    label: '推荐',
+    title: '推荐',
   },
   {
-    name: '排行',
-    path: '/rank',
-    icon: ['fas fa-house'],
-  },
-  {
-    name: '我的',
-    path: '/my',
-    icon: ['fas fa-house'],
+    label: '排行',
+    title: '排行',
+    key: '/rank',
+    icon: () => h('i', { class: 'fas fa-compass' }),
   },
 ]
