@@ -5,6 +5,14 @@
         <div class="y-navbar__logo">
           <img src="../assets/logo.svg" alt="Z-Player Logo" class="logo-img" />
         </div>
+        <div class="nav-buttons">
+          <a-button type="text" @click="goBack">
+            <font-awesome-icon :icon="['fas', 'angle-left']" />
+          </a-button>
+          <a-button type="text" @click="goForward">
+            <font-awesome-icon :icon="['fas', 'angle-right']" />
+          </a-button>
+        </div>
       </div>
       <a-menu
         v-model:selectedKeys="current"
@@ -36,6 +44,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import type { MenuProps } from 'ant-design-vue'
 import { navConfig } from '../router/nav.config'
 import { useRouter } from 'vue-router'
+import { UserOutlined } from '@ant-design/icons-vue' // 导入 UserOutlined
 
 const router = useRouter()
 const current = ref<string[]>(['/'])
@@ -47,6 +56,13 @@ const handleScroll = () => {
 }
 const handleMenuSelect = ({ key }: { key: string }) => {
   router.push(key as string)
+}
+
+const goBack = () => {
+  router.back()
+}
+const goForward = () => {
+  router.forward()
 }
 
 onMounted(() => {
@@ -69,6 +85,15 @@ onUnmounted(() => {
 .left {
   display: flex;
   align-items: center; /* 垂直居中 logo */
+}
+.nav-buttons {
+  display: flex;
+  align-items: center;
+  margin-left: 10px; /* 按钮与 logo 之间的间距 */
+}
+.nav-buttons .ant-btn {
+  font-size: 18px; /* 调整按钮图标大小 */
+  padding: 0 8px; /* 调整按钮内边距 */
 }
 .center-menu {
   justify-self: center; /* 菜单在中间列中水平居中 */
@@ -112,7 +137,6 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   font-size: 18px;
-  margin-right: 20px;
 }
 .logo-img {
   height: 32px; /* 调整 logo 大小 */
@@ -146,6 +170,7 @@ onUnmounted(() => {
   justify-content: center !important; /* 水平居中 */
   border-radius: var(--y-com-radius); /* 添加圆角，使色块更美观 */
   transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box; /* 确保 padding 不会增加高度 */
 }
 .y-navbar :deep(.ant-menu-item-selected) {
   background-color: #d2e5fe !important; /* 用户指定的背景颜色 */
