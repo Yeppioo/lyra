@@ -1,13 +1,23 @@
 export interface NavItem {
   name: string
   path: string
-  icon: string
+  icon: string[]
 }
 
 export const navConfig: NavItem[] = [
   {
-    name: '首页',
+    name: '推荐',
     path: '/',
-    icon: 'fa-solid fa-house',
+    icon: ['fas fa-compass'],
+  },
+  {
+    name: '排行',
+    path: '/rank',
+    icon: ['fas fa-house'],
+  },
+  {
+    name: '我的',
+    path: '/my',
+    icon: ['fas fa-house'],
   },
 ]

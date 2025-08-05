@@ -1,6 +1,6 @@
 :root {
-  --y-com-corner-radius: 10px;
+  --y-com-radius: 10px;
   --y-nav-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --y-nav-radius: 10px;
   --y-bg: #e1eef9;
+  --y-nav-bg: #fff;
 }

@@ -1,11 +1,11 @@
-@import './themes/publuc.css';
 @import './base.css';
+@import '../../node_modules/@fortawesome/fontawesome-free/css/all.min.css';
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+@font-face {
+  font-family: ZhuZiAYuanJWD;
+  src: url(https://npm.elemecdn.com/anzhiyu-blog@1.1.6/fonts/ZhuZiAWan.woff2);
+  font-display: swap;
+  font-weight: lighter;
 }
 
 a,
@@ -16,21 +16,13 @@ a,
   padding: 3px;
 }
 
+* {
+  font-family: 'ZhuZiAYuanJWD';
+  color: #444444;
+}
+
 @media (hover: hover) {
   a:hover {
     background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
   }
 }
