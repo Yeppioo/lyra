@@ -23,6 +23,24 @@
       />
       <div class="right">
         <a-dropdown>
+          <a-button @click.prevent class="nav-button" type="text">
+            <font-awesome-icon :icon="['fas', 'caret-down']" />
+          </a-button>
+          <template #overlay>
+            <a-menu
+              v-model:selectedKeys="current"
+              mode="vertical"
+              @select="handleMenuSelect"
+            >
+              <template v-for="item in items" :key="item?.key as string">
+                <a-menu-item v-if="item && 'key' in item && 'label' in item && (item as any).type !== 'divider'" :key="item.key as string" @click="handleMenuSelect({ key: item.key as string })">
+                  {{ item.label }}
+                </a-menu-item>
+              </template>
+            </a-menu>
+          </template>
+        </a-dropdown>
+        <a-dropdown>
           <a-avatar :size="32">
             <template #icon><UserOutlined /></template>
           </a-avatar>
@@ -40,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import type { MenuProps } from 'ant-design-vue'
 import { navConfig } from '../router/nav.config'
 import { useRouter } from 'vue-router'
@@ -56,6 +74,7 @@ const handleScroll = () => {
 }
 const handleMenuSelect = ({ key }: { key: string }) => {
   router.push(key as string)
+  current.value = [key]
 }
 
 const goBack = () => {
@@ -67,7 +86,17 @@ const goForward = () => {
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
+  current.value = [router.currentRoute.value.path] // 在挂载时设置初始选中项
 })
+
+watch(
+  () => router.currentRoute.value.path,
+  (newPath) => {
+    current.value = [newPath] // 监听路由变化并更新选中项
+  },
+  { immediate: true } // 立即执行一次，确保初始状态正确
+)
+
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
 })
@@ -82,9 +111,14 @@ onUnmounted(() => {
   align-items: center; /* 垂直居中 */
   height: 54px;
 }
-.left {
+.left,
+.right {
   display: flex;
   align-items: center; /* 垂直居中 logo */
+}
+.nav-button {
+  padding: 0 7px;
+  margin-right: 12px;
 }
 .nav-buttons {
   display: flex;
@@ -177,5 +211,10 @@ onUnmounted(() => {
 }
 .y-navbar :deep(.ant-menu-item-selected > span) {
   color: #1677ff !important; /* 用户指定的文本颜色 */
+}
+@media (max-width: 435px) {
+  .center-menu {
+    display: none;
+  }
 }
 </style>
