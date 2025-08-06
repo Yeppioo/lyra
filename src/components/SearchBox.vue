@@ -19,17 +19,44 @@
     >
     </a-input-search>
   </div>
+
+  <a-modal
+    :open="showSearchIcon && isSearchExpanded"
+    :footer="null"
+    :closable="false"
+    :maskClosable="true"
+    @cancel="collapseSearch"
+    wrapClassName="full-screen-modal"
+  >
+    <a-input-search
+      placeholder="搜索..."
+      class="search-box"
+      style="width: 100%;"
+      ref="searchInputModal"
+      :bordered="false"
+      @blur="collapseSearch"
+    >
+    </a-input-search>
+  </a-modal>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { Modal } from 'ant-design-vue'
 
 const isSearchExpanded = ref(false)
 const showSearchIcon = ref(window.innerWidth < 530)
+const searchInput = ref<HTMLInputElement | null>(null)
+const searchInputModal = ref<HTMLInputElement | null>(null)
 
 const expandSearch = async () => {
   isSearchExpanded.value = true
   await nextTick()
+  if (showSearchIcon.value) {
+    searchInputModal.value?.focus()
+  } else {
+    searchInput.value?.focus()
+  }
 }
 
 const collapseSearch = () => {
@@ -39,6 +66,7 @@ const collapseSearch = () => {
 const handleResize = () => {
   showSearchIcon.value = window.innerWidth < 530
   if (window.innerWidth >= 530) {
+    isSearchExpanded.value = false
   }
 }
 
@@ -53,8 +81,36 @@ onUnmounted(() => {
 defineExpose({
   isSearchExpanded,
   collapseSearch,
+  searchInput,
+  searchInputModal,
 })
 </script>
+
+<style>
+.full-screen-modal {
+  top: 0;
+  left: 0;
+  padding: 0;
+  margin: 0;
+  max-width: 100vw;
+}
+
+.full-screen-modal .ant-modal-content {
+  height: 100vh;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--y-bg);
+}
+
+.full-screen-modal .ant-modal-body {
+  flex-grow: 1;
+  padding: 10px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+</style>
 
 <style scoped>
 .search-container {
