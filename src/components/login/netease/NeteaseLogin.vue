@@ -41,4 +41,16 @@ a {
   margin-top: 10px;
   user-select: none;
 }
+.netease-login-container :deep(.ant-btn-primary) {
+  background-color: #c1dbff;
+}
+[theme-dark] .netease-login-container :deep(.ant-btn-primary) {
+  background-color: #1074ff;
+}
+.netease-login-container :deep(.ant-btn-primary:hover) {
+  background-color: #d7e8ff;
+}
+[theme-dark] .netease-login-container :deep(.ant-btn-primary:hover) {
+  background-color: #3187ff;
+}
 </style>

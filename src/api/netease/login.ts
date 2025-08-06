@@ -1,7 +1,10 @@
 import { apiSettings } from '../config'
-const apiBase = apiSettings.neteaseApiBase
+const { neteaseApiBase: apiBase, realIP } = apiSettings
+const realIpParam = realIP ? `&realIP=${realIP}` : ''
 async function getQrCodeKey(): Promise<string> {
-  const response = await fetch(`${apiBase}/login/qr/key?timestamp=${Date.now()}`)
+  const response = await fetch(`${apiBase}/login/qr/key?timestamp=${Date.now()}${realIpParam}`, {
+    credentials: 'include',
+  })
   if (!response.ok) {
     throw new Error('Network response was not ok')
   }
@@ -11,7 +14,8 @@ async function getQrCodeKey(): Promise<string> {
 
 async function createQrCodeImage(key: string): Promise<string> {
   const response = await fetch(
-    `${apiBase}/login/qr/create?key=${key}&qrimg=true&timestamp=${Date.now()}`
+    `${apiBase}/login/qr/create?key=${key}&qrimg=true&timestamp=${Date.now()}${realIpParam}`,
+    { credentials: 'include' },
   )
   if (!response.ok) {
     throw new Error('Network response was not ok')
@@ -27,7 +31,12 @@ interface CheckQrCodeStatusResponse {
 }
 
 async function checkQrCodeStatus(key: string): Promise<CheckQrCodeStatusResponse> {
-  const response = await fetch(`${apiBase}/login/qr/check?key=${key}&timestamp=${Date.now()}`)
+  const response = await fetch(
+    `${apiBase}/login/qr/check?key=${key}&timestamp=${Date.now()}${realIpParam}`,
+    {
+      credentials: 'include',
+    },
+  )
   if (!response.ok) {
     // Netease API might return 502, handle it as a specific case if needed
     throw new Error(`Network response was not ok, status: ${response.status}`)
@@ -41,7 +50,10 @@ interface CaptchaResponse {
 }
 
 async function sendCaptcha(phone: string): Promise<CaptchaResponse> {
-  const response = await fetch(`${apiBase}/captcha/sent?phone=${phone}&timestamp=${Date.now()}`)
+  const response = await fetch(
+    `${apiBase}/captcha/sent?phone=${phone}&timestamp=${Date.now()}${realIpParam}`,
+    { credentials: 'include' },
+  )
   if (!response.ok) {
     throw new Error('Network response was not ok')
   }
@@ -56,15 +68,15 @@ interface LoginResponse {
 async function loginByCellphone(
   phone: string,
   captcha?: string,
-  password?: string
+  password?: string,
 ): Promise<LoginResponse> {
-  let url = `${apiBase}/login/cellphone?phone=${phone}&timestamp=${Date.now()}`
+  let url = `${apiBase}/login/cellphone?phone=${phone}&timestamp=${Date.now()}${realIpParam}`
   if (captcha) {
     url += `&captcha=${captcha}`
   } else if (password) {
     url += `&password=${password}`
   }
-  const response = await fetch(url)
+  const response = await fetch(url, { credentials: 'include' })
   if (!response.ok) {
     throw new Error(`Network response was not ok, status: ${response.status}`)
   }
@@ -76,5 +88,5 @@ export const functions = {
   createQrCodeImage,
   checkQrCodeStatus,
   sendCaptcha,
-  loginByCellphone
+  loginByCellphone,
 }

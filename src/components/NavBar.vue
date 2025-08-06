@@ -2,7 +2,7 @@
   <div class="y-navbar" :class="{ 'y-navbar--scrolled': isScrolled }">
     <section class="content">
       <div class="left">
-        <div class="y-navbar__logo">
+        <div @click="goHome" class="y-navbar__logo">
           <img src="../assets/img/logo.svg" alt="Lyra Logo" class="logo-img" />
         </div>
         <div class="nav-buttons">
@@ -145,6 +145,10 @@ const handleMenuSelect = ({ key }: { key: string }) => {
 const goBack = () => {
   router.back()
 }
+
+const goHome = () => {
+  router.push('/')
+}
 const goForward = () => {
   router.forward()
 }
@@ -168,6 +172,14 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.y-navbar__logo {
+  cursor: pointer;
+}
+@media (min-width: 640px) {
+  .y-navbar__logo:hover {
+    transform: scale(1.15);
+  }
+}
 .avatar {
   background: rgba(0, 0, 0, 0.06);
 }
