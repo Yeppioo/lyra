@@ -4,7 +4,7 @@
     :class="{ 'y-navbar--scrolled': isScrolled, 'search-expanded': isSearchExpanded }"
   >
     <section class="content">
-      <div class="left" :class="{ 'hidden-on-search': isSearchExpanded }">
+      <div class="left">
         <div @click="goHome" class="y-navbar__logo">
           <img src="../assets/img/logo.svg" alt="Lyra Logo" class="logo-img" />
         </div>
@@ -26,9 +26,10 @@
         :class="{ 'hidden-on-search': isSearchExpanded }"
       />
       <div class="right">
-        <div class="buttons">
+        <div class="buttons" :class="{ 'expanded-serch-container': isSearchExpanded }">
           <div class="search-container">
-            <a-button style="margin-right: 6px;"
+            <a-button
+              style="margin-right: 6px"
               v-if="showSearchIcon && !isSearchExpanded"
               @click="expandSearch"
               type="text"
@@ -43,14 +44,21 @@
               v-model:value="searchValue"
               :options="searchOptions"
               style="width: 200px"
-              placeholder="搜索..."
               :bordered="false"
+              :filter-option="filterOption"
               @select="onSelect"
               @search="onSearch"
               @blur="collapseSearch"
-            />
+            >
+              <a-input-search :bordered="false" placeholder="搜索..."></a-input-search>
+            </a-auto-complete>
           </div>
-          <a-button class="nav-button" @click="toggleTheme" type="text">
+          <a-button
+            class="nav-button"
+            @click="toggleTheme"
+            type="text"
+            :class="{ 'hidden-on-search': isSearchExpanded }"
+          >
             <font-awesome-icon
               :icon="['fas', 'sun']"
               v-if="settingsStore.settings.theme === 'light'"
@@ -60,7 +68,7 @@
               v-if="settingsStore.settings.theme === 'dark'"
             />
           </a-button>
-          <a-dropdown class="nav-button-root">
+          <a-dropdown class="nav-button-root" :class="{ 'hidden-on-search': isSearchExpanded }">
             <a-button @click.prevent class="nav-button" type="text">
               <font-awesome-icon :icon="['fas', 'caret-down']" />
             </a-button>
@@ -82,7 +90,7 @@
             </template>
           </a-dropdown>
         </div>
-        <a-dropdown>
+        <a-dropdown :class="{ 'hidden-on-search': isSearchExpanded }">
           <a-avatar :src="settingsStore.settings.userinfo.avatar" class="avatar" :size="32">
             <template #icon>
               <font-awesome-icon transform="up-1" :icon="['fas', 'user']" />
@@ -148,6 +156,7 @@ import { AutoComplete } from 'ant-design-vue'
 import { navConfig } from '../router/nav.config'
 import { useRouter } from 'vue-router'
 import { useSettingsStore } from '../stores/settings'
+import { functions as neteaseLoginApi } from '@/api/netease/hot'
 
 const router = useRouter()
 const settingsStore = useSettingsStore()
@@ -157,24 +166,28 @@ const isScrolled = ref(false)
 
 // Search related state
 const searchValue = ref('')
-const searchOptions = ref<{ value: string }[]>([])
+const searchOptions = ref<Option[]>([])
 const isSearchExpanded = ref(false)
 const showSearchIcon = ref(window.innerWidth < 490) // Initial check
 const searchInput = ref<InstanceType<typeof AutoComplete> | null>(null)
+const hotSearch: Option[] = []
 
 interface Focusable {
   focus: () => void
 }
-
+const filterOption = (input: string, option: Option) => {
+  return option.value.toUpperCase().indexOf(input.toUpperCase()) >= 0
+}
 const onSearch = (searchText: string) => {
-  // Mock search results
-  searchOptions.value = !searchText
-    ? []
-    : [{ value: searchText }, { value: searchText.repeat(2) }, { value: searchText.repeat(3) }]
+  searchOptions.value = !searchText ? hotSearch : hotSearch
+}
+interface Option {
+  value: string
 }
 
 const onSelect = (value: string) => {
-  console.log('onSelect', value)
+  searchValue.value = value
+  ;(searchInput.value as unknown as Focusable)?.focus()
 }
 
 const expandSearch = async () => {
@@ -220,10 +233,22 @@ const goForward = () => {
   router.forward()
 }
 
+const asyncInit = async () => {
+  const list = await neteaseLoginApi.getHotKeyword()
+
+  list.forEach((item) => {
+    hotSearch.push({
+      value: item.iconType === 0 ? item.searchWord : item.searchWord + ' Up',
+    })
+  })
+  searchOptions.value = hotSearch
+}
+
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
   window.addEventListener('resize', handleResize)
   current.value = [router.currentRoute.value.path] // 在挂载时设置初始选中项
+  asyncInit()
 })
 
 watch(
@@ -245,9 +270,13 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
 }
-
+.expanded-serch-container {
+  margin-right: -20px;
+  width: 100%;
+  margin-left: 25px;
+}
 .y-navbar.search-expanded .content {
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto 1fr; /* Logo auto, search box 1fr */
 }
 
 .y-navbar.search-expanded .right {
@@ -265,6 +294,9 @@ onUnmounted(() => {
 
 .hidden-on-search {
   display: none !important;
+}
+.y-navbar.search-expanded .left .nav-buttons {
+  display: none;
 }
 .y-navbar__logo {
   cursor: pointer;
@@ -348,6 +380,16 @@ onUnmounted(() => {
     border-radius 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     background 0.3s;
+}
+.y-navbar :deep(.ant-btn-default) {
+  background: transparent;
+  border: 0;
+  box-shadow: unset;
+}
+.y-navbar :deep(.ant-input-group-addon) {
+  background: transparent;
+  border: 0;
+  box-shadow: unset;
 }
 .search-box {
   margin-right: 10px;
