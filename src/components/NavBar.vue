@@ -46,6 +46,7 @@
               style="width: 200px"
               :bordered="false"
               :filter-option="filterOption"
+              :render-option="renderSearchOption"
               @select="onSelect"
               @search="onSearch"
               @blur="collapseSearch"
@@ -150,9 +151,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick, h } from 'vue'
 import type { MenuProps } from 'ant-design-vue'
 import { AutoComplete } from 'ant-design-vue'
+import type { VNode } from 'vue'
 import { navConfig } from '../router/nav.config'
 import { useRouter } from 'vue-router'
 import { useSettingsStore } from '../stores/settings'
@@ -176,13 +178,22 @@ interface Focusable {
   focus: () => void
 }
 const filterOption = (input: string, option: Option) => {
-  return option.value.toUpperCase().indexOf(input.toUpperCase()) >= 0
+  return option.word.toUpperCase().indexOf(input.toUpperCase()) >= 0
 }
+const renderSearchOption = (option: Option) => {
+  return option.label
+}
+
 const onSearch = (searchText: string) => {
-  searchOptions.value = !searchText ? hotSearch : hotSearch
+  searchOptions.value = !searchText
+    ? hotSearch
+    : hotSearch.filter((option) => option.word.toUpperCase().includes(searchText.toUpperCase()))
 }
 interface Option {
-  value: string
+  word: string
+  label?: VNode
+  rank?: number
+  iconType?: number
 }
 
 const onSelect = (value: string) => {
@@ -236,9 +247,27 @@ const goForward = () => {
 const asyncInit = async () => {
   const list = await neteaseLoginApi.getHotKeyword()
 
-  list.forEach((item) => {
+  list.forEach((item, index) => {
+    const rank = index + 1
+    const isTop3 = rank <= 3
+    const showIcon = item.iconType !== 0
+
     hotSearch.push({
-      value: item.iconType === 0 ? item.searchWord : item.searchWord + ' Up',
+      word: item.searchWord,
+      label: h('div', { class: 'hot-search-item' }, [
+        h('span',
+          {
+            class:
+              ['rank-number', { 'rank-top3': isTop3 }],
+              style: {
+                color: isTop3 ? '#F55E55' : ''
+              }
+          }, rank),
+        h('span', item.searchWord),
+        showIcon ? h('span', { class: 'icon-badge' }, 'Up') : null,
+      ]),
+      rank: rank,
+      iconType: item.iconType,
     })
   })
   searchOptions.value = hotSearch
@@ -474,5 +503,29 @@ onUnmounted(() => {
   .nav-button-root {
     display: unset;
   }
+}
+
+.hot-search-item {
+  display: flex;
+  align-items: center;
+}
+
+.rank-number {
+  margin-right: 8px;
+  font-weight: bold;
+  color: #999;
+}
+
+.y-navbar :deep(.rank-top3) {
+  color: red;
+}
+
+.icon-badge {
+  margin-left: 8px;
+  background-color: red;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
 }
 </style>
