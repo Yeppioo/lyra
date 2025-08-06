@@ -1,7 +1,10 @@
 <template>
-  <div class="y-navbar" :class="{ 'y-navbar--scrolled': isScrolled }">
+  <div
+    class="y-navbar"
+    :class="{ 'y-navbar--scrolled': isScrolled, 'search-expanded': isSearchExpanded }"
+  >
     <section class="content">
-      <div class="left">
+      <div class="left" :class="{ 'hidden-on-search': isSearchExpanded }">
         <div @click="goHome" class="y-navbar__logo">
           <img src="../assets/img/logo.svg" alt="Lyra Logo" class="logo-img" />
         </div>
@@ -20,9 +23,33 @@
         @select="handleMenuSelect"
         :items="items"
         class="center-menu"
+        :class="{ 'hidden-on-search': isSearchExpanded }"
       />
       <div class="right">
         <div class="buttons">
+          <div class="search-container">
+            <a-button style="margin-right: 6px;"
+              v-if="showSearchIcon && !isSearchExpanded"
+              @click="expandSearch"
+              type="text"
+              class="nav-button"
+            >
+              <font-awesome-icon :icon="['fas', 'search']" />
+            </a-button>
+            <a-auto-complete
+              class="search-box"
+              v-if="!showSearchIcon || isSearchExpanded"
+              ref="searchInput"
+              v-model:value="searchValue"
+              :options="searchOptions"
+              style="width: 200px"
+              placeholder="搜索..."
+              :bordered="false"
+              @select="onSelect"
+              @search="onSearch"
+              @blur="collapseSearch"
+            />
+          </div>
           <a-button class="nav-button" @click="toggleTheme" type="text">
             <font-awesome-icon
               :icon="['fas', 'sun']"
@@ -115,8 +142,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import type { MenuProps } from 'ant-design-vue'
+import { AutoComplete } from 'ant-design-vue'
 import { navConfig } from '../router/nav.config'
 import { useRouter } from 'vue-router'
 import { useSettingsStore } from '../stores/settings'
@@ -126,6 +154,45 @@ const settingsStore = useSettingsStore()
 const current = ref<string[]>(['/'])
 const items = ref<MenuProps['items']>(navConfig)
 const isScrolled = ref(false)
+
+// Search related state
+const searchValue = ref('')
+const searchOptions = ref<{ value: string }[]>([])
+const isSearchExpanded = ref(false)
+const showSearchIcon = ref(window.innerWidth < 490) // Initial check
+const searchInput = ref<InstanceType<typeof AutoComplete> | null>(null)
+
+interface Focusable {
+  focus: () => void
+}
+
+const onSearch = (searchText: string) => {
+  // Mock search results
+  searchOptions.value = !searchText
+    ? []
+    : [{ value: searchText }, { value: searchText.repeat(2) }, { value: searchText.repeat(3) }]
+}
+
+const onSelect = (value: string) => {
+  console.log('onSelect', value)
+}
+
+const expandSearch = async () => {
+  isSearchExpanded.value = true
+  await nextTick()
+  ;(searchInput.value as unknown as Focusable)?.focus()
+}
+
+const collapseSearch = () => {
+  isSearchExpanded.value = false
+}
+
+const handleResize = () => {
+  showSearchIcon.value = window.innerWidth < 490
+  if (window.innerWidth >= 490) {
+    isSearchExpanded.value = false // Collapse if window is resized to be larger
+  }
+}
 
 const toggleTheme = () => {
   const themes = ['light', 'dark']
@@ -155,6 +222,7 @@ const goForward = () => {
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
+  window.addEventListener('resize', handleResize)
   current.value = [router.currentRoute.value.path] // 在挂载时设置初始选中项
 })
 
@@ -168,10 +236,36 @@ watch(
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('resize', handleResize)
 })
 </script>
 
 <style scoped>
+.search-container {
+  display: flex;
+  align-items: center;
+}
+
+.y-navbar.search-expanded .content {
+  grid-template-columns: 1fr auto;
+}
+
+.y-navbar.search-expanded .right {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.y-navbar.search-expanded .search-container {
+  flex-grow: 1;
+}
+
+.y-navbar.search-expanded .search-container .ant-select {
+  width: 100% !important;
+}
+
+.hidden-on-search {
+  display: none !important;
+}
 .y-navbar__logo {
   cursor: pointer;
 }
@@ -196,6 +290,7 @@ onUnmounted(() => {
   grid-template-columns: auto 1fr auto; /* 左侧、中间自适应、右侧 */
   align-items: center; /* 垂直居中 */
   height: 54px;
+  transition: grid-template-columns 0.3s ease;
 }
 .left,
 .right {
@@ -254,7 +349,12 @@ onUnmounted(() => {
     box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     background 0.3s;
 }
-
+.search-box {
+  margin-right: 10px;
+  margin-top: 1px;
+  border-radius: var(--y-com-radius);
+  background: var(--y-com-highlight-bg);
+}
 .y-navbar--scrolled {
   /* top: 15px;
   margin: 0 15px;
@@ -325,7 +425,7 @@ onUnmounted(() => {
 [theme-dark] .y-navbar :deep(.ant-menu-item-selected > svg) {
   fill: #81bbfd !important; /* 用户指定的文本颜色 */
 }
-@media (max-width: 450px) {
+@media (max-width: 768px) {
   .center-menu {
     display: none;
   }

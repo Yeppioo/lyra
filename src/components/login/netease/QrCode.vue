@@ -19,14 +19,14 @@ import { message } from 'ant-design-vue'
 import { functions as neteaseLoginApi } from '@/api/netease/login'
 import { useSettingsStore } from '@/stores/settings'
 
-import { LoadingOutlined } from '@ant-design/icons-vue';
-import { h } from 'vue';
+import { LoadingOutlined } from '@ant-design/icons-vue'
+import { h } from 'vue'
 const indicator = h(LoadingOutlined, {
   style: {
     fontSize: '24px',
   },
   spin: true,
-});
+})
 
 const qrImg = ref(' ') // Initial non-empty value to show loader
 const statusText = ref('请使用网易云音乐APP扫码登录')
