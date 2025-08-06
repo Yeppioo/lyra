@@ -3,7 +3,7 @@
     <section class="content">
       <div class="left">
         <div class="y-navbar__logo">
-          <img src="../assets/logo.svg" alt="Z-Player Logo" class="logo-img" />
+          <img src="../assets/logo.svg" alt="Lyra Logo" class="logo-img" />
         </div>
         <div class="nav-buttons">
           <a-button type="text" @click="goBack">
