@@ -9,11 +9,13 @@
 }
 
 body {
+  overflow-x: hidden;
   min-height: 100vh;
   color: var(--color-text);
   background: var(--y-bg);
   line-height: 1.6;
-  font-family:
+  /* font-family:
+    'HarmonyOS_Regular',
     Inter,
     -apple-system,
     BlinkMacSystemFont,
@@ -25,11 +27,15 @@ body {
     'Fira Sans',
     'Droid Sans',
     'Helvetica Neue',
-    sans-serif;
+    sans-serif; */
   font-size: 15px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  min-height: 100vh;
 }
 
 /* 全局滚动条美化 */

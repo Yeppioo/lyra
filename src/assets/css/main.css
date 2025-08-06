@@ -1,12 +1,13 @@
 @import './themes/public.css';
 @import './base.css';
+@import './hm_font.css';
 
-@font-face {
+/* @font-face {
   font-family: ZhuZiAYuanJWD;
   src: url(https://npm.elemecdn.com/anzhiyu-blog@1.1.6/fonts/ZhuZiAWan.woff2);
   font-display: swap;
   font-weight: lighter;
-}
+} */
 
 a,
 .green {
@@ -17,7 +18,7 @@ a,
 }
 
 * {
-  font-family: 'ZhuZiAYuanJWD';
+  font-family: 'HarmonyOS_Regular';
   color: var(--y-text);
   transition: 0.3s;
 }

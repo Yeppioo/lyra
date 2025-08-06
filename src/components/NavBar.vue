@@ -3,7 +3,7 @@
     <section class="content">
       <div class="left">
         <div class="y-navbar__logo">
-          <img src="../assets/logo.svg" alt="Lyra Logo" class="logo-img" />
+          <img src="../assets/img/logo.svg" alt="Lyra Logo" class="logo-img" />
         </div>
         <div class="nav-buttons">
           <a-button type="text" @click="goBack">
@@ -92,15 +92,15 @@
               </div>
               <a-divider style="margin: 4px 0" />
               <a-menu-item style="padding: 7px 12px" @click="handleMenuSelect({ key: 'login' })">
-                <font-awesome-icon :icon="['fas', 'arrow-right-to-bracket']" />
+                <font-awesome-icon style="margin-right: 7px" :icon="['fas', 'key']" />
                 登录账户
               </a-menu-item>
               <a-menu-item style="padding: 7px 12px" @click="handleMenuSelect({ key: 'settings' })">
-                <font-awesome-icon :icon="['fas', 'gear']" />
+                <font-awesome-icon style="margin-right: 7px" :icon="['fas', 'gear']" />
                 全局设置
               </a-menu-item>
               <a-menu-item style="padding: 7px 12px" @click="handleMenuSelect({ key: 'about' })">
-                <font-awesome-icon :icon="['fas', 'circle-info']" />
+                <font-awesome-icon style="margin-right: 7px" :icon="['fas', 'circle-info']" />
                 关于本站
               </a-menu-item>
             </a-menu>
