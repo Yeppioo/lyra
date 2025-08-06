@@ -1,7 +1,7 @@
 <template>
   <div class="search-container">
     <a-button
-      style="margin-right: 6px"
+      style="margin-right: 6px; padding: 0 7px"
       v-if="showSearchIcon && !isSearchExpanded"
       @click="expandSearch"
       type="text"
@@ -11,8 +11,9 @@
     </a-button>
     <a-input-search
       placeholder="搜索..."
-      class="search-box" style="width: calc(100% - 20px);"
-      v-if="!showSearchIcon || isSearchExpanded"
+      class="search-box"
+      style="width: calc(100% - 20px)"
+      v-if="!showSearchIcon"
       ref="searchInput"
       :bordered="false"
       @blur="collapseSearch"
@@ -23,18 +24,16 @@
   <a-modal
     :open="showSearchIcon && isSearchExpanded"
     :footer="null"
-    :closable="false"
-    :maskClosable="true"
+    :closable="true"
     @cancel="collapseSearch"
     wrapClassName="full-screen-modal"
-  >
+    ><span style="font-size: 17px; margin-top: -5px">搜索</span>
     <a-input-search
       placeholder="搜索..."
       class="search-box"
-      style="width: 100%;"
+      style="width: 100%; margin: 0; margin-top: 10px"
       ref="searchInputModal"
       :bordered="false"
-      @blur="collapseSearch"
     >
     </a-input-search>
   </a-modal>
@@ -42,7 +41,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import { Modal } from 'ant-design-vue'
 
 const isSearchExpanded = ref(false)
 const showSearchIcon = ref(window.innerWidth < 530)
@@ -87,12 +85,25 @@ defineExpose({
 </script>
 
 <style>
+.full-screen-modal > div {
+  width: 100vw;
+  overflow: hidden;
+  top: 54px !important;
+  border-radius: var(--y-com-radius);
+  margin: 16px;
+  height: calc(100vh - 86px);
+}
 .full-screen-modal {
   top: 0;
   left: 0;
   padding: 0;
   margin: 0;
-  max-width: 100vw;
+  overflow: hidden !important;
+  width: 100vw;
+}
+.nav-button {
+  padding: 0 7px;
+  margin-right: 2px;
 }
 
 .full-screen-modal .ant-modal-content {
@@ -105,10 +116,10 @@ defineExpose({
 
 .full-screen-modal .ant-modal-body {
   flex-grow: 1;
-  padding: 10px;
   display: flex;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: flex-start;
+  flex-direction: column;
 }
 </style>
 
@@ -132,5 +143,16 @@ defineExpose({
   margin-top: 1px;
   border-radius: var(--y-com-radius);
   background: var(--y-com-highlight-bg);
+}
+
+.search-box :deep(.ant-input-group-addon) {
+  background: transparent;
+}
+.search-box :deep(.ant-btn-default) {
+  background: transparent;
+  border: 0;
+}
+.search-box :deep(input) {
+  border: 0;
 }
 </style>
