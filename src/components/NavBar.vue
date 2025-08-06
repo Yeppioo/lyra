@@ -22,32 +22,86 @@
         class="center-menu"
       />
       <div class="right">
-        <a-dropdown>
-          <a-button @click.prevent class="nav-button" type="text">
-            <font-awesome-icon :icon="['fas', 'caret-down']" />
+        <div class="buttons">
+          <a-button class="nav-button" @click="toggleTheme" type="text">
+            <font-awesome-icon
+              :icon="['fas', 'sun']"
+              v-if="settingsStore.settings.theme === 'light'"
+            />
+            <font-awesome-icon
+              :icon="['fas', 'moon']"
+              v-if="settingsStore.settings.theme === 'dark'"
+            />
           </a-button>
-          <template #overlay>
-            <a-menu
-              v-model:selectedKeys="current"
-              mode="vertical"
-              @select="handleMenuSelect"
-            >
-              <template v-for="item in items" :key="item?.key as string">
-                <a-menu-item v-if="item && 'key' in item && 'label' in item && (item as any).type !== 'divider'" :key="item.key as string" @click="handleMenuSelect({ key: item.key as string })">
-                  {{ item.label }}
-                </a-menu-item>
-              </template>
-            </a-menu>
-          </template>
-        </a-dropdown>
+          <a-dropdown class="nav-button-root">
+            <a-button @click.prevent class="nav-button" type="text">
+              <font-awesome-icon :icon="['fas', 'caret-down']" />
+            </a-button>
+            <template #overlay>
+              <a-menu v-model:selectedKeys="current" mode="vertical" @select="handleMenuSelect">
+                <template v-for="item in items" :key="item?.key as string">
+                  <a-menu-item
+                    v-if="
+                      item && 'key' in item && 'label' in item && (item as any).type !== 'divider'
+                    "
+                    :key="item.key as string"
+                    @click="handleMenuSelect({ key: item.key as string })"
+                  >
+                    <component :is="(item as any).icon" v-if="(item as any).icon" />
+                    {{ item.label }}
+                  </a-menu-item>
+                </template>
+              </a-menu>
+            </template>
+          </a-dropdown>
+        </div>
         <a-dropdown>
-          <a-avatar :size="32">
-            <template #icon><UserOutlined /></template>
+          <a-avatar :src="settingsStore.settings.userinfo.avatar" class="avatar" :size="32">
+            <template #icon>
+              <font-awesome-icon transform="up-1" :icon="['fas', 'user']" />
+            </template>
           </a-avatar>
           <template #overlay>
             <a-menu>
-              <a-menu-item key="0">
-                <a href="#">未登录</a>
+              <div style="display: flex">
+                <a-avatar
+                  style="margin: 10px"
+                  :src="settingsStore.settings.userinfo.avatar"
+                  class="avatar"
+                  :size="38"
+                >
+                  <template #icon>
+                    <font-awesome-icon transform="up-1" :icon="['fas', 'user']" />
+                  </template>
+                </a-avatar>
+                <div
+                  style="
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    margin-right: 20px;
+                  "
+                >
+                  <span style="font-size: 14px; margin-bottom: -3px">
+                    {{ settingsStore.settings.userinfo.username }}
+                  </span>
+                  <span style="font-size: 12px; color: var(--y-color-gray)">
+                    {{ settingsStore.settings.userinfo.usernameLabel }}
+                  </span>
+                </div>
+              </div>
+              <a-divider style="margin: 4px 0" />
+              <a-menu-item style="padding: 7px 12px" @click="handleMenuSelect({ key: 'login' })">
+                <font-awesome-icon :icon="['fas', 'arrow-right-to-bracket']" />
+                登录账户
+              </a-menu-item>
+              <a-menu-item style="padding: 7px 12px" @click="handleMenuSelect({ key: 'settings' })">
+                <font-awesome-icon :icon="['fas', 'gear']" />
+                全局设置
+              </a-menu-item>
+              <a-menu-item style="padding: 7px 12px" @click="handleMenuSelect({ key: 'about' })">
+                <font-awesome-icon :icon="['fas', 'circle-info']" />
+                关于本站
               </a-menu-item>
             </a-menu>
           </template>
@@ -62,12 +116,20 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import type { MenuProps } from 'ant-design-vue'
 import { navConfig } from '../router/nav.config'
 import { useRouter } from 'vue-router'
-import { UserOutlined } from '@ant-design/icons-vue' // 导入 UserOutlined
+import { useSettingsStore } from '../stores/settings'
 
 const router = useRouter()
+const settingsStore = useSettingsStore()
 const current = ref<string[]>(['/'])
 const items = ref<MenuProps['items']>(navConfig)
 const isScrolled = ref(false)
+
+const toggleTheme = () => {
+  const themes = ['light', 'dark']
+  const currentIndex = themes.indexOf(settingsStore.settings.theme)
+  const nextIndex = (currentIndex + 1) % themes.length
+  settingsStore.settings.theme = themes[nextIndex] as 'light' | 'dark'
+}
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 0
@@ -94,7 +156,7 @@ watch(
   (newPath) => {
     current.value = [newPath] // 监听路由变化并更新选中项
   },
-  { immediate: true } // 立即执行一次，确保初始状态正确
+  { immediate: true }, // 立即执行一次，确保初始状态正确
 )
 
 onUnmounted(() => {
@@ -103,6 +165,15 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.avatar {
+  background: rgba(0, 0, 0, 0.06);
+}
+[theme-dark] .avatar {
+  background: rgba(255, 255, 255, 0.12);
+}
+.ant-menu-root {
+  background: transparent;
+}
 .content {
   max-width: 1200px;
   margin: 0 auto;
@@ -118,12 +189,20 @@ onUnmounted(() => {
 }
 .nav-button {
   padding: 0 7px;
-  margin-right: 12px;
+  margin-right: 2px;
 }
 .nav-buttons {
   display: flex;
   align-items: center;
   margin-left: 10px; /* 按钮与 logo 之间的间距 */
+}
+.nav-button-root {
+  display: none;
+}
+.buttons {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
 }
 .nav-buttons .ant-btn {
   font-size: 18px; /* 调整按钮图标大小 */
@@ -137,6 +216,7 @@ onUnmounted(() => {
   justify-self: end; /* 右侧头像靠右对齐 */
 }
 .y-navbar {
+  user-select: none;
   align-items: center;
   background: var(--y-nav-bg);
   box-shadow: none;
@@ -156,7 +236,7 @@ onUnmounted(() => {
     width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     border-radius 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background 0.3s;
 }
 
 .y-navbar--scrolled {
@@ -203,18 +283,40 @@ onUnmounted(() => {
   align-items: center !important; /* 垂直居中 */
   justify-content: center !important; /* 水平居中 */
   border-radius: var(--y-com-radius); /* 添加圆角，使色块更美观 */
-  transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box; /* 确保 padding 不会增加高度 */
 }
-.y-navbar :deep(.ant-menu-item-selected) {
-  background-color: #d2e5fe !important; /* 用户指定的背景颜色 */
+
+.y-navbar :deep(.ant-menu-item:hover) {
+  background-color: rgba(0, 0, 0, 0.06) !important;
 }
-.y-navbar :deep(.ant-menu-item-selected > span) {
+[theme-dark] .y-navbar :deep(.ant-menu-item:hover) {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+}
+.y-navbar :deep(.ant-menu-item-selected:hover),
+.y-navbar :deep(.ant-menu-item-selected) {
+  background-color: #d2e5fe !important;
+}
+[theme-dark] .y-navbar :deep(.ant-menu-item-selected:hover),
+[theme-dark] .y-navbar :deep(.ant-menu-item-selected) {
+  background-color: #232d3e !important;
+}
+.y-navbar :deep(.ant-menu-item-selected > span),
+.y-navbar :deep(.ant-menu-item-selected > svg > path) {
   color: #1677ff !important; /* 用户指定的文本颜色 */
 }
-@media (max-width: 435px) {
+[theme-dark] .y-navbar :deep(.ant-menu-item-selected > span),
+[theme-dark] .y-navbar :deep(.ant-menu-item-selected > svg > path) {
+  color: #81bbfd !important; /* 用户指定的文本颜色 */
+}
+[theme-dark] .y-navbar :deep(.ant-menu-item-selected > svg) {
+  fill: #81bbfd !important; /* 用户指定的文本颜色 */
+}
+@media (max-width: 450px) {
   .center-menu {
     display: none;
+  }
+  .nav-button-root {
+    display: unset;
   }
 }
 </style>

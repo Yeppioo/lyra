@@ -1,10 +1,17 @@
-import type { MenuProps } from 'ant-design-vue'
-import { h } from 'vue'
+import { h, type VNode } from 'vue'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-export const navConfig: MenuProps['items'] = [
+export interface NavItem {
+  key: string
+  label: string
+  title: string
+  icon: () => VNode
+}
+
+export const navConfig: NavItem[] = [
   {
     key: '/',
-    icon: () => h('i', { class: 'fas fa-compass' }),
+    icon: () => h(FontAwesomeIcon, { icon: ['fas', 'compass'] }),
     label: '推荐',
     title: '推荐',
   },
@@ -12,6 +19,6 @@ export const navConfig: MenuProps['items'] = [
     label: '排行',
     title: '排行',
     key: '/rank',
-    icon: () => h('i', { class: 'fas fa-compass' }),
+    icon: () => h(FontAwesomeIcon, { icon: ['fas', 'ranking-star'] }),
   },
 ]

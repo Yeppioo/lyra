@@ -1,5 +1,5 @@
+@import './themes/public.css';
 @import './base.css';
-@import '../../node_modules/@fortawesome/fontawesome-free/css/all.min.css';
 
 @font-face {
   font-family: ZhuZiAYuanJWD;
@@ -12,13 +12,14 @@ a,
 .green {
   text-decoration: none;
   color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
+  transition: 0.3s;
   padding: 3px;
 }
 
 * {
   font-family: 'ZhuZiAYuanJWD';
-  color: #444444;
+  color: var(--y-text);
+  transition: 0.3s;
 }
 
 @media (hover: hover) {

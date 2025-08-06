@@ -1,2 +1,5 @@
-[data-theme-light] :root {
+:root {
+  --y-bg: #e1eef9;
+  --y-nav-bg: #fff;
+  --y-text: #444;
 }

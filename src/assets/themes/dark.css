@@ -1,2 +1,5 @@
-[data-theme-dark] :root {
+[theme-dark]:root {
+  --y-bg: #16161a;
+  --y-nav-bg: #242629;
+  --y-text: #c9cdd4;
 }

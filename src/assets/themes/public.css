@@ -1,6 +1,8 @@
+@import './light.css';
+@import './dark.css';
+
 :root {
   --y-com-radius: 10px;
   --y-nav-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --y-bg: #e1eef9;
-  --y-nav-bg: #fff;
+  --y-color-gray: #767c82;
 }
