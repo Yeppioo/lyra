@@ -1,6 +1,7 @@
 @import './themes/public.css';
 @import './base.css';
 @import './hm_font.css';
+@import './components/segmented-menu.css';
 
 /* @font-face {
   font-family: ZhuZiAYuanJWD;
@@ -22,9 +23,11 @@ a,
   color: var(--y-text);
   transition: 0.3s;
 }
-
+.ant-input {
+  font-family: 'HarmonyOS_Regular' !important;
+}
 @media (hover: hover) {
   a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
+    color: hsla(160, 100%, 37%, 0.8);
   }
 }

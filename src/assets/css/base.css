@@ -36,6 +36,7 @@ body {
 
 #app {
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* 全局滚动条美化 */

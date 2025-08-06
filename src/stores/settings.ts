@@ -5,9 +5,15 @@ export interface SettingsState {
   theme: 'light' | 'dark'
   volume: number
   userinfo: {
-    username: string
-    avatar: string
-    usernameLabel: string
+    username: string | null
+    avatar: string | null
+    usernameLabel: string | null
+    netease: {
+      phone: string | null
+      email: string | null
+      password: string | null
+      cookie: string | null
+    }
   }
 }
 
@@ -17,7 +23,13 @@ const defaultSettings: SettingsState = {
   userinfo: {
     username: '未登录',
     usernameLabel: '登录使用完整功能',
-    avatar: '',
+    avatar: null,
+    netease: {
+      phone: null,
+      email: null,
+      password: null,
+      cookie: null,
+    },
   },
 }
 

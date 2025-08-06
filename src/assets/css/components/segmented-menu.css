@@ -1,0 +1,32 @@
+.y-segmented-menu {
+  user-select: none;
+  border-bottom: none;
+  border-radius: var(--y-com-radius);
+  background: var(--y-com-bg);
+  height: 40px;
+  line-height: 40px;
+  padding: 0 4px;
+  transition: all 0.3s;
+  align-items: center;
+}
+
+.y-segmented-menu .ant-menu-item {
+  border-radius: 4px;
+  height: 32px;
+  line-height: 32px;
+  margin-top: 4px;
+}
+.y-segmented-menu > .ant-menu-item::after {
+  border-bottom-width: 0 !important;
+}
+.y-segmented-menu > .ant-menu-item {
+  margin-top: 3px;
+  border-radius: calc(var(--y-com-radius) - 2px) !important;
+}
+.y-segmented-menu > .ant-menu-item-selected {
+  background-color: var(--y-com-highlight-bg) !important;
+}
+
+.y-segmented-menu > .ant-menu-item-selected::after {
+  border-bottom: none !important;
+}

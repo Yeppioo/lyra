@@ -18,12 +18,17 @@ const theme = computed(() => {
 <template>
   <ConfigProvider :theme="theme">
     <NavBar />
-    <RouterView />
+    <div id="view">
+      <RouterView />
+    </div>
   </ConfigProvider>
 </template>
 
 <style scoped>
 html {
   background: var(--y-bg);
+}
+#view {
+  margin-top: 54px;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <a-flex class="container" justify="center" align="center">
+  <a-flex class="login-container" justify="center" align="center">
     <a-flex :style="{ marginTop: '65px' }" vertical align="center">
       <img id="logo" src="/src/assets/img/logo.svg" alt="Logo" />
       <span id="title">登录 Lyra</span>
@@ -7,7 +7,7 @@
         v-model:selectedKeys="current"
         mode="horizontal"
         :items="items"
-        class="provider-menu"
+        class="y-segmented-menu"
       />
       <div class="login-component-container">
         <component :is="selectedComponent" />
@@ -53,8 +53,10 @@ const selectedComponent = computed(() => {
   height: 80px;
   margin-bottom: 20px;
 }
-.container {
+.login-container {
   width: 100%;
+  align-items: start;
+  margin-bottom: 20px;
 }
 #title {
   user-select: none;
@@ -65,36 +67,5 @@ const selectedComponent = computed(() => {
 }
 .login-component-container {
   margin-top: 20px;
-}
-.provider-menu {
-  user-select: none;
-  border-bottom: none;
-  border-radius: var(--y-com-radius);
-  background: var(--y-com-bg);
-  height: 40px;
-  line-height: 40px;
-  padding: 0 4px;
-  transition: all 0.3s;
-}
-
-.provider-menu :deep(.ant-menu-item) {
-  border-radius: 4px;
-  height: 32px;
-  line-height: 32px;
-  margin-top: 4px;
-}
-.container :deep(.ant-menu-item::after) {
-  border-bottom-width: 0 !important;
-}
-.container :deep(.ant-menu-item) {
-  margin-top: 3px;
-  border-radius: calc(var(--y-com-radius) - 2px);
-}
-.provider-menu :deep(.ant-menu-item-selected) {
-  background-color: var(--y-com-highlight-bg);
-}
-
-.provider-menu :deep(.ant-menu-item-selected::after) {
-  border-bottom: none !important;
 }
 </style>

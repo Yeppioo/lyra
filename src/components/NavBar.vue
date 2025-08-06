@@ -91,7 +91,10 @@
                 </div>
               </div>
               <a-divider style="margin: 4px 0" />
-              <a-menu-item style="padding: 7px 12px" @click="handleMenuSelect({ key: 'login' })">
+              <a-menu-item
+                style="padding: 7px 12px"
+                @click="handleMenuSelect({ key: '/auth/login' })"
+              >
                 <font-awesome-icon style="margin-right: 7px" :icon="['fas', 'key']" />
                 登录账户
               </a-menu-item>
@@ -216,11 +219,12 @@ onUnmounted(() => {
   justify-self: end; /* 右侧头像靠右对齐 */
 }
 .y-navbar {
+  position: fixed;
+
   user-select: none;
   align-items: center;
   background: var(--y-nav-bg);
   box-shadow: none;
-  position: sticky;
   top: 0;
   left: 0;
   right: 0;
@@ -240,12 +244,10 @@ onUnmounted(() => {
 }
 
 .y-navbar--scrolled {
-  position: fixed;
-  top: 15px;
-  left: 15px;
-  right: 15px;
+  /* top: 15px;
+  margin: 0 15px;
   width: auto;
-  border-radius: 12px;
+  border-radius: 12px; */
 }
 .y-navbar__logo {
   display: flex;
