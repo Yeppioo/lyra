@@ -336,12 +336,7 @@ onUnmounted(() => {
   border: 0;
   box-shadow: unset;
 }
-.search-box {
-  margin-right: 10px;
-  margin-top: 1px;
-  border-radius: var(--y-com-radius);
-  background: var(--y-com-highlight-bg);
-}
+
 .y-navbar--scrolled {
   /* top: 15px;
   margin: 0 15px;

@@ -4,6 +4,7 @@ import { ref, watch } from 'vue';
 export interface SettingsState {
   theme: 'light' | 'dark';
   volume: number;
+  searchHistory: string[];
   userinfo: {
     username: string | null;
     avatar: string | null;
@@ -20,6 +21,7 @@ export interface SettingsState {
 const defaultSettings: SettingsState = {
   theme: 'light',
   volume: 0.8,
+  searchHistory: [],
   userinfo: {
     username: '未登录',
     usernameLabel: '登录使用完整功能',

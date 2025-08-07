@@ -41,18 +41,17 @@ body {
 
 /* 全局滚动条美化 */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 5px;
   height: 8px;
-  background: #fff;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: #3390ff;
   border-radius: 8px;
-  border: 2px solid #e8ebf7; /* 与底色区分，形成包裹感 */
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #1976d2;
 }
 ::-webkit-scrollbar-corner {
-  background: #e1eef9;
+  background: transparent;
 }
