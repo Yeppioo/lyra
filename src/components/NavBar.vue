@@ -101,7 +101,7 @@
                     justify-content: center;
                     margin-right: 20px;
                   ">
-                  <span style="font-size: 14px; margin-bottom: -3px">
+                  <span style="font-size: 14px; margin-bottom: -3px; color: var(--y-text)">
                     {{ settingsStore.settings.userinfo.username }}
                   </span>
                   <span style="font-size: 12px; color: var(--y-color-gray)">
