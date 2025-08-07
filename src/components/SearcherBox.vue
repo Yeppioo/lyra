@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { h, onMounted, ref } from 'vue';
 import type { VNode } from 'vue';
-import {  functions as neteaseLoginApi } from '@/api/netease/hot';
+import { functions as neteaseLoginApi } from '@/api/netease/hot';
 import type { Input } from 'ant-design-vue';
 
 const hotSearch: Option[] = [];
@@ -29,9 +29,9 @@ const renderSearchOption = (option: Option) => {
   return option.label;
 };
 
-const focusInput = () => {
+function focusInput() {
   (searchInput.value as unknown as Focusable)?.focus();
-};
+}
 
 const onSearch = (searchText: string) => {
   searchOptions.value = !searchText
@@ -88,7 +88,8 @@ const asyncInit = async () => {
   searchOptions.value = hotSearch;
 };
 
-export  = {
+// 暴露方法给父组件调用
+defineExpose({
   focusInput,
-};
+});
 </script>

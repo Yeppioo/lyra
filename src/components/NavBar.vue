@@ -34,7 +34,10 @@
               class="nav-button">
               <font-awesome-icon :icon="['fas', 'search']" />
             </a-button>
-            <SearcherBox v-if="!showSearchIcon || isSearchExpanded" @blur="collapseSearch" />
+            <SearcherBox
+              ref="searchInput"
+              v-if="!showSearchIcon || isSearchExpanded"
+              @blur="collapseSearch" />
           </div>
           <a-button
             class="nav-button"
@@ -138,6 +141,7 @@ const settingsStore = useSettingsStore();
 const current = ref<string[]>(['/']);
 const items = ref<MenuProps['items']>(navConfig);
 const isScrolled = ref(false);
+const searchInput = ref<InstanceType<typeof SearcherBox> | null>(null);
 
 const isSearchExpanded = ref(false);
 const showSearchIcon = ref(window.innerWidth < 590);
@@ -150,6 +154,7 @@ const handleMenuSelect = ({ key }: { key: string }) => {
 const expandSearch = async () => {
   isSearchExpanded.value = true;
   await nextTick();
+  searchInput.value?.focusInput();
 };
 
 const collapseSearch = () => {
