@@ -137,7 +137,7 @@ import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import type { MenuProps } from 'ant-design-vue';
 import { navConfig } from '../router/nav.config';
 import { useRouter } from 'vue-router';
-import { useSettingsStore } from '../stores/settings';
+import { useSettingsStore } from '../constant/settings';
 import SearcherBox from './SearcherBox.vue';
 
 const router = useRouter();

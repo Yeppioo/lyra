@@ -2,7 +2,11 @@
   <a-row :gutter="[16, 16]">
     <!-- 大块 -->
     <a-col :xs="24" :md="12">
-      <div class="grid-item large-item">1</div>
+      <div
+        class="grid-item large-item"
+        :style="{ backgroundImage: uiProperties.personalized.song30[0]?.pic }">
+        1
+      </div>
     </a-col>
     <!-- 右侧/下方的小块容器 -->
     <a-col :xs="24" :md="12">
@@ -29,6 +33,12 @@
 
 <script setup lang="ts">
 import { Row as ARow, Col as ACol } from 'ant-design-vue';
+import { useUIPropertiesStore } from '../../constant/uiProperties';
+import { storeToRefs } from 'pinia';
+
+const uiPropertiesStore = useUIPropertiesStore();
+const { uiProperties } = storeToRefs(uiPropertiesStore);
+uiPropertiesStore.fetchPersonalizedSongs();
 </script>
 
 <style scoped>

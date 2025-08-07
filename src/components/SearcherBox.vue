@@ -1,11 +1,12 @@
 <template>
   <a-popover placement="bottomLeft" trigger="focus">
     <a-input-search
-      :placeholder="defaultKey.show"
+      :placeholder="uiProperties.defaultSearchKey.show"
       class="search-box"
       ref="searchInput"
       v-model:value="searchValue"
       :bordered="false"
+      @focus="onFocus"
       @change="onChange"
       @search="onSearch">
     </a-input-search
@@ -83,13 +84,16 @@
   >
 </template>
 <script setup lang="ts">
-import { useSettingsStore } from '../stores/settings';
-import { onMounted, ref, type VNode, h } from 'vue';
-import { functions as neteaseLoginApi } from '@/api/netease/search';
+import { useSettingsStore } from '../constant/settings';
+import { onMounted, ref, h } from 'vue';
+import { functions as neteaseSearchApi } from '@/api/netease/search';
 import { type Input } from 'ant-design-vue';
 import debounce from '@/utils/debounce';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { message } from 'ant-design-vue';
+import { useUIPropertiesStore } from '../constant/uiProperties';
+import { storeToRefs } from 'pinia';
+import type { SearchTipGroup, SearchTipEntry } from '../types/uiProperties.d';
 
 const current = ref<SearchTipEntry[] | null>(null);
 const settingsStore = useSettingsStore();
@@ -97,13 +101,20 @@ const searchValue = ref('');
 const open = ref(false);
 const SearchTipGroups = ref<SearchTipGroup[]>([]);
 const searchInput = ref<InstanceType<typeof Input> | null>(null);
-let defaultKey: DefaultSearchTip = { key: '', show: '搜索...' };
 let abortController: AbortController | null = null;
+
+const uiPropertiesStore = useUIPropertiesStore();
+const { uiProperties } = storeToRefs(uiPropertiesStore);
+
+const onFocus = () => {
+  if (!searchValue.value || searchValue.value.length === 0)
+    SearchTipGroups.value = uiProperties.value.hotSearchTips;
+};
 
 const handleSearchKey = async () => {
   const key = searchValue.value;
   if (!key || key.length === 0) {
-    SearchTipGroups.value = hotSearch;
+    SearchTipGroups.value = uiProperties.value.hotSearchTips;
   } else {
     // 取消之前的请求
     SearchTipGroups.value = [];
@@ -115,7 +126,7 @@ const handleSearchKey = async () => {
     abortController = new AbortController();
 
     try {
-      const result = await neteaseLoginApi.getSuggestKeyword(key, abortController.signal);
+      const result = await neteaseSearchApi.getSuggestKeyword(key, abortController.signal);
       // 检查请求是否被取消
       if (!abortController.signal.aborted) {
         SearchTipGroups.value = result;
@@ -175,54 +186,24 @@ const onSearch = (searchText: string) => {
 };
 
 const onChange = () => {
+  if (!searchValue.value || searchValue.value.length === 0) {
+    SearchTipGroups.value = uiProperties.value.hotSearchTips;
+    return;
+  }
   debouncedOnTextChange();
 };
-
-interface DefaultSearchTip {
-  key: string;
-  show: string;
-}
-
-interface SearchTipGroup {
-  name: string;
-  items: SearchTipEntry[];
-  icon: VNode;
-}
-
-interface SearchTipEntry {
-  key: string;
-  type: 'hot' | 'album' | 'artist' | 'song' | 'playlist' | 'string';
-  obj: unknown;
-  iconType: number;
-  rank?: number;
-}
-
-export type { SearchTipGroup, SearchTipEntry, DefaultSearchTip };
 
 interface Focusable {
   focus: () => void;
 }
 
-let hotSearch: SearchTipGroup[] = [];
-
 onMounted(() => {
-  getHotSearchKey();
-  getDefaultKey();
+  SearchTipGroups.value = uiProperties.value.hotSearchTips;
 });
 
 function focusInput() {
   (searchInput.value as unknown as Focusable)?.focus();
 }
-
-const getHotSearchKey = async () => {
-  hotSearch = await neteaseLoginApi.getHotKeyword();
-  SearchTipGroups.value = hotSearch;
-  console.log(hotSearch);
-};
-
-const getDefaultKey = async () => {
-  defaultKey = await neteaseLoginApi.getDefaultKey();
-};
 
 defineExpose({
   focusInput,

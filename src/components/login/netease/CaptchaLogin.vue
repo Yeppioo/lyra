@@ -37,7 +37,7 @@
 import { ref } from 'vue';
 import { message } from 'ant-design-vue';
 import { functions as neteaseLoginApi } from '@/api/netease/login';
-import { useSettingsStore } from '@/stores/settings';
+import { useSettingsStore } from '@/constant/settings';
 
 const phone = ref('');
 const captcha = ref('');

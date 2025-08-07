@@ -24,4 +24,8 @@ app.component('font-awesome-layers-text', FontAwesomeLayersText);
 
 app.use(createPinia());
 app.use(router);
+
+import { initializeApplication } from './utils/appInitializer';
+initializeApplication();
+
 app.use(Antd).mount('#app');

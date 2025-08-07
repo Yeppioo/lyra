@@ -1,7 +1,7 @@
 import { apiSettings } from '../config';
-import type { DefaultSearchTip, SearchTipGroup } from '../../components/SearcherBox.vue';
 import { h } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import type { DefaultSearchTip, SearchTipGroup } from '../../types/uiProperties.d';
 
 interface hotResponse {
   searchWord: string;
@@ -141,6 +141,8 @@ async function getSuggestKeyword(
               items: data.result.songs.map((song) => ({
                 key: song.name,
                 iconType: 0,
+                type: 'song',
+                obj: song,
               })),
               icon: h(FontAwesomeIcon, { icon: ['fas', 'music'], size: 'lg' }),
             });
@@ -154,6 +156,8 @@ async function getSuggestKeyword(
               items: data.result.artists.map((artist) => ({
                 key: artist.name,
                 iconType: 0,
+                type: 'artist',
+                obj: artist,
               })),
               icon: h(FontAwesomeIcon, { icon: ['fas', 'user'], size: 'lg' }),
             });
@@ -167,6 +171,8 @@ async function getSuggestKeyword(
               items: data.result.albums.map((album) => ({
                 key: album.name,
                 iconType: 0,
+                type: 'album',
+                obj: album,
               })),
               icon: h(FontAwesomeIcon, { icon: ['fas', 'compact-disc'], size: 'lg' }),
             });
@@ -180,6 +186,8 @@ async function getSuggestKeyword(
               items: data.result.playlists.map((playlist) => ({
                 key: playlist.name,
                 iconType: 0,
+                type: 'playlist',
+                obj: playlist,
               })),
               icon: h(FontAwesomeIcon, { icon: ['fas', 'list-ul'], size: 'lg' }),
             });

@@ -17,7 +17,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { message } from 'ant-design-vue';
 import { functions as neteaseLoginApi } from '@/api/netease/login';
-import { useSettingsStore } from '@/stores/settings';
+import { useSettingsStore } from '@/constant/settings';
 
 import { LoadingOutlined } from '@ant-design/icons-vue';
 import { h } from 'vue';
