@@ -216,7 +216,7 @@ onUnmounted(() => {
   align-items: center;
 }
 .expanded-serch-container {
-  margin-right: -20px;
+  margin-right: -20px !important;
   width: 100%;
   margin-left: 25px;
 }
