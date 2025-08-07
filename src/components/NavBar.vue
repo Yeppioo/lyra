@@ -34,10 +34,14 @@
               class="nav-button">
               <font-awesome-icon :icon="['fas', 'search']" />
             </a-button>
-            <SearcherBox
-              ref="searchInput"
-              v-if="!showSearchIcon || isSearchExpanded"
-              @blur="collapseSearch" />
+            <div
+              :class="{ 'hidden-on-search': !isSearchExpanded && showSearchIcon }"
+              class="search-control">
+              <SearcherBox
+                ref="searchInput"
+                class="expanded-serch-container"
+                @blur="collapseSearch" />
+            </div>
           </div>
           <a-button
             class="nav-button"
@@ -211,7 +215,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.search-container {
+.search-control {
   display: flex;
   align-items: center;
 }

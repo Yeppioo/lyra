@@ -11,10 +11,10 @@
     </a-input-search
     ><template #content>
       <main class="search-tip-container">
-         <div v-if="settingsStore.settings.searchHistory.length > 0" class="title">
-            <font-awesome-icon size="lg" :icon="['fas', 'clock-rotate-left']" />
-            <span>搜索历史</span>
-          </div>
+        <div v-if="settingsStore.settings.searchHistory.length > 0" class="title">
+          <font-awesome-icon size="lg" :icon="['fas', 'clock-rotate-left']" />
+          <span>搜索历史</span>
+        </div>
         <div v-for="(value, index) in SearchTipGroups" :key="index">
           <div class="title">
             <component :is="(value as SearchTipGroup).icon" v-if="(value as SearchTipGroup).icon" />
