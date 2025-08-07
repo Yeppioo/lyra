@@ -1,7 +1,7 @@
 <template>
   <a-popover placement="bottomLeft" trigger="focus">
     <a-input-search
-      placeholder="搜索..."
+      :placeholder="defaultKey.show"
       class="search-box"
       ref="searchInput"
       v-model:value="searchValue"
@@ -97,6 +97,7 @@ const searchValue = ref('');
 const open = ref(false);
 const SearchTipGroups = ref<SearchTipGroup[]>([]);
 const searchInput = ref<InstanceType<typeof Input> | null>(null);
+let defaultKey: DefaultSearchTip = { key: '', show: '搜索...' };
 
 const handleSearchKey = () => {
   console.log('change to:', searchValue.value);
@@ -160,7 +161,7 @@ interface SearchTipEntry {
   rank?: number;
 }
 
-export type { SearchTipGroup, SearchTipEntry };
+export type { SearchTipGroup, SearchTipEntry, DefaultSearchTip };
 
 interface Focusable {
   focus: () => void;
@@ -169,17 +170,22 @@ interface Focusable {
 let hotSearch: SearchTipGroup[] = [];
 
 onMounted(() => {
-  asyncInit();
+  getHotSearchKey();
+  getDefaultKey();
 });
 
 function focusInput() {
   (searchInput.value as unknown as Focusable)?.focus();
 }
 
-const asyncInit = async () => {
+const getHotSearchKey = async () => {
   hotSearch = await neteaseLoginApi.getHotKeyword();
   SearchTipGroups.value = hotSearch;
   console.log(hotSearch);
+};
+
+const getDefaultKey = async () => {
+  defaultKey = await neteaseLoginApi.getDefaultKey();
 };
 
 defineExpose({

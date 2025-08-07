@@ -1,5 +1,5 @@
 import { apiSettings } from '../config';
-import type { SearchTipGroup } from '../../components/SearcherBox.vue';
+import type { DefaultSearchTip, SearchTipGroup } from '../../components/SearcherBox.vue';
 import { h } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
@@ -9,10 +9,10 @@ interface hotResponse {
 }
 
 const { neteaseApiBase: apiBase, realIP } = apiSettings;
-const realIpParam = realIP ? `&realIP=${realIP}` : '';
+const realIpParam = realIP ? `realIP=${realIP}` : '';
 
 async function getHotKeyword(): Promise<SearchTipGroup[]> {
-  const response = await fetch(`${apiBase}/search/hot/detail${realIpParam}`);
+  const response = await fetch(`${apiBase}/search/hot/detail?${realIpParam}`);
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
@@ -30,21 +30,21 @@ async function getHotKeyword(): Promise<SearchTipGroup[]> {
   ];
 }
 
-async function getDefaultKey(): Promise<SearchTipGroup[]> {
-  const response = await fetch(`${apiBase}/search/hot/detail${realIpParam}`);
+async function getDefaultKey(): Promise<DefaultSearchTip> {
+  const response = await fetch(`${apiBase}/search/default?${realIpParam}`);
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
   const data = await response.json();
-  return [
-    {
-      name: '热搜榜',
-      items: data.data.map((item: hotResponse, index: number) => ({}))
-    }
-  ]
+  return {
+    key: data.data.realkeyword,
+    show: data.data.showKeyword,
+  };
 }
+
 
 
 export const functions = {
   getHotKeyword,
+  getDefaultKey,
 };
