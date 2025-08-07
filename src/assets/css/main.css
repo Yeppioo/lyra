@@ -22,13 +22,6 @@ a,
   transition: 0.3s;
 }
 
-.ant-menu-title-content,
-.ant-dropdown-menu-title-content,
-.svg-inline--fa {
-  font-family: 'HarmonyOS_Regular';
-  color: var(--y-text);
-}
-
 .ant-input {
   font-family: 'HarmonyOS_Regular' !important;
 }

@@ -64,7 +64,7 @@
           <a-menu class="search-tip-menu">
             <a-menu-item
               v-model:selectedKeys="current"
-              @click="handleMenuSelect({ key: item.key })"
+              @click="handleMenuSelect(item)"
               v-for="(item, index) in (value as SearchTipGroup).items"
               :key="index">
               <span
@@ -98,9 +98,35 @@ const open = ref(false);
 const SearchTipGroups = ref<SearchTipGroup[]>([]);
 const searchInput = ref<InstanceType<typeof Input> | null>(null);
 let defaultKey: DefaultSearchTip = { key: '', show: '搜索...' };
+let abortController: AbortController | null = null;
 
-const handleSearchKey = () => {
-  console.log('change to:', searchValue.value);
+const handleSearchKey = async () => {
+  const key = searchValue.value;
+  if (!key || key.length === 0) {
+    SearchTipGroups.value = hotSearch;
+  } else {
+    // 取消之前的请求
+    SearchTipGroups.value = [];
+    if (abortController) {
+      abortController.abort();
+    }
+
+    // 创建新的AbortController
+    abortController = new AbortController();
+
+    try {
+      const result = await neteaseLoginApi.getSuggestKeyword(key, abortController.signal);
+      // 检查请求是否被取消
+      if (!abortController.signal.aborted) {
+        SearchTipGroups.value = result;
+      }
+    } catch (error) {
+      // 忽略取消请求的错误
+      if (error instanceof Error && error.name !== 'AbortError') {
+        console.error('Search suggest error:', error);
+      }
+    }
+  }
 };
 const openModal = () => {
   open.value = true;
@@ -108,36 +134,44 @@ const openModal = () => {
 
 const debouncedOnTextChange = debounce(handleSearchKey, 200);
 
-const handleMenuSelect = ({ key }: { key: string }) => {
+const handleMenuSelect = (key: SearchTipEntry) => {
   current.value = null;
   handleSearch(key);
 };
 const handleClear = () => {
   settingsStore.settings.searchHistory = [];
 };
-const handleSearch = (word: string) => {
-  console.log('searchText:', word);
+const handleSearch = (key: SearchTipEntry) => {
+  const word = key.key.trim();
+  if (!word || word === '') return;
 
-  if (!word || word.trim() === '') return;
-  const key = word.trim();
-
-  // 先移除相同的记录（如果存在）
-  const index = settingsStore.settings.searchHistory.indexOf(key);
+  const index = settingsStore.settings.searchHistory.indexOf(word);
   if (index !== -1) {
     settingsStore.settings.searchHistory.splice(index, 1);
   }
 
   // 将新记录添加到数组开头
-  settingsStore.settings.searchHistory.unshift(key);
+  settingsStore.settings.searchHistory.unshift(word);
 
   // 如果记录超过15个，移除最后一个
   if (settingsStore.settings.searchHistory.length > 15) {
     settingsStore.settings.searchHistory.pop();
   }
+
+  if (key.type === 'hot') {
+    searchValue.value = key.key;
+    debouncedOnTextChange();
+    //TODO 搜索热词
+  }
 };
 
 const onSearch = (searchText: string) => {
-  handleSearch(searchText);
+  handleSearch({
+    key: searchText,
+    type: 'string',
+    obj: null,
+    iconType: 0,
+  });
 };
 
 const onChange = () => {
@@ -157,6 +191,8 @@ interface SearchTipGroup {
 
 interface SearchTipEntry {
   key: string;
+  type: 'hot' | 'album' | 'artist' | 'song' | 'playlist' | 'string';
+  obj: unknown;
   iconType: number;
   rank?: number;
 }
@@ -208,7 +244,7 @@ defineExpose({
   font-size: 15px;
 }
 .search-tip-container {
-  max-height: 510px;
+  max-height: 542px;
   overflow: scroll;
   min-width: 230px;
   max-width: 360px;
@@ -226,6 +262,7 @@ defineExpose({
 }
 .search-tip-menu {
   margin-top: 7px;
+  margin-bottom: 7px;
 }
 .history-item {
   border: 0;

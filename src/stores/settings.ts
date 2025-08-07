@@ -6,6 +6,7 @@ export interface SettingsState {
   volume: number;
   searchHistory: string[];
   userinfo: {
+    state: string[];
     username: string | null;
     avatar: string | null;
     usernameLabel: string | null;
@@ -23,6 +24,7 @@ const defaultSettings: SettingsState = {
   volume: 0.8,
   searchHistory: [],
   userinfo: {
+    state: [],
     username: '未登录',
     usernameLabel: '登录使用完整功能',
     avatar: null,

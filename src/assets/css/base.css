@@ -34,6 +34,20 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.ant-menu-title-content,
+.ant-dropdown-menu-title-content,
+.svg-inline--fa,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  font-family: 'HarmonyOS_Regular';
+  color: var(--y-text);
+}
+
 #app {
   min-height: 100vh;
   overflow-x: hidden;
