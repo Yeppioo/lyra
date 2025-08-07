@@ -6,8 +6,7 @@
       type="number"
       name="phone"
       v-model:value="phone"
-      placeholder="手机号"
-    />
+      placeholder="手机号" />
     <a-input-group compact>
       <a-input
         class="a-input"
@@ -16,14 +15,12 @@
         type="number"
         name="captcha"
         v-model:value="captcha"
-        placeholder="验证码"
-      />
+        placeholder="验证码" />
       <a-button
         style="width: 100px; height: 38px; border-radius: 0px 10px 10px 0px"
         type="primary"
         @click="handleSendCaptcha"
-        :disabled="loging || isCountingDown"
-      >
+        :disabled="loging || isCountingDown">
         {{ sendButtonText }}
       </a-button>
     </a-input-group>
@@ -31,73 +28,72 @@
       type="primary"
       @click="login"
       :loading="loging"
-      style="width: 100%; border-radius: 10px; height: 38px"
-    >
+      style="width: 100%; border-radius: 10px; height: 38px">
       登录
     </a-button>
   </main>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
-import { message } from 'ant-design-vue'
-import { functions as neteaseLoginApi } from '@/api/netease/login'
-import { useSettingsStore } from '@/stores/settings'
+import { ref } from 'vue';
+import { message } from 'ant-design-vue';
+import { functions as neteaseLoginApi } from '@/api/netease/login';
+import { useSettingsStore } from '@/stores/settings';
 
-const phone = ref('')
-const captcha = ref('')
-const loging = ref(false)
-const settingsStore = useSettingsStore()
+const phone = ref('');
+const captcha = ref('');
+const loging = ref(false);
+const settingsStore = useSettingsStore();
 
-const sendButtonText = ref('发送验证码')
-const isCountingDown = ref(false)
-let countDownTimer: number | undefined
+const sendButtonText = ref('发送验证码');
+const isCountingDown = ref(false);
+let countDownTimer: number | undefined;
 
 const handleSendCaptcha = async () => {
-  if (!phone.value) return
-  isCountingDown.value = true
-  sendButtonText.value = '发送中'
+  if (!phone.value) return;
+  isCountingDown.value = true;
+  sendButtonText.value = '发送中';
   try {
-    await neteaseLoginApi.sendCaptcha(phone.value)
-    message.success('验证码发送成功')
+    await neteaseLoginApi.sendCaptcha(phone.value);
+    message.success('验证码发送成功');
     // Start countdown
-    let seconds = 60
-    sendButtonText.value = `${seconds}s`
+    let seconds = 60;
+    sendButtonText.value = `${seconds}s`;
     countDownTimer = window.setInterval(() => {
-      seconds--
+      seconds--;
       if (seconds <= 0) {
-        window.clearInterval(countDownTimer)
-        sendButtonText.value = '发送验证码'
-        isCountingDown.value = false
+        window.clearInterval(countDownTimer);
+        sendButtonText.value = '发送验证码';
+        isCountingDown.value = false;
       } else {
-        sendButtonText.value = `${seconds}s`
+        sendButtonText.value = `${seconds}s`;
       }
-    }, 1000)
+    }, 1000);
   } catch (error) {
-    console.error('Failed to send captcha:', error)
-    message.error('验证码发送失败')
-    sendButtonText.value = '重新发送'
-    isCountingDown.value = false
+    console.error('Failed to send captcha:', error);
+    message.error('验证码发送失败');
+    sendButtonText.value = '重新发送';
+    isCountingDown.value = false;
   }
-}
+};
 
 async function login() {
-  if (!phone.value || !captcha.value) return
-  loging.value = true
+  if (!phone.value || !captcha.value) return;
+  loging.value = true;
   try {
-    const res = await neteaseLoginApi.loginByCellphone(phone.value, captcha.value)
+    const res = await neteaseLoginApi.loginByCellphone(phone.value, captcha.value);
     if (res.cookie) {
-      settingsStore.settings.userinfo.netease.cookie = res.cookie
-      message.success('登录成功')
+      settingsStore.settings.userinfo.netease.cookie = res.cookie;
+      message.success('登录成功');
     } else {
-      message.error('登录失败，请检查手机号或验证码')
+      message.error('登录失败，请检查手机号或验证码');
     }
     // Handle login success, maybe emit an event or navigate
   } catch (error) {
-    console.error('Login failed:', error)
-    message.error('登录失败，请稍后重试')
+    console.error('Login failed:', error);
+    message.error('登录失败，请稍后重试');
     // Handle login failure
   } finally {
-    loging.value = false
+    loging.value = false;
   }
 }
 </script>

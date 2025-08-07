@@ -8,8 +8,7 @@
         type="email"
         name="email"
         v-model:value="email"
-        placeholder="邮箱"
-      />
+        placeholder="邮箱" />
       <a-button
         :disabled="loging"
         style="width: 85px; height: 38px; border-radius: 0px 10px 10px 0px"
@@ -25,29 +24,28 @@
       class="password-input"
       name="password"
       v-model:value="password"
-      placeholder="密码"
-    />
+      placeholder="密码" />
   </main>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
-import { message } from 'ant-design-vue'
+import { ref } from 'vue';
+import { message } from 'ant-design-vue';
 
-const email = ref('')
-const password = ref('')
-const state = ref('登录')
-const loging = ref(false)
+const email = ref('');
+const password = ref('');
+const state = ref('登录');
+const loging = ref(false);
 
 async function login() {
-  if (!email.value || password.value === '') return
-  loging.value = true
-  state.value = '登录中...'
+  if (!email.value || password.value === '') return;
+  loging.value = true;
+  state.value = '登录中...';
   try {
     // Note: The Netease API does not seem to have a direct email login function in the provided files.
     // This is a placeholder for the actual API call.
     // You would need to add a loginByEmail function to your API.
     // For now, this will simulate a failed login.
-    message.error('邮箱登录功能暂未实现')
+    message.error('邮箱登录功能暂未实现');
     // const res = await neteaseLoginApi.loginByEmail(email.value, password.value)
     // if (res.cookie) {
     //   settingsStore.settings.userinfo.netease.cookie = res.cookie
@@ -56,11 +54,11 @@ async function login() {
     //   message.error('登录失败，请检查邮箱或密码')
     // }
   } catch (error) {
-    console.error('Login failed:', error)
-    message.error('登录失败，请稍后重试')
+    console.error('Login failed:', error);
+    message.error('登录失败，请稍后重试');
   } finally {
-    loging.value = false
-    state.value = '登录'
+    loging.value = false;
+    state.value = '登录';
   }
 }
 </script>

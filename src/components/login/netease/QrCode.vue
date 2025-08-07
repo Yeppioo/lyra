@@ -14,95 +14,95 @@
   </main>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { message } from 'ant-design-vue'
-import { functions as neteaseLoginApi } from '@/api/netease/login'
-import { useSettingsStore } from '@/stores/settings'
+import { ref, onMounted, onUnmounted } from 'vue';
+import { message } from 'ant-design-vue';
+import { functions as neteaseLoginApi } from '@/api/netease/login';
+import { useSettingsStore } from '@/stores/settings';
 
-import { LoadingOutlined } from '@ant-design/icons-vue'
-import { h } from 'vue'
+import { LoadingOutlined } from '@ant-design/icons-vue';
+import { h } from 'vue';
 const indicator = h(LoadingOutlined, {
   style: {
     fontSize: '24px',
   },
   spin: true,
-})
+});
 
-const qrImg = ref(' ') // Initial non-empty value to show loader
-const statusText = ref('请使用网易云音乐APP扫码登录')
-const settingsStore = useSettingsStore()
-const spinning = ref(true)
-const spinningText = ref('加载中...')
+const qrImg = ref(' '); // Initial non-empty value to show loader
+const statusText = ref('请使用网易云音乐APP扫码登录');
+const settingsStore = useSettingsStore();
+const spinning = ref(true);
+const spinningText = ref('加载中...');
 
-let qrKey = ''
-let pollInterval: number | undefined
+let qrKey = '';
+let pollInterval: number | undefined;
 
 const stopPolling = () => {
   if (pollInterval) {
-    clearInterval(pollInterval)
-    pollInterval = undefined
+    clearInterval(pollInterval);
+    pollInterval = undefined;
   }
-}
+};
 
 const getQrCode = async () => {
-  stopPolling()
-  qrImg.value = ' ' // Show loader
-  spinning.value = true
-  spinningText.value = '加载中...'
-  statusText.value = '正在生成二维码...'
+  stopPolling();
+  qrImg.value = ' '; // Show loader
+  spinning.value = true;
+  spinningText.value = '加载中...';
+  statusText.value = '正在生成二维码...';
   try {
-    qrKey = await neteaseLoginApi.getQrCodeKey()
-    qrImg.value = await neteaseLoginApi.createQrCodeImage(qrKey)
-    statusText.value = '请使用网易云音乐APP扫码登录'
-    spinning.value = false
-    startPolling()
+    qrKey = await neteaseLoginApi.getQrCodeKey();
+    qrImg.value = await neteaseLoginApi.createQrCodeImage(qrKey);
+    statusText.value = '请使用网易云音乐APP扫码登录';
+    spinning.value = false;
+    startPolling();
   } catch (error) {
-    console.error('Failed to get QR code:', error)
-    qrImg.value = '' // Trigger fallback
-    statusText.value = '二维码获取失败, 刷新页面重试'
-    message.error('二维码获取失败, 刷新页面重试')
-    spinningText.value = '加载失败'
+    console.error('Failed to get QR code:', error);
+    qrImg.value = ''; // Trigger fallback
+    statusText.value = '二维码获取失败, 刷新页面重试';
+    message.error('二维码获取失败, 刷新页面重试');
+    spinningText.value = '加载失败';
   }
-}
+};
 
 const startPolling = () => {
   pollInterval = window.setInterval(async () => {
     try {
-      const res = await neteaseLoginApi.checkQrCodeStatus(qrKey)
+      const res = await neteaseLoginApi.checkQrCodeStatus(qrKey);
       switch (res.code) {
         case 800:
-          statusText.value = '二维码已过期，请刷新'
-          stopPolling()
-          break
+          statusText.value = '二维码已过期，请刷新';
+          stopPolling();
+          break;
         case 801:
-          statusText.value = '等待扫码'
-          break
+          statusText.value = '等待扫码';
+          break;
         case 802:
-          statusText.value = '待确认'
-          break
+          statusText.value = '待确认';
+          break;
         case 803:
-          statusText.value = '登录成功'
-          stopPolling()
+          statusText.value = '登录成功';
+          stopPolling();
           if (res.cookie) {
-            settingsStore.settings.userinfo.netease.cookie = res.cookie
-            message.success('登录成功')
+            settingsStore.settings.userinfo.netease.cookie = res.cookie;
+            message.success('登录成功');
           }
-          break
+          break;
       }
     } catch (error) {
-      console.error('Polling failed:', error)
+      console.error('Polling failed:', error);
       // Optional: handle polling errors, maybe stop polling
     }
-  }, 3000) // Poll every 3 seconds
-}
+  }, 3000); // Poll every 3 seconds
+};
 
 onMounted(() => {
-  getQrCode()
-})
+  getQrCode();
+});
 
 onUnmounted(() => {
-  stopPolling()
-})
+  stopPolling();
+});
 </script>
 <style scoped>
 .container-netease-qrcode {

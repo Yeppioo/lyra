@@ -1,8 +1,7 @@
 <template>
   <div
     class="y-navbar"
-    :class="{ 'y-navbar--scrolled': isScrolled, 'search-expanded': isSearchExpandedFromSearchBox }"
-  >
+    :class="{ 'y-navbar--scrolled': isScrolled, 'search-expanded': isSearchExpanded }">
     <section class="content">
       <div class="left">
         <div @click="goHome" class="y-navbar__logo">
@@ -23,30 +22,33 @@
         @select="handleMenuSelect"
         :items="items"
         class="center-menu"
-        :class="{ 'hidden-on-search': isSearchExpandedFromSearchBox }"
-      />
+        :class="{ 'hidden-on-search': isSearchExpanded }" />
       <div class="right">
-        <div class="buttons" :class="{ 'expanded-serch-container': isSearchExpandedFromSearchBox }">
-          <SearchBox ref="searchBoxRef" />
+        <div class="buttons" :class="{ 'expanded-serch-container': isSearchExpanded }">
+          <div class="search-container">
+            <a-button
+              style="margin-right: 6px"
+              v-if="showSearchIcon && !isSearchExpanded"
+              @click="expandSearch"
+              type="text"
+              class="nav-button">
+              <font-awesome-icon :icon="['fas', 'search']" />
+            </a-button>
+            <SearcherBox v-if="!showSearchIcon || isSearchExpanded" @blur="collapseSearch" />
+          </div>
           <a-button
             class="nav-button"
             @click="toggleTheme"
             type="text"
-            :class="{ 'hidden-on-search': isSearchExpandedFromSearchBox }"
-          >
+            :class="{ 'hidden-on-search': isSearchExpanded }">
             <font-awesome-icon
               :icon="['fas', 'sun']"
-              v-if="settingsStore.settings.theme === 'light'"
-            />
+              v-if="settingsStore.settings.theme === 'light'" />
             <font-awesome-icon
               :icon="['fas', 'moon']"
-              v-if="settingsStore.settings.theme === 'dark'"
-            />
+              v-if="settingsStore.settings.theme === 'dark'" />
           </a-button>
-          <a-dropdown
-            class="nav-button-root"
-            :class="{ 'hidden-on-search': isSearchExpandedFromSearchBox }"
-          >
+          <a-dropdown class="nav-button-root" :class="{ 'hidden-on-search': isSearchExpanded }">
             <a-button @click.prevent class="nav-button" type="text">
               <font-awesome-icon :icon="['fas', 'caret-down']" />
             </a-button>
@@ -58,8 +60,7 @@
                       item && 'key' in item && 'label' in item && (item as any).type !== 'divider'
                     "
                     :key="item.key as string"
-                    @click="handleMenuSelect({ key: item.key as string })"
-                  >
+                    @click="handleMenuSelect({ key: item.key as string })">
                     <component :is="(item as any).icon" v-if="(item as any).icon" />
                     {{ item.label }}
                   </a-menu-item>
@@ -68,7 +69,7 @@
             </template>
           </a-dropdown>
         </div>
-        <a-dropdown :class="{ 'hidden-on-search': isSearchExpandedFromSearchBox }">
+        <a-dropdown :class="{ 'hidden-on-search': isSearchExpanded }">
           <a-avatar :src="settingsStore.settings.userinfo.avatar" class="avatar" :size="32">
             <template #icon>
               <font-awesome-icon transform="up-1" :icon="['fas', 'user']" />
@@ -81,8 +82,7 @@
                   style="margin: 10px"
                   :src="settingsStore.settings.userinfo.avatar"
                   class="avatar"
-                  :size="38"
-                >
+                  :size="38">
                   <template #icon>
                     <font-awesome-icon transform="up-1" :icon="['fas', 'user']" />
                   </template>
@@ -93,8 +93,7 @@
                     flex-direction: column;
                     justify-content: center;
                     margin-right: 20px;
-                  "
-                >
+                  ">
                   <span style="font-size: 14px; margin-bottom: -3px">
                     {{ settingsStore.settings.userinfo.username }}
                   </span>
@@ -106,8 +105,7 @@
               <a-divider style="margin: 4px 0" />
               <a-menu-item
                 style="padding: 7px 12px"
-                @click="handleMenuSelect({ key: '/auth/login' })"
-              >
+                @click="handleMenuSelect({ key: '/auth/login' })">
                 <font-awesome-icon style="margin-right: 7px" :icon="['fas', 'key']" />
                 登录账户
               </a-menu-item>
@@ -128,77 +126,118 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
-import type { MenuProps } from 'ant-design-vue'
-import { navConfig } from '../router/nav.config'
-import { useRouter } from 'vue-router'
-import { useSettingsStore } from '../stores/settings'
-import SearchBox from './SearchBox.vue'
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
+import type { MenuProps } from 'ant-design-vue';
+import { navConfig } from '../router/nav.config';
+import { useRouter } from 'vue-router';
+import { useSettingsStore } from '../stores/settings';
+import SearcherBox from './SearcherBox.vue';
 
-const router = useRouter()
-const settingsStore = useSettingsStore()
-const current = ref<string[]>(['/'])
-const items = ref<MenuProps['items']>(navConfig)
-const isScrolled = ref(false)
-const searchBoxRef = ref<InstanceType<typeof SearchBox> | null>(null)
+const router = useRouter();
+const settingsStore = useSettingsStore();
+const current = ref<string[]>(['/']);
+const items = ref<MenuProps['items']>(navConfig);
+const isScrolled = ref(false);
 
-const isSearchExpandedFromSearchBox = computed(() => {
-  return searchBoxRef.value?.isSearchExpanded || false
-})
+const isSearchExpanded = ref(false);
+const showSearchIcon = ref(window.innerWidth < 590);
+
+const handleMenuSelect = ({ key }: { key: string }) => {
+  router.push(key as string);
+  current.value = [key];
+};
+
+const expandSearch = async () => {
+  isSearchExpanded.value = true;
+  await nextTick();
+};
+
+const collapseSearch = () => {
+  isSearchExpanded.value = false;
+};
 
 const handleResize = () => {
-  if (window.innerWidth >= 490) {
-    searchBoxRef.value?.collapseSearch()
+  showSearchIcon.value = window.innerWidth < 590;
+  if (window.innerWidth >= 590) {
+    isSearchExpanded.value = false;
   }
-}
+};
 
 const toggleTheme = () => {
-  const themes = ['light', 'dark']
-  const currentIndex = themes.indexOf(settingsStore.settings.theme)
-  const nextIndex = (currentIndex + 1) % themes.length
-  settingsStore.settings.theme = themes[nextIndex] as 'light' | 'dark'
-}
+  const themes = ['light', 'dark'];
+  const currentIndex = themes.indexOf(settingsStore.settings.theme);
+  const nextIndex = (currentIndex + 1) % themes.length;
+  settingsStore.settings.theme = themes[nextIndex] as 'light' | 'dark';
+};
 
 const handleScroll = () => {
-  isScrolled.value = window.scrollY > 0
-}
-const handleMenuSelect = ({ key }: { key: string }) => {
-  router.push(key as string)
-  current.value = [key]
-}
+  isScrolled.value = window.scrollY > 0;
+};
 
 const goBack = () => {
-  router.back()
-}
+  router.back();
+};
 
 const goHome = () => {
-  router.push('/')
-}
+  router.push('/');
+};
 const goForward = () => {
-  router.forward()
-}
+  router.forward();
+};
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll)
-  window.addEventListener('resize', handleResize)
-  current.value = [router.currentRoute.value.path] // 在挂载时设置初始选中项
-})
+  window.addEventListener('scroll', handleScroll);
+  window.addEventListener('resize', handleResize);
+  current.value = [router.currentRoute.value.path];
+});
 
 watch(
   () => router.currentRoute.value.path,
   (newPath) => {
-    current.value = [newPath] // 监听路由变化并更新选中项
+    current.value = [newPath]; // 监听路由变化并更新选中项
   },
-  { immediate: true }, // 立即执行一次，确保初始状态正确
-)
+  { immediate: true } // 立即执行一次，确保初始状态正确
+);
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
-  window.removeEventListener('resize', handleResize)
-})
+  window.removeEventListener('scroll', handleScroll);
+  window.removeEventListener('resize', handleResize);
+});
 </script>
 
 <style scoped>
+.search-container {
+  display: flex;
+  align-items: center;
+}
+.expanded-serch-container {
+  margin-right: -20px;
+  width: 100%;
+  margin-left: 25px;
+}
+.y-navbar.search-expanded .content {
+  grid-template-columns: auto 1fr; /* Logo auto, search box 1fr */
+}
+
+.y-navbar.search-expanded .right {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.y-navbar.search-expanded .search-container {
+  flex-grow: 1;
+}
+
+.y-navbar.search-expanded .search-container .ant-select {
+  width: 100% !important;
+}
+
+.hidden-on-search {
+  display: none !important;
+}
+.y-navbar.search-expanded .left .nav-buttons {
+  display: none;
+}
 .y-navbar__logo {
   cursor: pointer;
 }
@@ -291,6 +330,12 @@ onUnmounted(() => {
   background: transparent;
   border: 0;
   box-shadow: unset;
+}
+.search-box {
+  margin-right: 10px;
+  margin-top: 1px;
+  border-radius: var(--y-com-radius);
+  background: var(--y-com-highlight-bg);
 }
 .y-navbar--scrolled {
   /* top: 15px;

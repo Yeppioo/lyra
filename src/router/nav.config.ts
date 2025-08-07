@@ -1,11 +1,11 @@
-import { h, type VNode } from 'vue'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { h, type VNode } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 export interface NavItem {
-  key: string
-  label: string
-  title: string
-  icon: () => VNode
+  key: string;
+  label: string;
+  title: string;
+  icon: () => VNode;
 }
 
 export const navConfig: NavItem[] = [
@@ -21,4 +21,4 @@ export const navConfig: NavItem[] = [
     key: '/rank',
     icon: () => h(FontAwesomeIcon, { icon: ['fas', 'ranking-star'] }),
   },
-]
+];

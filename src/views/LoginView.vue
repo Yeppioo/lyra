@@ -7,8 +7,7 @@
         v-model:selectedKeys="current"
         mode="horizontal"
         :items="items"
-        class="y-segmented-menu"
-      />
+        class="y-segmented-menu" />
       <div class="login-component-container">
         <component :is="selectedComponent" />
       </div>
@@ -16,10 +15,10 @@
   </a-flex>
 </template>
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import type { MenuProps } from 'ant-design-vue'
-import NeteaseLogin from '@/components/login/netease/NeteaseLogin.vue'
-import TencentLogin from '@/components/login/tencent/TencentLogin.vue'
+import { computed, ref } from 'vue';
+import type { MenuProps } from 'ant-design-vue';
+import NeteaseLogin from '@/components/login/netease/NeteaseLogin.vue';
+import TencentLogin from '@/components/login/tencent/TencentLogin.vue';
 const providers = [
   {
     label: '网易云音乐',
@@ -31,20 +30,20 @@ const providers = [
     value: 'tencent',
     component: TencentLogin,
   },
-]
+];
 
-const current = ref<string[]>(['netease'])
+const current = ref<string[]>(['netease']);
 
 const items = computed<MenuProps['items']>(() => {
   return providers.map((p) => ({
     key: p.value,
     label: p.label,
-  }))
-})
+  }));
+});
 
 const selectedComponent = computed(() => {
-  return providers.find((p) => p.value === current.value[0])?.component
-})
+  return providers.find((p) => p.value === current.value[0])?.component;
+});
 </script>
 <style scoped>
 #logo {
