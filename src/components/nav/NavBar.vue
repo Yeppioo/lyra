@@ -5,7 +5,7 @@
     <section class="content">
       <div class="left">
         <div @click="goHome" class="y-navbar__logo">
-          <img src="../assets/img/logo.svg" alt="Lyra Logo" class="logo-img" />
+          <img src="../../assets/img/logo.svg" alt="Lyra Logo" class="logo-img" />
         </div>
         <div class="nav-buttons">
           <a-button type="text" @click="goBack">
@@ -135,9 +135,9 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import type { MenuProps } from 'ant-design-vue';
-import { navConfig } from '../router/nav.config';
+import { navConfig } from '../../router/nav.config';
 import { useRouter } from 'vue-router';
-import { useSettingsStore } from '../constant/settings';
+import { useSettingsStore } from '../../constant/settings';
 import SearcherBox from './SearcherBox.vue';
 
 const router = useRouter();
