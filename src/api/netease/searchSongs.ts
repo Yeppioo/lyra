@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiSettings } from '../config';
 
 const { neteaseApiBase: apiBase, realIP } = apiSettings;
@@ -14,6 +15,9 @@ export interface SongEntry {
     id: number;
     name: string;
   };
+  hasMv: boolean;
+  mvId: number;
+  requireVip: boolean;
   duration: number;
   picUrl: string;
 }
@@ -25,7 +29,7 @@ export interface SearchResult {
 
 async function searchSongs(key: string, page: number = 1): Promise<SearchResult> {
   const response = await fetch(
-    `${apiBase}/search?keywords=${encodeURIComponent(key)}&type=1&limit=15&offset=${(page - 1) * 15}&${realIpParam}`
+    `${apiBase}/cloudsearch?keywords=${encodeURIComponent(key)}&type=1&limit=15&offset=${(page - 1) * 15}&${realIpParam}`
   );
   if (!response.ok) {
     throw new Error('Network response was not ok');
@@ -35,22 +39,25 @@ async function searchSongs(key: string, page: number = 1): Promise<SearchResult>
 
   return {
     count: data.result.songCount,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    songs: data.result.songs.map((song: any) => ({
-      id: song.id,
-      name: song.name,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      artists: song.ar.map((artist: any) => ({
-        id: artist.id,
-        name: artist.name,
-      })),
-      album: {
-        id: song.al.id,
-        name: song.al.name,
-      },
-      duration: song.dt,
-      picUrl: song.al.picUrl,
-    })),
+    songs:
+      data.result.songs?.map((song: any) => ({
+        id: song.id,
+        name: song.name,
+        artists:
+          song.ar?.map((artist: any) => ({
+            id: artist.id,
+            name: artist.name,
+          })) || [],
+        album: {
+          id: song.al?.id,
+          name: song.al?.name,
+        },
+        duration: song.dt,
+        picUrl: song.al?.picUrl,
+        hasMv: song.mv !== 0,
+        mvId: song.mv,
+        requireVip: song.fee === 1,
+      })) || [],
   };
 }
 

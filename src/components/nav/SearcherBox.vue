@@ -48,6 +48,7 @@
           </div>
           <a-flex class="history-container" wrap="wrap" gap="small">
             <a-button
+              @click="handleMenuSelect({ key: item, type: 'string' })"
               class="history-item"
               v-for="item in settingsStore.settings.searchHistory"
               :key="item"
@@ -75,7 +76,7 @@
                 >{{ item.rank }}</span
               >
               <span class="text">{{ item.key }}</span>
-              <span class="up-icon" v-if="item.iconType > 0">UP</span>
+              <span class="up-icon" v-if="(item.iconType as number) > 0">UP</span>
             </a-menu-item>
           </a-menu>
         </div>
@@ -149,6 +150,7 @@ const debouncedOnTextChange = debounce(handleSearchKey, 200);
 
 const handleMenuSelect = (key: SearchTipEntry) => {
   current.value = null;
+  searchValue.value = key.key;
   handleSearch(key);
 };
 const handleClear = () => {

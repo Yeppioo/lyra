@@ -22,7 +22,7 @@ export interface SearchTipGroup {
 export interface SearchTipEntry {
   key: string;
   type: 'hot' | 'album' | 'artist' | 'song' | 'playlist' | 'string';
-  obj: unknown;
-  iconType: number;
+  obj?: unknown;
+  iconType?: number;
   rank?: number;
 }

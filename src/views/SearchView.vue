@@ -52,9 +52,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.container {
-  padding: 20px;
-}
 .title .key {
   font-size: 40px;
   color: var(--y-text);
