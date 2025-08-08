@@ -241,6 +241,12 @@ onUnmounted(() => {
   width: 100% !important;
 }
 
+@media (min-width: 590px) {
+  .search-container {
+    width: 270px;
+  }
+}
+
 .hidden-on-search {
   display: none !important;
 }
@@ -341,12 +347,12 @@ onUnmounted(() => {
   box-shadow: unset;
 }
 
-.y-navbar--scrolled {
-  /* top: 15px;
+/* .y-navbar--scrolled {
+  top: 15px;
   margin: 0 15px;
   width: auto;
-  border-radius: 12px; */
-}
+  border-radius: 12px;
+} */
 .y-navbar__logo {
   display: flex;
   align-items: center;

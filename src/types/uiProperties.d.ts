@@ -2,7 +2,6 @@ import type { PersonalizedEntry } from '../api/netease/personlized';
 
 export interface UIPropertiesState {
   personalized: PersonalizedEntry;
-  // 待补充其他UI属性
   defaultSearchKey: DefaultSearchTip;
   hotSearchTips: SearchTipGroup[];
 }

@@ -6,7 +6,11 @@ import { functions as searchApi } from '../api/netease/search';
 
 const defaultUIProperties: UIPropertiesState = {
   personalized: {
-    song30: [],
+    song30: {
+      songs: [],
+      loading: true,
+      selectedindex: 0,
+    },
   },
   defaultSearchKey: { key: '', show: '搜索...' },
   hotSearchTips: [],
@@ -20,7 +24,10 @@ export const useUIPropertiesStore = defineStore('uiProperties', () => {
       getPersonalizedSongs()
         .then((data) => {
           console.log('获取推荐歌曲成功：', data);
-          uiProperties.value.personalized.song30 = data || [];
+          uiProperties.value.personalized.song30.songs = data || [];
+          if (data && data.length > 0) {
+            uiProperties.value.personalized.song30.loading = false;
+          }
         })
         .catch((error) => {
           console.error('Failed to fetch personalized songs:', error);

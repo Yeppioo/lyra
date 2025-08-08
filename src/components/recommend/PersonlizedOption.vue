@@ -2,24 +2,20 @@
   <a-row :gutter="[16, 16]">
     <!-- 大块 -->
     <a-col :xs="24" :md="12">
-      <div
-        class="grid-item large-item">
+      <div class="grid-item large-item">
         <div
           class="background-blur"
-          :style="{ backgroundImage: `url(${uiProperties.personalized.song30[0]?.pic})` }"></div>
-        <div class="content-overlay">
-          {{ uiProperties.personalized.song30[0]?.name }}
-        </div>
+          :style="{
+            backgroundImage: `url(${uiProperties.personalized.song30.songs[uiProperties.personalized.song30.selectedindex]?.pic})`,
+          }"></div>
+        <Song30 />
       </div>
     </a-col>
-    <!-- 右侧/下方的小块容器 -->
     <a-col :xs="24" :md="12">
       <a-row :gutter="[16, 16]">
-        <!-- 第一个小块 -->
         <a-col :span="24">
           <div class="grid-item small-item-1">2</div>
         </a-col>
-        <!-- 第二个小块 (内部还有两个) -->
         <a-col :span="24">
           <a-row :gutter="[16, 16]">
             <a-col :span="12">
@@ -39,6 +35,7 @@
 import { Row as ARow, Col as ACol } from 'ant-design-vue';
 import { useUIPropertiesStore } from '../../constant/uiProperties';
 import { storeToRefs } from 'pinia';
+import Song30 from './Song30.vue';
 
 const uiPropertiesStore = useUIPropertiesStore();
 const { uiProperties } = storeToRefs(uiPropertiesStore);
@@ -46,8 +43,8 @@ const { uiProperties } = storeToRefs(uiPropertiesStore);
 
 <style scoped>
 .grid-item {
-  background-color: #999;
-  color: white;
+  background-color: #00000040;
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -68,9 +65,11 @@ const { uiProperties } = storeToRefs(uiPropertiesStore);
   left: 0;
   width: 100%;
   height: 100%;
+  background: round;
   background-size: cover;
-  background-position: center;
-  filter: blur(30px); /* 调整模糊程度 */
+  /* background-position: center; */
+  filter: blur(40px);
+  /* background-repeat: round; */
   z-index: 1;
 }
 

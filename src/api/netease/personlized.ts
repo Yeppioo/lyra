@@ -13,7 +13,11 @@ interface SongEntry {
 }
 
 export interface PersonalizedEntry {
-  song30: SongEntry[];
+  song30: {
+    songs: SongEntry[];
+    selectedindex: number;
+    loading: boolean;
+  };
 }
 
 export async function getPersonalizedSongs(): Promise<SongEntry[]> {

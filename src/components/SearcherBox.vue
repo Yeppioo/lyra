@@ -225,7 +225,7 @@ defineExpose({
   font-size: 15px;
 }
 .search-tip-container {
-  max-height: 542px;
+  max-height: 561px;
   overflow: scroll;
   min-width: 230px;
   max-width: 360px;

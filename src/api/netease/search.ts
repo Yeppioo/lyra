@@ -139,7 +139,7 @@ async function getSuggestKeyword(
             result.push({
               name: '单曲',
               items: data.result.songs.map((song) => ({
-                key: song.name,
+                key: song.name + ' - ' + song.artists.map((artist) => artist.name).join(', '),
                 iconType: 0,
                 type: 'song',
                 obj: song,
@@ -169,7 +169,7 @@ async function getSuggestKeyword(
             result.push({
               name: '专辑',
               items: data.result.albums.map((album) => ({
-                key: album.name,
+                key: album.name + ' - ' + album.artist.name,
                 iconType: 0,
                 type: 'album',
                 obj: album,

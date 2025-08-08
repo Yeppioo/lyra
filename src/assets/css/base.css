@@ -14,20 +14,6 @@ body {
   color: var(--color-text);
   background: var(--y-bg);
   line-height: 1.6;
-  /* font-family:
-    'HarmonyOS_Regular',
-    Inter,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
-    sans-serif; */
   font-size: 15px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -44,7 +30,7 @@ h4,
 h5,
 h6,
 p {
-  font-family: 'HarmonyOS_Regular';
+  font-family: var(--y-font);
   color: var(--y-text);
 }
 
