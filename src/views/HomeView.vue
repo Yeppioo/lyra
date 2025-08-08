@@ -24,12 +24,6 @@ const setting = useSettingsStore().settings;
 </script>
 
 <style scoped lang="css">
-.container {
-  padding: 0 50px;
-  max-width: 1200px;
-  margin: 0 auto;
-  margin-top: 80px;
-}
 .title h3 {
   font-weight: 600;
   font-size: 21px;

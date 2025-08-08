@@ -18,7 +18,7 @@ const theme = computed(() => {
 <template>
   <ConfigProvider :theme="theme">
     <NavBar />
-    <div id="view">
+    <div id="app-view">
       <RouterView />
     </div>
   </ConfigProvider>

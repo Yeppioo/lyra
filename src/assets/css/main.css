@@ -1,7 +1,7 @@
 @import './themes/public.css';
 @import './base.css';
-@import './hm_font.css';
-/* @import './components/segmented-menu.css'; */
+/* @import './hm_font.css'; */
+@import './components/segmented-menu.css';
 
 @font-face {
   font-family: ZhuZiAYuanJWD;
@@ -31,13 +31,19 @@ a,
   }
 }
 
+#app-view {
+  max-width: 1200px;
+  padding: 0 50px !important;
+  margin: 0 auto;
+  margin-top: 80px;
+}
 @media (max-width: 930px) {
-  .container {
+  #app-view {
     padding: 0 30px !important;
   }
 }
 @media (max-width: 825px) {
-  .container {
+  #app-view {
     padding: 0 20px !important;
   }
 }

@@ -94,7 +94,9 @@ import { message } from 'ant-design-vue';
 import { useUIPropertiesStore } from '../../constant/uiProperties';
 import { storeToRefs } from 'pinia';
 import type { SearchTipGroup, SearchTipEntry } from '../../types/uiProperties';
+import { useRouter } from 'vue-router'; // 引入 useRouter
 
+const router = useRouter(); // 获取 router 实例
 const current = ref<SearchTipEntry[] | null>(null);
 const settingsStore = useSettingsStore();
 const searchValue = ref('');
@@ -174,6 +176,8 @@ const handleSearch = (key: SearchTipEntry) => {
     debouncedOnTextChange();
     //TODO 搜索热词
   }
+  // 导航到搜索结果页
+  router.push(`/search/songs/${encodeURIComponent(word)}`);
 };
 
 const onSearch = (searchText: string) => {
