@@ -1,4 +1,4 @@
 export const apiSettings = {
-  neteaseApiBase: 'http://localhost:3000',
+  neteaseApiBase: 'https://neteasemusic.api.yeppioo.vip',
   realIP: '',
 };
