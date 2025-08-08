@@ -1,6 +1,4 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <main>
-    albums
-  </main>
+  <main>albums</main>
 </template>

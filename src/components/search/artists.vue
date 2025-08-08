@@ -1,6 +1,4 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <main>
-    artists
-  </main>
+  <main>artists</main>
 </template>

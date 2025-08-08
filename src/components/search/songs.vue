@@ -58,6 +58,9 @@
 
 <!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script setup lang="ts">
+import { usePlayerStore } from '@/stores/player';
+import { functions as getSongApi } from '@/api/netease/getSong';
+
 import { onMounted, ref, watch } from 'vue';
 import {
   functions as neteaseApi,
@@ -65,6 +68,7 @@ import {
   type SearchResult,
 } from '@/api/netease/searchSongs';
 import { useRoute } from 'vue-router';
+import { message } from 'ant-design-vue';
 
 const route = useRoute();
 const songsList = ref<any[]>([]);
@@ -111,9 +115,51 @@ const pageChange = () => {
   fetchSongs(currentPage.value, route.params.key as string);
 };
 
-const handleMenuItemClick = (e: { key: string }) => {
-  console.log('click', e.key);
-  // 在这里处理菜单项点击事件，例如导航到歌曲详情页或播放歌曲
+const playerStore = usePlayerStore();
+const handleMenuItemClick = async (e: { key: string }) => {
+  const songId = e.key;
+  const song = songsList.value.find((s: any) => s.id == songId);
+  if (!song) return;
+  // 获取播放url
+  try {
+    const urlRes = await getSongApi.getSongUrl(songId);
+    const url = urlRes.data?.[0]?.url;
+    if (!url) {
+      message.error('无法获取播放地址');
+      return;
+    }
+    // 构造播放信息
+    const info = {
+      name: song.name,
+      artist: song.artists?.map((a: any) => a.name).join(', '),
+      url,
+      cover: song.picUrl || song.album?.picUrl,
+      id: song.id,
+    };
+    // 设置pinia store
+    playerStore.setPlayList(
+      songsList.value.map((s: any) => ({
+        name: s.name,
+        artist: s.artists?.map((a: any) => a.name).join(', '),
+        url: '', // 只在当前播放项填真实url
+        cover: s.picUrl || s.album?.picUrl,
+        id: s.id,
+      })),
+      songsList.value.findIndex((s: any) => s.id == songId)
+    );
+    playerStore.play(
+      info,
+      songsList.value.findIndex((s: any) => s.id == songId)
+    );
+    // 直接调用全局播放器
+    (window as any).MusicPlayer?.play(
+      url,
+      { name: info.name, artist: info.artist },
+      { cover: info.cover }
+    );
+  } catch {
+    message.error('播放失败');
+  }
 };
 
 watch(

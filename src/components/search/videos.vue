@@ -1,6 +1,4 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <main>
-    videos
-  </main>
+  <main>videos</main>
 </template>

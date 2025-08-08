@@ -1,6 +1,4 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <main>
-    playlists
-  </main>
+  <main>playlists</main>
 </template>
