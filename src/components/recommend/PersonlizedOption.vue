@@ -3,9 +3,13 @@
     <!-- 大块 -->
     <a-col :xs="24" :md="12">
       <div
-        class="grid-item large-item"
-        :style="{ backgroundImage: uiProperties.personalized.song30[0]?.pic }">
-        1
+        class="grid-item large-item">
+        <div
+          class="background-blur"
+          :style="{ backgroundImage: `url(${uiProperties.personalized.song30[0]?.pic})` }"></div>
+        <div class="content-overlay">
+          {{ uiProperties.personalized.song30[0]?.name }}
+        </div>
       </div>
     </a-col>
     <!-- 右侧/下方的小块容器 -->
@@ -38,7 +42,6 @@ import { storeToRefs } from 'pinia';
 
 const uiPropertiesStore = useUIPropertiesStore();
 const { uiProperties } = storeToRefs(uiPropertiesStore);
-uiPropertiesStore.fetchPersonalizedSongs();
 </script>
 
 <style scoped>
@@ -54,6 +57,26 @@ uiPropertiesStore.fetchPersonalizedSongs();
 
 .large-item {
   height: 200px;
+  background-repeat: round;
+  position: relative;
+  overflow: hidden;
+}
+
+.background-blur {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(30px); /* 调整模糊程度 */
+  z-index: 1;
+}
+
+.content-overlay {
+  position: relative;
+  z-index: 2;
 }
 
 .small-item-1 {

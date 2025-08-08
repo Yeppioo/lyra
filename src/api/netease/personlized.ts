@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiSettings } from '../config';
 
 const { neteaseApiBase: apiBase, realIP } = apiSettings;
@@ -21,5 +22,14 @@ export async function getPersonalizedSongs(): Promise<SongEntry[]> {
     throw new Error('Network response was not ok');
   }
   const data = await response.json();
-  return data || [];
+  if (!data.data) {
+    return [];
+  }
+  return data.data.dailySongs.map((song: any) => ({
+    id: song.id,
+    name: song.name,
+    pic: song.al.picUrl,
+    artist: song.ar.map((artist: any) => artist.name),
+    reason: song.reason,
+  }));
 }
