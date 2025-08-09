@@ -1,12 +1,12 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div class="songs-search-result">
-    <a-menu
-      :disabled="loading"
-      v-model:selectedKeys="current"
-      mode="vertical"
-      @click="handleMenuItemClick">
-      <a-menu-item :disabled="loading" v-for="item in songsList" :key="item.id">
+    <a-menu :disabled="loading" v-model:selectedKeys="current" mode="vertical">
+      <a-menu-item
+        @click="handleMenuItemClick(item.id, item.picUrl)"
+        :disabled="loading"
+        v-for="item in songsList"
+        :key="item.id">
         <a-skeleton avatar :title="false" v-if="loading" active>
           <a-list-item-meta>
             <template #avatar>
@@ -118,17 +118,52 @@ const pageChange = () => {
 };
 
 const playerStore = usePlayerStore();
-const handleMenuItemClick = async (e: { key: string }) => {
-  const songId = e.key;
+const handleMenuItemClick = async (key: number, cover: string) => {
+  const songId = key;
   const song = songsList.value.find((s: any) => s.id == songId);
   if (!song) return;
   try {
     const urlRes = await getSongApi.getSongUrl(songId);
+    console.log('urlRes', urlRes);
+
     const url = urlRes.data?.[0]?.url;
     if (!url) {
       message.error('无法获取播放地址');
       return;
     }
+
+    if (!playerStore.state.playListGroup) {
+      playerStore.state.playListGroup = [];
+    }
+    if (playerStore.state.playListGroup.length === 0) {
+      playerStore.state.playListGroup.push({
+        name: '默认歌单',
+        songs: [],
+        songIndex: 0,
+        canDelete: false,
+      });
+    }
+
+    if (!playerStore.state.playListGroup[0].songs) {
+      playerStore.state.playListGroup[0].songs = [];
+    }
+
+    if (playerStore.state.playListGroup[0].songs.length === 0)
+      if (!playerStore.state.playListGroup[0].songs.some((s: any) => s.id === songId)) {
+        playerStore.state.playListGroup[0].songs.push({
+          id: songId,
+          duration: song.duration,
+          name: song.name,
+          artist: song.artists[0].name,
+          url,
+          cover: cover,
+          lyric: '',
+          currentTime: 0,
+        });
+      }
+    playerStore.state.groupIndex = 0;
+    playerStore.state.playListGroup[0].songIndex =
+      playerStore.state.playListGroup[0].songs.findIndex((s: any) => s.id === songId);
   } catch {
     message.error('播放失败');
   }
@@ -267,27 +302,27 @@ watch(
   border: 0;
 }
 .songs-search-result :deep(.ant-menu-item-selected) {
-  border: #f55e55 1px solid !important;
-  background: #f55e551f !important;
+  border: #70baff 1px solid !important;
+  background: #70baff1f !important;
   span {
-    color: #f55e55;
+    color: #70baff;
   }
 }
 
 .songs-search-result :deep(.ant-menu-item-active) {
-  border: #f55e55 1px solid !important;
+  border: #70baff 1px solid !important;
 }
 .vip-tag {
   background: #f55e551f;
 }
 .vip-tag span {
-  color: #f55e55;
+  color: #f55e55 !important;
 }
 .mv-tag {
   background: rgba(242, 201, 125, 0.16);
 }
 .mv-tag span {
-  color: #f2c97d !important;
+  color: #ffa600 !important;
 }
 [theme-dark] .mv-tag {
   background: rgba(240, 160, 32, 0.15);

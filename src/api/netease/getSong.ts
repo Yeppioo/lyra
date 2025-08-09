@@ -53,7 +53,7 @@ export interface GetSongResponse {
  * @param br - Bitrate (default: 999000 for max quality)
  * @returns Promise<GetSongResponse> - Song URL data
  */
-async function getSongUrl(id: string, br: number = 999000): Promise<GetSongResponse> {
+async function getSongUrl(id: number, br: number = 999000): Promise<GetSongResponse> {
   try {
     const response = await fetch(`${apiBase}/song/url?id=${id}&br=${br}&${realIpParam}`);
 

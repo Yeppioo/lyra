@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 
 export interface SongInfo {
   id: number;
@@ -8,37 +8,36 @@ export interface SongInfo {
   artist: string;
   url: string;
   cover: string;
+  lyric: string;
+  currentTime: number;
 }
 
 export interface PlayListGroup {
   name: string;
   songs: SongInfo[];
+  songIndex: number;
   neteaseId?: number;
+  canDelete: boolean;
 }
 
 export interface PlayerState {
   playListGroup: PlayListGroup[];
-  playIndex: number;
-  currentSong: SongInfo | null;
+  groupIndex: number;
   isPlaying: boolean;
-  audioUrl: string;
-  coverUrl: string;
-  lyric: string;
   playMode: 'order' | 'repeat' | 'random';
-  currentTime: number;
-  duration: number;
 }
 
 const defaultPlayerState: PlayerState = {
-  playListGroup: [],
-  currentTime: 0,
-  duration: 0,
-  playIndex: 0,
-  currentSong: null,
+  playListGroup: [
+    {
+      name: '默认歌单',
+      songs: [],
+      songIndex: 0,
+      canDelete: false,
+    },
+  ],
+  groupIndex: 0,
   isPlaying: false,
-  audioUrl: '',
-  coverUrl: '',
-  lyric: '',
   playMode: 'order',
 };
 
@@ -58,7 +57,15 @@ export const usePlayerStore = defineStore('player', () => {
     { deep: true }
   );
 
+  const currentSong = computed(() => {
+    const group = state.value.playListGroup[state.value.groupIndex];
+    if (!group || !group.songs.length) return null;
+    const idx = group.songIndex ?? 0;
+    return group.songs[idx] || null;
+  });
+
   return {
     state,
+    currentSong,
   };
 });

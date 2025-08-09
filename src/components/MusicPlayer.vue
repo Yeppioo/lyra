@@ -1,18 +1,18 @@
 <template>
-  <div v-if="playerStore.state.currentSong || true" class="control-container">
+  <div v-if="playerStore.currentSong || true" class="control-container">
     <div class="progress">
       <span class="progress-text current-time">
-        {{ formatSecondsToMinutes(playerStore.state.currentTime) }}
+        {{ formatSecondsToMinutes(playerStore.currentSong?.currentTime) }}
       </span>
       <a-slider
         :tooltipOpen="false"
         id="progress-slider"
-        v-model:value="playerStore.state.currentTime"
-        :max="playerStore.state.duration"
+        v-model:value="currentTime"
+        :max="playerStore.currentSong?.duration ? playerStore.currentSong.duration / 1000 : 0"
         :step="1"
         :tip-formatter="formatSecondsToMinutes" />
       <span class="progress-text current-time">
-        {{ formatSecondsToMinutes(playerStore.state.duration) }}
+        {{ formatSecondsToMinutes(playerStore.currentSong?.duration) }}
       </span>
     </div>
     <div class="main-section">
@@ -23,13 +23,38 @@
           class="icon-img"
           :width="48"
           :height="48"
-          :src="playerStore.state.currentSong?.cover">
+          :src="playerStore.currentSong?.cover">
         </a-image>
       </div>
       <div class="control">
-        <font-awesome-icon class="control-button" size="xl" :icon="['fas', 'backward-step']" />
-        <font-awesome-icon class="control-button" size="xl" :icon="['fas', 'play']" />
-        <font-awesome-icon class="control-button" size="xl" :icon="['fas', 'forward-step']" />
+        <button class="control-button">
+          <font-awesome-icon size="1x" :icon="['fas', 'backward-step']" />
+        </button>
+
+        <button class="play-button">
+          <i :class="{ 'playing-icon': playerStore.state.isPlaying }">
+            <svg
+              class="play-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              height="100%"
+              viewBox="128 61 829 902"
+              width="100%">
+              <path
+                d="M224.5,963C211.167,963 198.667,960.5 187,955.5C175.333,950.5 165.083,943.667 156.25,935C147.417,926.333 140.5,916.167 135.5,904.5C130.5,892.833 128,880.333 128,867L128,157C128,143.667 130.5,131.167 135.5,119.5C140.5,107.833 147.333,97.6667 156,89C164.667,80.3334 174.833,73.5001 186.5,68.5C198.167,63.5001 210.667,61.0001 224,61C232,61.0001 240,62.0001 248,64C256,66.0001 263.5,69.0001 270.5,73L907.5,428C922.833,436.667 934.833,448.417 943.5,463.25C952.167,478.083 956.5,494.333 956.5,512C956.5,530 952.25,546.333 943.75,561C935.25,575.667 923.167,587.333 907.5,596L271,951C264,955 256.5,958 248.5,960C240.5,962 232.5,963 224.5,963Z"
+                fill="#ffffff"
+                fill-opacity="1"></path>
+            </svg>
+            <svg class="pause-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+              <path
+                d="M176 96C149.5 96 128 117.5 128 144L128 496C128 522.5 149.5 544 176 544L240 544C266.5 544 288 522.5 288 496L288 144C288 117.5 266.5 96 240 96L176 96zM400 96C373.5 96 352 117.5 352 144L352 496C352 522.5 373.5 544 400 544L464 544C490.5 544 512 522.5 512 496L512 144C512 117.5 490.5 96 464 96L400 96z"
+                fill="#ffffff" />
+            </svg>
+          </i>
+        </button>
+        <button class="control-button">
+          <font-awesome-icon size="1x" :icon="['fas', 'forward-step']" />
+        </button>
       </div>
     </div>
   </div>
@@ -37,14 +62,27 @@
 <script setup lang="ts">
 import { usePlayerStore } from '@/stores/player';
 import { fallbackImg } from '@/stores/constant';
+import { computed } from 'vue';
 
 const playerStore = usePlayerStore();
-const formatSecondsToMinutes = (seconds: number) => {
+const formatSecondsToMinutes = (seconds: number | undefined) => {
+  if (!seconds) return '00:00';
+  seconds = seconds / 1000;
   const totalSeconds = Math.floor(seconds);
   const minutes = Math.floor(totalSeconds / 60);
   const remainingSeconds = totalSeconds % 60;
   return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
+
+const currentTime = computed({
+  get: () =>
+    playerStore.currentSong?.currentTime ? playerStore.currentSong.currentTime / 1000 : 0,
+  set: (value) => {
+    if (playerStore.currentSong) {
+      playerStore.currentSong.currentTime = value * 1000;
+    }
+  },
+});
 </script>
 
 <style>
@@ -89,9 +127,13 @@ const formatSecondsToMinutes = (seconds: number) => {
   align-items: center;
   justify-content: center;
 }
+[theme-dark] .progress-text {
+  outline: rgba(255, 255, 255, 0.09) 1px solid;
+}
 #progress-slider {
   width: calc(100% - 130px);
 }
+
 .main-section {
   width: 100%;
   padding: 0 5vw;
@@ -109,5 +151,66 @@ const formatSecondsToMinutes = (seconds: number) => {
   align-items: center;
   justify-content: center;
   margin-top: -6px;
+}
+.play-button {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 0 10px;
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+}
+.play-button i {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  background-color: #70baff;
+  border-radius: 50%;
+}
+.play-button:hover i {
+  transform: scale(1.1);
+}
+.pause-icon {
+  display: none;
+}
+.play-button i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.play-icon {
+  width: 13px;
+  position: relative;
+  left: 1px;
+}
+.pause-icon {
+  width: 21px;
+}
+.playing-icon .play-icon {
+  display: none;
+}
+.playing-icon .pause-icon {
+  display: block;
+}
+.control-button {
+  color: var(--y-text);
+  cursor: pointer;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+  border-radius: 50%;
+}
+.control-button:hover {
+  background-color: #70baff;
+  path {
+    fill: white;
+  }
 }
 </style>
