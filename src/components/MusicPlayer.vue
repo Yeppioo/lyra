@@ -1,5 +1,14 @@
 <template>
-  <div v-if="playerStore.currentSong || true" class="control-container">
+  <div>
+    <audio
+      ref="audioRef"
+      :src="playerStore.currentSong?.url"
+      @ended="onAudioEnded"
+      @timeupdate="onTimeUpdate"
+      @canplay="onCanPlay"
+      style="display:none"
+    ></audio>
+  <div v-if="playerStore.currentSong" class="control-container">
     <div class="progress">
       <span class="progress-text current-time">
         {{ formatSecondsToMinutes(playerStore.currentSong?.currentTime) }}
@@ -7,7 +16,7 @@
       <a-slider
         :tooltipOpen="false"
         id="progress-slider"
-        v-model:value="currentTime"
+  v-model="currentTime"
         :max="playerStore.currentSong?.duration ? playerStore.currentSong.duration / 1000 : 0"
         :step="1"
         :tip-formatter="formatSecondsToMinutes" />
@@ -27,12 +36,12 @@
         </a-image>
       </div>
       <div class="control">
-        <button class="control-button">
+        <button class="control-button" @click="playerStore.prev()">
           <font-awesome-icon size="1x" :icon="['fas', 'backward-step']" />
         </button>
 
-        <button class="play-button">
-          <i :class="{ 'playing-icon': playerStore.state.isPlaying }">
+        <button class="play-button" @click="togglePlay">
+          <i :class="{ 'playing-icon': isPlaying }">
             <svg
               class="play-icon"
               xmlns="http://www.w3.org/2000/svg"
@@ -52,19 +61,86 @@
             </svg>
           </i>
         </button>
-        <button class="control-button">
+        <button class="control-button" @click="playerStore.next()">
           <font-awesome-icon size="1x" :icon="['fas', 'forward-step']" />
         </button>
       </div>
     </div>
-  </div>
+  </div></div>
 </template>
 <script setup lang="ts">
+
+
+import { ref, watch } from 'vue';
 import { usePlayerStore } from '@/stores/player';
 import { fallbackImg } from '@/stores/constant';
-// ...existing code...
+
 
 const playerStore = usePlayerStore();
+
+const audioRef = ref<HTMLAudioElement | null>(null);
+// 页面加载后如果有 currentSong 自动播放
+const isPlaying = ref(false);
+
+function playAudio() {
+  if (audioRef.value) {
+    audioRef.value.play();
+  }
+}
+
+function pauseAudio() {
+  if (audioRef.value) {
+    audioRef.value.pause();
+  }
+}
+
+function togglePlay() {
+  if (isPlaying.value) {
+    pauseAudio();
+  } else {
+    playAudio();
+  }
+}
+
+function onCanPlay() {
+  // 可以在这里做自动播放或其他初始化
+  playAudio();
+}
+
+function onAudioEnded() {
+  playerStore.onSongEnded();
+}
+
+function onTimeUpdate(e: Event) {
+  const audio = e.target as HTMLAudioElement;
+  if (playerStore.currentSong) {
+    playerStore.currentSong.currentTime = audio.currentTime * 1000;
+  }
+}
+
+// 切歌时自动播放
+watch(
+  () => playerStore.currentSong?.url,
+  (url) => {
+    if (url) {
+      playAudio();
+    }
+  }
+);
+
+// 监听 audio 的 play/pause 事件，自动同步 isPlaying
+import { onMounted } from 'vue';
+onMounted(() => {
+  if (audioRef.value) {
+    audioRef.value.addEventListener('play', () => {
+      isPlaying.value = true;
+    });
+    audioRef.value.addEventListener('pause', () => {
+      isPlaying.value = false;
+    });
+  }
+});
+
 const formatSecondsToMinutes = (seconds: number | undefined) => {
   if (!seconds) return '00:00';
   seconds = seconds / 1000;
@@ -75,7 +151,6 @@ const formatSecondsToMinutes = (seconds: number | undefined) => {
 };
 
 // ...existing code...
-import { watch, ref } from 'vue';
 
 const currentTime = ref(0);
 
