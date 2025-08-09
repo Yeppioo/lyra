@@ -107,7 +107,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { useUIPropertiesStore } from '../../constant/uiProperties';
+import { useUIPropertiesStore } from '../../stores/uiProperties';
 import { storeToRefs } from 'pinia';
 const uiPropertiesStore = useUIPropertiesStore();
 const { uiProperties } = storeToRefs(uiPropertiesStore);

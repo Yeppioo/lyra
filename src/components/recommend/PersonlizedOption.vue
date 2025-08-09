@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import { Row as ARow, Col as ACol } from 'ant-design-vue';
-import { useUIPropertiesStore } from '../../constant/uiProperties';
+import { useUIPropertiesStore } from '../../stores/uiProperties';
 import { storeToRefs } from 'pinia';
 import Song30 from './Song30.vue';
 

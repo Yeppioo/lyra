@@ -1,6 +1,7 @@
 <template>
   <a-popover placement="bottomLeft" trigger="focus">
     <a-input-search
+      autocomplete="off"
       :placeholder="uiProperties.defaultSearchKey.show"
       class="search-box"
       ref="searchInput"
@@ -85,14 +86,14 @@
   >
 </template>
 <script setup lang="ts">
-import { useSettingsStore } from '../../constant/settings';
+import { useSettingsStore } from '../../stores/settings';
 import { onMounted, ref, h } from 'vue';
 import { functions as neteaseSearchApi } from '@/api/netease/search';
 import { type Input } from 'ant-design-vue';
 import debounce from '@/utils/debounce';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { message } from 'ant-design-vue';
-import { useUIPropertiesStore } from '../../constant/uiProperties';
+import { useUIPropertiesStore } from '../../stores/uiProperties';
 import { storeToRefs } from 'pinia';
 import type { SearchTipGroup, SearchTipEntry } from '../../types/uiProperties';
 import { useRouter } from 'vue-router'; // 引入 useRouter

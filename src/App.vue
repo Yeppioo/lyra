@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { RouterView } from 'vue-router';
 import { ConfigProvider, theme as aTheme } from 'ant-design-vue';
-import { useSettingsStore } from '@/constant/settings';
+import { useSettingsStore } from '@/stores/settings';
 import NavBar from './components/nav/NavBar.vue';
 
 import MusicPlayer from './components/MusicPlayer.vue';

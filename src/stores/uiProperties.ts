@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { getPersonalizedSongs } from '../api/netease/personlized';
-import type { UIPropertiesState } from '../types/uiProperties.d';
+import type { UIPropertiesState } from '../types/uiProperties';
 import { functions as searchApi } from '../api/netease/search';
 
 const defaultUIProperties: UIPropertiesState = {

@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSettingsStore } from '../constant/settings';
+import { useSettingsStore } from '../stores/settings';
 import PersonlizedOption from '../components/recommend/PersonlizedOption.vue';
 const setting = useSettingsStore().settings;
 </script>

@@ -1,45 +1,89 @@
 <template>
   <div v-if="visible" class="music-player-bar">
-    <div class="player-controls">
-      <a-button shape="circle" @click="prev" :disabled="!canPrev">&#60;</a-button>
-      <a-button shape="circle" @click="togglePlay">{{ isPlaying ? '⏸' : '▶️' }}</a-button>
-      <a-button shape="circle" @click="next" :disabled="!canNext">&#62;</a-button>
-      <a-button shape="circle" @click="toggleMute">{{ muted ? '🔇' : '🔊' }}</a-button>
-      <a-slider
-        :min="0"
-        :max="1"
-        :step="0.01"
-        v-model:value="volume"
-        @change="setVolume"
-        style="width: 60px; margin-left: 8px" />
-      <a-dropdown>
-        <a-button shape="circle">{{
-          playMode === 'order' ? '顺序' : playMode === 'repeat' ? '单曲' : '随机'
-        }}</a-button>
-        <template #overlay>
-          <a-menu>
-            <a-menu-item @click="setPlayMode('order')">顺序播放</a-menu-item>
-            <a-menu-item @click="setPlayMode('repeat')">单曲循环</a-menu-item>
-            <a-menu-item @click="setPlayMode('random')">随机播放</a-menu-item>
-          </a-menu>
-        </template>
-      </a-dropdown>
-    </div>
-    <div class="player-info">
-      <img v-if="coverUrl" :src="coverUrl" class="cover" />
-      <span class="song-title">{{ currentSong?.name || '未播放' }}</span>
-      <span class="artist">{{ currentSong?.artist || '' }}</span>
-    </div>
-    <div class="player-progress">
+    <div class="player-progress-bar">
+      <span class="progress-time">{{ formatTime(currentTime) }}</span>
       <a-slider
         :min="0"
         :max="duration"
         v-model:value="currentTime"
         @change="onSeek"
-        style="width: 120px" />
-      <span>{{ formatTime(currentTime) }} / {{ formatTime(duration) }}</span>
+        class="progress-slider" />
+      <span class="progress-time">{{ formatTime(duration) }}</span>
     </div>
-    <a-button v-if="lyric" @click="showLyric = !showLyric" style="margin-left: 8px">歌词</a-button>
+    <div class="player-main">
+      <div class="player-left">
+        <img v-if="coverUrl" :src="coverUrl" class="cover" />
+        <div class="song-meta">
+          <span class="song-title">{{ currentSong?.name || '未播放' }}</span>
+          <span class="artist">{{ currentSong?.artist || '' }}</span>
+        </div>
+      </div>
+      <div class="player-center">
+        <a-button shape="circle" @click="prev" :disabled="!canPrev">
+          <font-awesome-icon size="lg" :icon="['fas', 'backward']" />
+        </a-button>
+        <a-button shape="circle" @click="togglePlay">
+          <font-awesome-icon size="lg" :icon="isPlaying ? ['fas', 'pause'] : ['fas', 'play']" />
+        </a-button>
+        <a-button shape="circle" @click="next" :disabled="!canNext">
+          <font-awesome-icon size="lg" :icon="['fas', 'forward']" />
+        </a-button>
+      </div>
+      <div class="player-right">
+        <a-button shape="circle" @click="toggleMute">
+          <font-awesome-icon
+            size="lg"
+            :icon="muted ? ['fas', 'volume-xmark'] : ['fas', 'volume-high']" />
+        </a-button>
+        <div
+          class="volume-slider-wrap"
+          @mouseenter="showVolume = true"
+          @mouseleave="onVolumeMouseLeave">
+          <transition name="fade">
+            <a-slider
+              v-if="showVolume"
+              :min="0"
+              :max="1"
+              :step="0.01"
+              v-model:value="volume"
+              @change="setVolume"
+              class="volume-slider" />
+          </transition>
+        </div>
+        <a-dropdown>
+          <a-button shape="circle">
+            <font-awesome-icon
+              size="lg"
+              :icon="
+                playMode === 'order'
+                  ? ['fas', 'arrow-right-arrow-left']
+                  : playMode === 'repeat'
+                    ? ['fas', 'repeat']
+                    : ['fas', 'shuffle']
+              " />
+          </a-button>
+          <template #overlay>
+            <a-menu>
+              <a-menu-item @click="setPlayMode('order')">
+                <font-awesome-icon size="lg" :icon="['fas', 'arrow-right-arrow-left']" /> 顺序播放
+              </a-menu-item>
+              <a-menu-item @click="setPlayMode('repeat')">
+                <font-awesome-icon size="lg" :icon="['fas', 'repeat']" /> 单曲循环
+              </a-menu-item>
+              <a-menu-item @click="setPlayMode('random')">
+                <font-awesome-icon size="lg" :icon="['fas', 'shuffle']" /> 随机播放
+              </a-menu-item>
+            </a-menu>
+          </template>
+        </a-dropdown>
+        <a-button v-if="lyric" @click="showLyric = !showLyric" shape="circle">
+          <font-awesome-icon size="lg" :icon="['fas', 'music']" />
+        </a-button>
+        <a-button shape="circle">
+          <font-awesome-icon size="lg" :icon="['fas', 'clock-rotate-left']" />
+        </a-button>
+      </div>
+    </div>
     <div v-if="showLyric && lyric" class="lyric-popup">{{ lyric }}</div>
     <audio
       ref="audioRef"
@@ -51,6 +95,17 @@
 </template>
 <!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script setup lang="ts">
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+const showVolume = ref(false);
+let volumeTimer: any = null;
+
+function onVolumeMouseLeave() {
+  if (volumeTimer) clearTimeout(volumeTimer);
+  volumeTimer = setTimeout(() => {
+    showVolume.value = false;
+  }, 600);
+}
+
 import { ref, watch, nextTick, onMounted } from 'vue';
 
 interface SongInfo {
@@ -273,23 +328,92 @@ if (typeof window !== 'undefined') {
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
   z-index: 1000;
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+  height: auto;
+  flex-wrap: nowrap;
+}
+.player-progress-bar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0 24px;
+  height: 32px;
+  background: var(--y-bg, #f7f7f7);
+  border-bottom: 1px solid #eee;
+  box-sizing: border-box;
+}
+.progress-time {
+  width: 48px;
+  text-align: center;
+  font-size: 13px;
+  color: #888;
+  flex-shrink: 0;
+}
+.progress-slider {
+  flex: 1;
+  margin: 0 8px;
+}
+.player-main {
+  display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 8px 24px;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 24px 0 24px;
   height: 64px;
-  flex-wrap: wrap;
+  background: var(--y-com-bg, #fff);
 }
-.player-controls {
+.player-left {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  min-width: 0;
 }
-.player-info {
-  flex: 1;
-  margin-left: 24px;
+.song-meta {
   display: flex;
   flex-direction: column;
+  margin-left: 12px;
   min-width: 0;
-  align-items: flex-start;
+}
+.player-center {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.player-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+.volume-slider-wrap {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.volume-slider {
+  position: absolute;
+  left: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 90px;
+  z-index: 10;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  padding: 0 8px;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 .song-title {
   font-weight: bold;
@@ -340,11 +464,21 @@ if (typeof window !== 'undefined') {
   .music-player-bar {
     flex-direction: column;
     height: auto;
-    padding: 8px 4px;
+    padding: 0;
   }
-  .player-info {
-    margin-left: 0;
-    align-items: center;
+  .player-progress-bar {
+    padding: 0 8px;
+    height: 28px;
+  }
+  .player-main {
+    padding: 0 8px 0 8px;
+    height: auto;
+  }
+  .player-left {
+    min-width: 0;
+  }
+  .song-meta {
+    margin-left: 6px;
   }
   .cover {
     width: 32px;
