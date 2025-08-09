@@ -15,12 +15,13 @@
           </a-list-item-meta>
         </a-skeleton>
         <div class="item" v-else>
-          <a-image class="icon-img" :width="48" :height="48" :src="item.picUrl">
-            <template #fallback>
-              <div class="state-container">
-                <span>加载失败</span>
-              </div>
-            </template>
+          <a-image
+            :fallback="fallbackImg"
+            :placeholder="true"
+            class="icon-img"
+            :width="48"
+            :height="48"
+            :src="item.picUrl">
           </a-image>
           <div class="info">
             <div class="basic-info">
@@ -69,6 +70,7 @@ import {
 } from '@/api/netease/searchSongs';
 import { useRoute } from 'vue-router';
 import { message } from 'ant-design-vue';
+import { fallbackImg } from '@/stores/constant';
 
 const route = useRoute();
 const songsList = ref<any[]>([]);
@@ -120,7 +122,6 @@ const handleMenuItemClick = async (e: { key: string }) => {
   const songId = e.key;
   const song = songsList.value.find((s: any) => s.id == songId);
   if (!song) return;
-  // 获取播放url
   try {
     const urlRes = await getSongApi.getSongUrl(songId);
     const url = urlRes.data?.[0]?.url;
@@ -128,35 +129,6 @@ const handleMenuItemClick = async (e: { key: string }) => {
       message.error('无法获取播放地址');
       return;
     }
-    // 构造播放信息
-    const info = {
-      name: song.name,
-      artist: song.artists?.map((a: any) => a.name).join(', '),
-      url,
-      cover: song.picUrl || song.album?.picUrl,
-      id: song.id,
-    };
-    // 设置pinia store
-    playerStore.setPlayList(
-      songsList.value.map((s: any) => ({
-        name: s.name,
-        artist: s.artists?.map((a: any) => a.name).join(', '),
-        url: '', // 只在当前播放项填真实url
-        cover: s.picUrl || s.album?.picUrl,
-        id: s.id,
-      })),
-      songsList.value.findIndex((s: any) => s.id == songId)
-    );
-    playerStore.play(
-      info,
-      songsList.value.findIndex((s: any) => s.id == songId)
-    );
-    // 直接调用全局播放器
-    (window as any).MusicPlayer?.play(
-      url,
-      { name: info.name, artist: info.artist },
-      { cover: info.cover }
-    );
   } catch {
     message.error('播放失败');
   }

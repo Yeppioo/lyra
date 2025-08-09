@@ -63,6 +63,7 @@ const selectedComponent = computed(() => {
   font-weight: 700;
   margin-bottom: 30px;
   margin-top: 5px;
+  color: var(--y-text);
 }
 .login-component-container {
   margin-top: 20px;

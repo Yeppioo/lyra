@@ -28,5 +28,6 @@ const setting = useSettingsStore().settings;
   font-weight: 600;
   font-size: 21px;
   margin-bottom: 14px;
+  user-select: none;
 }
 </style>

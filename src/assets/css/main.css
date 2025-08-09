@@ -47,3 +47,9 @@ a,
     padding: 0 20px !important;
   }
 }
+#__vue-devtools-container__ {
+  display: none !important;
+}
+.ant-image-mask {
+  border-radius: 8px !important;
+}

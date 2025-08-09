@@ -1,59 +1,64 @@
 import { defineStore } from 'pinia';
+import { ref, watch } from 'vue';
 
 export interface SongInfo {
+  id: number;
+  duration: number;
   name: string;
   artist: string;
   url: string;
-  cover?: string;
-  lyric?: string;
-  id?: string | number;
+  cover: string;
 }
 
-export const usePlayerStore = defineStore('player', {
-  state: () => ({
-    playList: [] as SongInfo[],
-    playIndex: -1,
-    currentSong: null as SongInfo | null,
-    isPlaying: false,
-    audioUrl: '',
-    coverUrl: '',
-    lyric: '',
-  }),
-  actions: {
-    setPlayList(list: SongInfo[], startIndex = 0) {
-      this.playList = list;
-      this.playIndex = startIndex;
-      this.currentSong = list[startIndex] || null;
-      this.audioUrl = this.currentSong?.url || '';
-      this.coverUrl = this.currentSong?.cover || '';
-      this.lyric = this.currentSong?.lyric || '';
-      this.isPlaying = !!this.audioUrl;
+export interface PlayListGroup {
+  name: string;
+  songs: SongInfo[];
+  neteaseId?: number;
+}
+
+export interface PlayerState {
+  playListGroup: PlayListGroup[];
+  playIndex: number;
+  currentSong: SongInfo | null;
+  isPlaying: boolean;
+  audioUrl: string;
+  coverUrl: string;
+  lyric: string;
+  playMode: 'order' | 'repeat' | 'random';
+  currentTime: number;
+  duration: number;
+}
+
+const defaultPlayerState: PlayerState = {
+  playListGroup: [],
+  currentTime: 0,
+  duration: 0,
+  playIndex: 0,
+  currentSong: null,
+  isPlaying: false,
+  audioUrl: '',
+  coverUrl: '',
+  lyric: '',
+  playMode: 'order',
+};
+
+export const usePlayerStore = defineStore('player', () => {
+  const STORAGE_KEY = 'player';
+  let loadedState: Partial<PlayerState> = {};
+  try {
+    loadedState = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  } catch {}
+  const state = ref<PlayerState>({ ...defaultPlayerState, ...loadedState });
+
+  watch(
+    state,
+    (newState) => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
     },
-    play(song: SongInfo, index = 0) {
-      this.currentSong = song;
-      this.playIndex = index;
-      this.audioUrl = song.url;
-      this.coverUrl = song.cover || '';
-      this.lyric = song.lyric || '';
-      this.isPlaying = true;
-    },
-    pause() {
-      this.isPlaying = false;
-    },
-    resume() {
-      if (this.audioUrl) this.isPlaying = true;
-    },
-    next() {
-      if (this.playList.length > 0 && this.playIndex < this.playList.length - 1) {
-        this.playIndex++;
-        this.play(this.playList[this.playIndex], this.playIndex);
-      }
-    },
-    prev() {
-      if (this.playList.length > 0 && this.playIndex > 0) {
-        this.playIndex--;
-        this.play(this.playList[this.playIndex], this.playIndex);
-      }
-    },
-  },
+    { deep: true }
+  );
+
+  return {
+    state,
+  };
 });
