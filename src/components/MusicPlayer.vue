@@ -62,7 +62,7 @@
 <script setup lang="ts">
 import { usePlayerStore } from '@/stores/player';
 import { fallbackImg } from '@/stores/constant';
-import { computed } from 'vue';
+// ...existing code...
 
 const playerStore = usePlayerStore();
 const formatSecondsToMinutes = (seconds: number | undefined) => {
@@ -74,15 +74,29 @@ const formatSecondsToMinutes = (seconds: number | undefined) => {
   return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
-const currentTime = computed({
-  get: () =>
-    playerStore.currentSong?.currentTime ? playerStore.currentSong.currentTime / 1000 : 0,
-  set: (value) => {
-    if (playerStore.currentSong) {
-      playerStore.currentSong.currentTime = value * 1000;
+// ...existing code...
+import { watch, ref } from 'vue';
+
+const currentTime = ref(0);
+
+// 同步 currentTime <-> currentSong.currentTime
+watch(
+  () => playerStore.currentSong?.currentTime,
+  (val) => {
+    if (typeof val === 'number') {
+      currentTime.value = val / 1000;
     }
   },
-});
+  { immediate: true }
+);
+watch(
+  currentTime,
+  (val) => {
+    if (playerStore.currentSong) {
+      playerStore.currentSong.currentTime = val * 1000;
+    }
+  }
+);
 </script>
 
 <style>

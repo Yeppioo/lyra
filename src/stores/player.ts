@@ -1,3 +1,31 @@
+// 设置当前播放歌曲，自动初始化播放列表等
+export function setCurrentSong(song: SongInfo, playerStore: ReturnType<typeof usePlayerStore>) {
+  const state = playerStore.state;
+  // 初始化播放列表组
+  if (!state.playListGroup) {
+    state.playListGroup = [];
+  }
+  if (state.playListGroup.length === 0) {
+    state.playListGroup.push({
+      name: '默认歌单',
+      songs: [],
+      songIndex: 0,
+      canDelete: false,
+    });
+  }
+  if (!state.playListGroup[0].songs) {
+    state.playListGroup[0].songs = [];
+  }
+  // 检查是否已存在该歌曲
+  const existIdx = state.playListGroup[0].songs.findIndex((s: SongInfo) => s.id === song.id);
+  if (existIdx === -1) {
+    state.playListGroup[0].songs.push(song);
+    state.playListGroup[0].songIndex = state.playListGroup[0].songs.length - 1;
+  } else {
+    state.playListGroup[0].songIndex = existIdx;
+  }
+  state.groupIndex = 0;
+}
 import { defineStore } from 'pinia';
 import { ref, watch, computed } from 'vue';
 

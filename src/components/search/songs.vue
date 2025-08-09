@@ -59,7 +59,7 @@
 
 <!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script setup lang="ts">
-import { usePlayerStore } from '@/stores/player';
+import { usePlayerStore, setCurrentSong } from '@/stores/player';
 import { functions as getSongApi } from '@/api/netease/getSong';
 
 import { onMounted, ref, watch } from 'vue';
@@ -132,38 +132,16 @@ const handleMenuItemClick = async (key: number, cover: string) => {
       return;
     }
 
-    if (!playerStore.state.playListGroup) {
-      playerStore.state.playListGroup = [];
-    }
-    if (playerStore.state.playListGroup.length === 0) {
-      playerStore.state.playListGroup.push({
-        name: '默认歌单',
-        songs: [],
-        songIndex: 0,
-        canDelete: false,
-      });
-    }
-
-    if (!playerStore.state.playListGroup[0].songs) {
-      playerStore.state.playListGroup[0].songs = [];
-    }
-
-    if (playerStore.state.playListGroup[0].songs.length === 0)
-      if (!playerStore.state.playListGroup[0].songs.some((s: any) => s.id === songId)) {
-        playerStore.state.playListGroup[0].songs.push({
-          id: songId,
-          duration: song.duration,
-          name: song.name,
-          artist: song.artists[0].name,
-          url,
-          cover: cover,
-          lyric: '',
-          currentTime: 0,
-        });
-      }
-    playerStore.state.groupIndex = 0;
-    playerStore.state.playListGroup[0].songIndex =
-      playerStore.state.playListGroup[0].songs.findIndex((s: any) => s.id === songId);
+    setCurrentSong({
+      id: songId,
+      duration: song.duration,
+      name: song.name,
+      artist: song.artists[0].name,
+      url,
+      cover: cover,
+      lyric: '',
+      currentTime: 0,
+    }, playerStore);
   } catch {
     message.error('播放失败');
   }
