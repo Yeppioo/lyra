@@ -15,6 +15,7 @@
         <a-slider
           :tooltipOpen="false"
           id="progress-slider"
+          :value="currentTime"
           v-model="currentTime"
           :max="playerStore.currentSong?.duration ? playerStore.currentSong.duration / 1000 : 0"
           :step="1"
@@ -218,7 +219,7 @@ watch(currentTime, (val) => {
   background: #fff;
 }
 [theme-dark] .control-container {
-  background: #18181c;
+  background: #242424;
 }
 .progress {
   width: 100%;
@@ -250,7 +251,7 @@ watch(currentTime, (val) => {
   outline: rgba(255, 255, 255, 0.09) 1px solid;
 }
 #progress-slider {
-  width: calc(100% - 130px);
+  width: calc(100% - 114px);
 }
 
 .main-section {
