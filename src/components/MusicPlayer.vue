@@ -12,7 +12,8 @@
         <span class="progress-text current-time">
           {{ formatSecondsToMinutes(playerStore.currentSong?.currentTime) }}
         </span>
-        <a-slider ref="sliderRef"
+        <a-slider
+          ref="sliderRef"
           :tooltipOpen="false"
           id="progress-slider"
           :value="currentTime"
@@ -86,7 +87,6 @@ import { ref, watch } from 'vue';
 import { usePlayerStore } from '@/stores/player';
 import { fallbackImg } from '@/stores/constant';
 
-
 const playerStore = usePlayerStore();
 
 const audioRef = ref<HTMLAudioElement | null>(null);
@@ -104,7 +104,6 @@ function pauseAudio() {
     audioRef.value.pause();
   }
 }
-
 
 function togglePlay() {
   if (isPlaying.value) {
@@ -143,6 +142,7 @@ watch(
 // 监听 audio 的 play/pause 事件，自动同步 isPlaying
 import { onMounted } from 'vue';
 onMounted(() => {
+  document.title = playerStore.currentSong ? `Lyra - ${playerStore.currentSong.name}` : 'Lyra';
   if (audioRef.value) {
     audioRef.value.addEventListener('play', () => {
       isPlaying.value = true;
@@ -195,10 +195,22 @@ watch(currentTime, (val) => {
   flex-direction: column;
   justify-content: center;
 }
+:deep(.ant-image-img) {
+  height: 48px;
+  width: 48px;
+}
 .info-text span {
   color: var(--y-text);
   font-family: var(--y-font);
   line-height: 1.3;
+  display: -webkit-box;
+  word-wrap: break-word;
+  text-wrap: auto;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .artist-name {
   margin-top: 2px;

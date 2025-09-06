@@ -241,6 +241,9 @@ defineExpose({
   border: 0;
   background: transparent;
 }
+.ant-popover-arrow{
+  display: none !important;
+}
 .history-container {
   margin: 15px;
   margin-bottom: 20px;

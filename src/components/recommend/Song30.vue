@@ -257,6 +257,14 @@ const play = async () => {
 .song-artists {
   font-size: 15px;
   font-family: var(--y-font);
+  display: -webkit-box;
+  word-wrap: break-word;
+  text-wrap: auto;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .play-button-container {
   width: 42px;

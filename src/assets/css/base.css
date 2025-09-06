@@ -9,7 +9,7 @@
 }
 
 body {
-  overflow-x: hidden;
+  overflow: hidden;
   min-height: 100vh;
   color: var(--color-text);
   background: var(--y-bg);

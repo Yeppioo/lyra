@@ -56,6 +56,7 @@ export const usePlayerStore = defineStore('player', () => {
   watch(
     state,
     (newState) => {
+      document.title = currentSong.value ? `Lyra - ${currentSong?.value?.name}` : 'Lyra';
       const { playListGroup, groupIndex, playMode } = newState;
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ playListGroup, groupIndex, playMode }));
     },

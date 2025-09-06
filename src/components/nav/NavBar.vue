@@ -314,7 +314,7 @@ onUnmounted(() => {
 }
 .y-navbar {
   position: fixed;
-
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
   user-select: none;
   align-items: center;
   background: var(--y-nav-bg);

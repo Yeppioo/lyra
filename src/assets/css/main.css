@@ -35,7 +35,7 @@ a,
   max-width: 1200px;
   padding: 0 50px !important;
   margin: 0 auto;
-  margin-top: 80px;
+  margin-top: 55px;
 }
 @media (max-width: 930px) {
   #app-view {
@@ -46,6 +46,9 @@ a,
   #app-view {
     padding: 0 20px !important;
   }
+}
+#app-view {
+  padding-top: 20px !important;
 }
 #__vue-devtools-container__ {
   display: none !important;

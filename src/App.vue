@@ -22,7 +22,7 @@ const theme = computed(() => {
 <template>
   <ConfigProvider :locale="zhCN" :theme="theme">
     <NavBar />
-    <div id="app-view" :class="{ showPlayer: !playerStore.currentSong || true }">
+    <div id="app-view" :class="{ showPlayer: playerStore.currentSong }">
       <RouterView />
     </div>
     <MusicPlayer />
@@ -33,7 +33,12 @@ const theme = computed(() => {
 html {
   background: var(--y-bg);
 }
+#app-view {
+  overflow: scroll;
+  height: calc(100vh - 54px);
+}
 .showPlayer {
+  height: calc(100vh - 122px) !important;
   margin-bottom: 70px !important;
 }
 </style>
