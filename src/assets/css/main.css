@@ -31,6 +31,22 @@ a,
   }
 }
 
+#app-view {
+  max-width: 1200px;
+  padding: 0 50px !important;
+  margin: 0 auto;
+  margin-top: 80px;
+}
+@media (max-width: 930px) {
+  #app-view {
+    padding: 0 30px !important;
+  }
+}
+@media (max-width: 825px) {
+  #app-view {
+    padding: 0 20px !important;
+  }
+}
 #__vue-devtools-container__ {
   display: none !important;
 }

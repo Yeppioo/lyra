@@ -12,7 +12,7 @@
         <span class="progress-text current-time">
           {{ formatSecondsToMinutes(playerStore.currentSong?.currentTime) }}
         </span>
-        <a-slider
+        <a-slider ref="sliderRef"
           :tooltipOpen="false"
           id="progress-slider"
           :value="currentTime"
@@ -86,6 +86,7 @@ import { ref, watch } from 'vue';
 import { usePlayerStore } from '@/stores/player';
 import { fallbackImg } from '@/stores/constant';
 
+
 const playerStore = usePlayerStore();
 
 const audioRef = ref<HTMLAudioElement | null>(null);
@@ -103,6 +104,7 @@ function pauseAudio() {
     audioRef.value.pause();
   }
 }
+
 
 function togglePlay() {
   if (isPlaying.value) {

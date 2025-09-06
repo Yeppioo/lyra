@@ -21,34 +21,15 @@ const theme = computed(() => {
 
 <template>
   <ConfigProvider :locale="zhCN" :theme="theme">
-    <div id="app">
-      <NavBar />
-      <div id="main-view">
-        <RouterView />
-      </div>
-      <MusicPlayer />
+    <NavBar />
+    <div id="app-view" :class="{ showPlayer: !playerStore.currentSong || true }">
+      <RouterView />
     </div>
+    <MusicPlayer />
   </ConfigProvider>
 </template>
 
 <style scoped>
-#main-view {
-  max-width: 1200px;
-  padding: 0 50px !important;
-  margin: 0 auto;
-  margin-top: 80px;
-  overflow-x: scroll;
-}
-@media (max-width: 930px) {
-  #main-view {
-    padding: 0 30px !important;
-  }
-}
-@media (max-width: 825px) {
-  #main-view {
-    padding: 0 20px !important;
-  }
-}
 html {
   background: var(--y-bg);
 }
