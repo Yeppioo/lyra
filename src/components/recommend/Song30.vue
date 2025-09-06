@@ -111,10 +111,13 @@
   </div>
 </template>
 <script setup lang="ts">
+import { usePlayerStore, setCurrentSong } from '@/stores/player';
 import { useUIPropertiesStore } from '../../stores/uiProperties';
 import { storeToRefs } from 'pinia';
 const uiPropertiesStore = useUIPropertiesStore();
 const { uiProperties } = storeToRefs(uiPropertiesStore);
+import { functions as getSongApi } from '@/api/netease/getSong';
+import { message } from 'ant-design-vue';
 
 const dislike = () => {
   console.log('dislike');
@@ -127,8 +130,37 @@ const next = () => {
   )
     uiProperties.value.personalized.song30.selectedindex = 0;
 };
-const play = () => {
-  console.log('play');
+const play = async () => {
+  const song =
+    uiProperties.value.personalized.song30.songs[
+      uiProperties.value.personalized.song30.selectedindex
+    ];
+  try {
+    const urlRes = await getSongApi.getSongUrl(song.id);
+    console.log('urlRes', urlRes);
+
+    const url = urlRes.data?.[0]?.url;
+    if (!url) {
+      message.error('无法获取播放地址');
+      return;
+    }
+
+    setCurrentSong(
+      {
+        id: song.id,
+        duration: urlRes.data[0].time,
+        name: song.name,
+        artist: song.artist.join(','),
+        url,
+        cover: song.pic,
+        lyric: '',
+        currentTime: 0,
+      },
+      usePlayerStore()
+    );
+  } catch {
+    message.error('播放失败');
+  }
 };
 </script>
 <style lang="css" scoped>

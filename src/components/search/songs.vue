@@ -132,16 +132,19 @@ const handleMenuItemClick = async (key: number, cover: string) => {
       return;
     }
 
-    setCurrentSong({
-      id: songId,
-      duration: song.duration,
-      name: song.name,
-      artist: song.artists[0].name,
-      url,
-      cover: cover,
-      lyric: '',
-      currentTime: 0,
-    }, playerStore);
+    setCurrentSong(
+      {
+        id: songId,
+        duration: song.duration,
+        name: song.name,
+        artist: song.artists[0].name,
+        url,
+        cover: cover,
+        lyric: '',
+        currentTime: 0,
+      },
+      playerStore
+    );
   } catch {
     message.error('播放失败');
   }
