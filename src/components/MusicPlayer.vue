@@ -221,7 +221,6 @@ const playModeIcon = computed(() => {
   }
 });
 
-
 const onProgressChange = (value: number) => {
   if (audioRef.value) {
     audioRef.value.currentTime = value;

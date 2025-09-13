@@ -18,6 +18,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import { message } from 'ant-design-vue';
 import { functions as neteaseLoginApi } from '@/api/netease/login';
 import { useSettingsStore } from '@/stores/settings';
+import { useRouter } from 'vue-router';
 
 import { LoadingOutlined } from '@ant-design/icons-vue';
 import { h } from 'vue';
@@ -31,6 +32,7 @@ const indicator = h(LoadingOutlined, {
 const qrImg = ref(' '); // Initial non-empty value to show loader
 const statusText = ref('请使用网易云音乐APP扫码登录');
 const settingsStore = useSettingsStore();
+const router = useRouter();
 const spinning = ref(true);
 const spinningText = ref('加载中...');
 
@@ -85,7 +87,12 @@ const startPolling = () => {
           stopPolling();
           if (res.cookie) {
             settingsStore.settings.userinfo.netease.cookie = res.cookie;
+            const accountInfo = await neteaseLoginApi.getUserAccount();
+            settingsStore.settings.userinfo.netease.account = accountInfo.account;
+            settingsStore.settings.userinfo.netease.profile = accountInfo.profile;
+            settingsStore.updateUserInfo(accountInfo.profile);
             message.success('登录成功');
+            router.push('/'); // 登录成功后跳转到主页
           }
           break;
       }

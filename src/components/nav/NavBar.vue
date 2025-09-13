@@ -104,17 +104,27 @@
                   <span style="font-size: 14px; margin-bottom: -3px; color: var(--y-text)">
                     {{ settingsStore.settings.userinfo.username }}
                   </span>
-                  <span style="font-size: 12px; color: var(--y-color-gray)">
-                    {{ settingsStore.settings.userinfo.usernameLabel }}
+                  <span
+                    v-if="settingsStore.settings.userinfo.netease.cookie"
+                    style="font-size: 12px; color: var(--y-color-gray)">
+                    已登录
                   </span>
+                  <span v-else style="font-size: 12px; color: var(--y-color-gray)"> 未登录 </span>
                 </div>
               </div>
               <a-divider style="margin: 4px 0" />
               <a-menu-item
+                v-if="!settingsStore.settings.userinfo.netease.cookie"
                 style="padding: 7px 12px"
                 @click="handleMenuSelect({ key: '/auth/login' })">
                 <font-awesome-icon style="margin-right: 7px" :icon="['fas', 'key']" />
                 登录账户
+              </a-menu-item>
+              <a-menu-item v-else style="padding: 7px 12px" @click="handleLogout">
+                <font-awesome-icon
+                  style="margin-right: 7px"
+                  :icon="['fas', 'right-from-bracket']" />
+                退出登录
               </a-menu-item>
               <a-menu-item style="padding: 7px 12px" @click="handleMenuSelect({ key: 'settings' })">
                 <font-awesome-icon style="margin-right: 7px" :icon="['fas', 'gear']" />
@@ -135,10 +145,12 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import type { MenuProps } from 'ant-design-vue';
+import { message } from 'ant-design-vue';
 import { navConfig } from '../../router/nav.config';
 import { useRouter } from 'vue-router';
 import { useSettingsStore } from '../../stores/settings';
 import SearcherBox from './SearcherBox.vue';
+import { logout } from '@/api/netease/login';
 
 const router = useRouter();
 const settingsStore = useSettingsStore();
@@ -192,6 +204,20 @@ const goHome = () => {
 };
 const goForward = () => {
   router.forward();
+};
+
+const handleLogout = async () => {
+  try {
+    await logout();
+    settingsStore.settings.userinfo.netease.cookie = null;
+    settingsStore.settings.userinfo.netease.account = null;
+    settingsStore.settings.userinfo.netease.profile = null;
+    settingsStore.settings.userinfo.username = '未登录';
+    settingsStore.settings.userinfo.avatar = null;
+    message.success('已退出登录');
+  } catch (error) {
+    console.error('Logout failed:', error);
+  }
 };
 
 onMounted(() => {

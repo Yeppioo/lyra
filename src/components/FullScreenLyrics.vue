@@ -7,7 +7,10 @@
             :icon="['fas', 'expand']"
             class="fullscreen-icon"
             @click="toggleFullScreen" />
-          <font-awesome-icon :icon="['fas', 'chevron-down']" class="close-icon" @click="closeLyrics" />
+          <font-awesome-icon
+            :icon="['fas', 'chevron-down']"
+            class="close-icon"
+            @click="closeLyrics" />
         </div>
       </div>
       <div class="lyrics-main-content">
@@ -164,7 +167,7 @@ async function updateLyricsPosition() {
     if (activeLineElement) {
       const containerHeight = lyricsContentRef.value.clientHeight;
       const lineHeight = activeLineElement.clientHeight;
-      const scrollPosition = activeLineElement.offsetTop - (containerHeight * 0.33) + (lineHeight / 2);
+      const scrollPosition = activeLineElement.offsetTop - containerHeight * 0.33 + lineHeight / 2;
       lyricsContentRef.value.scrollTo({
         top: scrollPosition,
         behavior: 'smooth', // 始终平滑滚动
@@ -212,9 +215,9 @@ function onProgressChange(value: number) {
 </script>
 
 <style scoped>
-*{
+* {
   user-select: none;
-  color: #FEFEFE;
+  color: #fefefe;
 }
 .full-screen-lyrics-container {
   position: fixed;
@@ -226,7 +229,7 @@ function onProgressChange(value: number) {
   z-index: 9999;
   display: flex;
   flex-direction: column;
-  color: #FEFEFE;
+  color: #fefefe;
   font-family: var(--y-font);
   background-size: cover;
   background-position: center;
@@ -251,7 +254,8 @@ function onProgressChange(value: number) {
   display: flex;
   justify-content: flex-end; /* 将内容推到右边 */
   align-items: center;
-    padding: 25px 30px 0 0;  position: relative;
+  padding: 25px 30px 0 0;
+  position: relative;
   z-index: 10;
 }
 
@@ -265,7 +269,7 @@ function onProgressChange(value: number) {
 .fullscreen-icon {
   font-size: 24px;
   cursor: pointer;
-  color:#FEFEFE;
+  color: #fefefe;
 }
 
 .lyrics-main-content {
@@ -314,7 +318,7 @@ function onProgressChange(value: number) {
   font-weight: bold;
   display: block;
   margin-bottom: 8px;
-  color: #FEFEFE;
+  color: #fefefe;
 }
 
 .song-info .artist-name {
@@ -393,7 +397,6 @@ function onProgressChange(value: number) {
   max-height: 100%; /* 歌词区域高度自适应 */
 }
 
-
 @media (max-width: 768px) {
   .lyrics-main-content {
     padding: 0 60px;
@@ -409,7 +412,7 @@ function onProgressChange(value: number) {
 }
 
 @media (max-width: 768px) {
-  .lyrics-main-content{
+  .lyrics-main-content {
     display: block;
   }
 }
@@ -449,7 +452,7 @@ function onProgressChange(value: number) {
 
 .lyrics-line.active {
   color: #ffffff; /* 活跃歌词颜色为白色 */
-  font-size:  30px;
+  font-size: 30px;
   font-weight: bold;
 }
 

@@ -151,10 +151,7 @@ const play = async () => {
         duration: urlRes.data[0].time,
         name: song.name,
         artist: song.artist.join(','),
-        url,
         cover: song.pic,
-        lyric: '',
-        currentTime: 0,
       },
       usePlayerStore()
     );

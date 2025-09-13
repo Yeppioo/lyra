@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
+import type { UserAccountResponse } from '@/api/netease/login';
 
 export interface SettingsState {
   theme: 'light' | 'dark';
@@ -7,14 +8,12 @@ export interface SettingsState {
   searchHistory: string[];
   userinfo: {
     state: string[];
-    username: string | null;
-    avatar: string | null;
-    usernameLabel: string | null;
+    username: string | null; // 将通过 netease.profile.nickname 获取
+    avatar: string | null; // 将通过 netease.profile.avatarUrl 获取
     netease: {
-      phone: string | null;
-      email: string | null;
-      password: string | null;
       cookie: string | null;
+      account: UserAccountResponse['account'] | null;
+      profile: UserAccountResponse['profile'] | null;
     };
   };
 }
@@ -26,13 +25,11 @@ const defaultSettings: SettingsState = {
   userinfo: {
     state: [],
     username: '未登录',
-    usernameLabel: '登录使用完整功能',
     avatar: null,
     netease: {
-      phone: null,
-      email: null,
-      password: null,
       cookie: null,
+      account: null,
+      profile: null,
     },
   },
 };
@@ -66,5 +63,9 @@ export const useSettingsStore = defineStore('settings', () => {
 
   return {
     settings,
+    updateUserInfo(profile: UserAccountResponse['profile']) {
+      settings.value.userinfo.username = profile.nickname;
+      settings.value.userinfo.avatar = profile.avatarUrl;
+    },
   };
 });

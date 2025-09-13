@@ -84,10 +84,89 @@ async function loginByCellphone(
   return (await response.json()) as LoginResponse;
 }
 
+export interface UserAccountResponse {
+  code: number;
+  account: {
+    id: number;
+    userName: string;
+    type: number;
+    status: number;
+    whitelistAuthority: number;
+    createTime: number;
+    tokenVersion: number;
+    ban: number;
+    baoyueVersion: number;
+    donateVersion: number;
+    vipType: number;
+    anonimousUser: boolean;
+    paidFee: boolean;
+  };
+  profile: {
+    userId: number;
+    userType: number;
+    nickname: string;
+    avatarImgId: number;
+    avatarUrl: string;
+    backgroundImgId: number;
+    backgroundUrl: string;
+    signature: string | null;
+    createTime: number;
+    userName: string;
+    accountType: number;
+    shortUserName: string;
+    birthday: number;
+    authority: number;
+    gender: number;
+    accountStatus: number;
+    province: number;
+    city: number;
+    authStatus: number;
+    description: string | null;
+    detailDescription: string | null;
+    defaultAvatar: boolean;
+    expertTags: string[] | null;
+    experts: string | null;
+    djStatus: number;
+    locationStatus: number;
+    vipType: number;
+    followed: boolean;
+    mutual: boolean;
+    authenticated: boolean;
+    lastLoginTime: number;
+    lastLoginIP: string;
+    remarkName: string | null;
+    viptypeVersion: number;
+    authenticationTypes: number;
+    avatarDetail: string | null;
+    anchor: boolean;
+  };
+}
+
+async function getUserAccount(): Promise<UserAccountResponse> {
+  const response = await fetch(`${apiBase}/user/account?timestamp=${Date.now()}${realIpParam}`, {
+    credentials: 'include',
+  });
+  if (!response.ok) {
+    throw new Error(`Network response was not ok, status: ${response.status}`);
+  }
+  return (await response.json()) as UserAccountResponse;
+}
+
 export const functions = {
   getQrCodeKey,
   createQrCodeImage,
   checkQrCodeStatus,
   sendCaptcha,
   loginByCellphone,
+  getUserAccount,
 };
+
+export async function logout(): Promise<void> {
+  const response = await fetch(`${apiBase}/logout?timestamp=${Date.now()}${realIpParam}`, {
+    credentials: 'include',
+  });
+  if (!response.ok) {
+    throw new Error(`Network response was not ok, status: ${response.status}`);
+  }
+  // No need to parse JSON for logout, just ensure it's successful
+}

@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { useSettingsStore } from '@/stores/settings';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -52,6 +53,17 @@ const router = createRouter({
       ],
     },
   ],
+});
+
+router.beforeEach((to, from, next) => {
+  const settingsStore = useSettingsStore();
+  const isLoggedIn = !!settingsStore.settings.userinfo.netease.cookie;
+
+  if (to.path === '/auth/login' && isLoggedIn) {
+    next('/'); // 如果已登录且尝试访问登录页，则重定向到主页
+  } else {
+    next(); // 否则正常导航
+  }
 });
 
 export default router;
