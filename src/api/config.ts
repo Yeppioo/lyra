@@ -1,5 +1,7 @@
+const isDevelopment = import.meta.env.DEV;
+import { config } from '../../config.ts';
+
 export const apiSettings = {
-  neteaseApiBase: 'https://neteasemusic.api.yeppioo.vip',
-  // neteaseApiBase: 'http://localhost:3000',
-  realIP: '',
+  neteaseApiBase: isDevelopment ? config.DevNeteaseApiBase : config.ProductionNeteaseApiBase,
+  realIP: config.realIP,
 };

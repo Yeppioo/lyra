@@ -12,15 +12,25 @@
         <span class="progress-text current-time">
           {{ formatSecondsToMinutes(playerStore.currentSong?.currentTime) }}
         </span>
-        <a-slider
-          ref="sliderRef"
-          :tooltipOpen="false"
-          id="progress-slider"
-          :value="currentTime"
-          v-model="currentTime"
-          :max="playerStore.currentSong?.duration ? playerStore.currentSong.duration / 1000 : 0"
-          :step="1"
-          :tip-formatter="formatSecondsToMinutes" />
+        <div class="slider-container">
+          <a-slider
+            ref="sliderRef"
+            :tooltipOpen="false"
+            class="progress-slider"
+            :value="currentTime"
+            v-model="currentTime"
+            :max="playerStore.currentSong?.duration ? playerStore.currentSong.duration / 1000 : 0"
+            :step="1"
+            :tip-formatter="formatSecondsToMinutes" />
+          <a-slider
+            @afterChange="onProgressChange"
+            :tooltipOpen="false"
+            class="progress-slider"
+            id="progress-change-slider"
+            :max="playerStore.currentSong?.duration ? playerStore.currentSong.duration / 1000 : 0"
+            :step="1"
+            :tip-formatter="formatSecondsToMinutes" />
+        </div>
         <span class="progress-text current-time">
           {{ formatSecondsToMinutes(playerStore.currentSong?.duration) }}
         </span>
@@ -104,6 +114,12 @@ function pauseAudio() {
     audioRef.value.pause();
   }
 }
+
+const onProgressChange = (value: number) => {
+  if (audioRef.value) {
+    audioRef.value.currentTime = value;
+  }
+};
 
 function togglePlay() {
   if (isPlaying.value) {
@@ -235,6 +251,13 @@ watch(currentTime, (val) => {
 [theme-dark] .control-container {
   background: #242424;
 }
+#progress-slider {
+  pointer-events: none;
+}
+#progress-change-slider {
+  opacity: 0;
+}
+
 .progress {
   width: 100%;
   display: flex;
@@ -264,8 +287,14 @@ watch(currentTime, (val) => {
 [theme-dark] .progress-text {
   outline: rgba(255, 255, 255, 0.09) 1px solid;
 }
-#progress-slider {
-  width: calc(100% - 114px);
+.slider-container {
+  width: 100%;
+  position: relative;
+  margin-bottom: 30px;
+}
+.progress-slider {
+  width: calc(100% - 10px);
+  position: absolute;
 }
 
 .main-section {

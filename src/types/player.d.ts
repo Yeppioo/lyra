@@ -3,8 +3,16 @@ export interface SongInfo {
   duration: number;
   name: string;
   artist: string;
-  url: string;
   cover: string;
+}
+
+export interface CurrentSong {
+  id: number;
+  duration: number;
+  name: string;
+  artist: string;
+  cover: string;
+  url: string;
   lyric: string;
   currentTime: number;
 }

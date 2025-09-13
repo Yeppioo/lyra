@@ -241,7 +241,7 @@ defineExpose({
   border: 0;
   background: transparent;
 }
-.ant-popover-arrow{
+.ant-popover-arrow {
   display: none !important;
 }
 .history-container {
