@@ -389,56 +389,28 @@ function onProgressChange(value: number) {
   display: flex;
   flex-direction: column;
   /* padding-left: 50px; 与左侧专辑封面图的间距 */
-  overflow-y: auto;
+  overflow-y: hidden;
   max-height: 100%; /* 歌词区域高度自适应 */
 }
 
-@media (max-width: 1024px) {
-  .lyrics-main-content {
-    grid-template-columns: 1fr; /* 平板端单列布局 */
-    padding: 20px;
-  }
-
-  .left-section {
-    padding-right: 0;
-    margin-bottom: 40px;
-  }
-
-  .cover-container {
-    width: 250px;
-    height: 250px;
-    margin-bottom: 20px;
-  }
-
-  .song-info {
-    margin-bottom: 20px;
-  }
-
-  .right-section {
-    padding-left: 0;
-  }
-}
 
 @media (max-width: 768px) {
   .lyrics-main-content {
-    padding: 15px;
+    padding: 0 60px;
   }
 
   .left-section {
-    display: none; /* 手机端隐藏专辑封面图和控制 */
+    display: none;
   }
 
   .right-section {
     padding: 0;
   }
+}
 
-  .lyrics-header {
-    padding: 10px 15px;
-  }
-
-  .close-icon,
-  .fullscreen-icon {
-    font-size: 20px;
+@media (max-width: 768px) {
+  .lyrics-main-content{
+    display: block;
   }
 }
 
@@ -467,7 +439,7 @@ function onProgressChange(value: number) {
 
 .lyrics-line {
   margin-bottom: 40px;
-  font-size: 31px;
+  font-size: calc(30px - 4px);
   color: rgba(255, 255, 255, 0.15); /* 未选中歌词偏透明 */
   transition:
     color 0.3s ease-in-out,
@@ -477,7 +449,7 @@ function onProgressChange(value: number) {
 
 .lyrics-line.active {
   color: #ffffff; /* 活跃歌词颜色为白色 */
-  font-size: 38px;
+  font-size:  30px;
   font-weight: bold;
 }
 
