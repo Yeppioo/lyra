@@ -131,7 +131,9 @@ function togglePlay() {
 
 function onCanPlay() {
   // 可以在这里做自动播放或其他初始化
-  playAudio();
+  if (playerStore.currentSong?.url) {
+    playAudio();
+  }
 }
 
 function onAudioEnded() {
@@ -141,24 +143,17 @@ function onAudioEnded() {
 function onTimeUpdate(e: Event) {
   const audio = e.target as HTMLAudioElement;
   if (playerStore.currentSong) {
-    playerStore.currentSong.currentTime = audio.currentTime * 1000;
+    // 创建一个新的对象来触发 shallowRef 的更新
+    playerStore.currentSong = {
+      ...playerStore.currentSong,
+      currentTime: audio.currentTime * 1000,
+    };
   }
 }
-
-// 切歌时自动播放
-watch(
-  () => playerStore.currentSong?.url,
-  (url) => {
-    if (url) {
-      playAudio();
-    }
-  }
-);
 
 // 监听 audio 的 play/pause 事件，自动同步 isPlaying
 import { onMounted } from 'vue';
 onMounted(() => {
-  document.title = playerStore.currentSong ? `Lyra - ${playerStore.currentSong.name}` : 'Lyra';
   if (audioRef.value) {
     audioRef.value.addEventListener('play', () => {
       isPlaying.value = true;
@@ -169,6 +164,16 @@ onMounted(() => {
   }
 });
 
+// 监听 currentSong 变化，更新 document.title 并在有 URL 时自动播放
+watch(
+  () => playerStore.currentSong,
+  (newSong) => {
+    document.title = newSong ? `Lyra - ${newSong.name}` : 'Lyra';
+    // 移除自动播放逻辑，由用户手动触发或 onCanPlay 根据 isPlaying 状态决定
+  },
+  { immediate: true }
+);
+
 const formatSecondsToMinutes = (seconds: number | undefined) => {
   if (!seconds) return '00:00';
   seconds = seconds / 1000;
@@ -178,7 +183,6 @@ const formatSecondsToMinutes = (seconds: number | undefined) => {
   return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
-// ...existing code...
 
 const currentTime = ref(0);
 
