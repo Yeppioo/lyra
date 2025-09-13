@@ -37,7 +37,7 @@
       </div>
       <div class="main-section">
         <div class="info">
-          <div class="icon-container">
+          <div @click="toggleFullScreenLyrics" class="icon-container">
             <div class="icon-mask">
               <font-awesome-icon class="icon-mask-icon" size="xl" :icon="['fas', 'expand']" />
             </div>
@@ -189,9 +189,11 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
 import { usePlayerStore } from '@/stores/player';
+import { useUIPropertiesStore } from '@/stores/uiProperties'; // 引入 uiPropertiesStore
 import { fallbackImg } from '@/stores/constant';
 
 const playerStore = usePlayerStore();
+const uiPropertiesStore = useUIPropertiesStore(); // 使用 uiPropertiesStore
 
 const audioRef = ref<HTMLAudioElement | null>(null);
 const isPlaying = ref(false);
@@ -199,6 +201,7 @@ const showVolumePopup = ref(false);
 const showPlayModePopup = ref(false);
 const showPlaylistPopup = ref(false);
 const hoveredSongId = ref<number | null>(null); // 新增：用于跟踪鼠标悬停的歌曲ID
+// 移除 showFullScreenLyrics，因为它现在由 uiPropertiesStore 管理
 
 // 计算属性，根据播放模式返回不同的图标
 const playModeIcon = computed(() => {
@@ -387,6 +390,10 @@ watch(currentTime, (val) => {
     playerStore.currentSong.currentTime = val * 1000;
   }
 });
+
+function toggleFullScreenLyrics() {
+  uiPropertiesStore.toggleFullScreenLyrics(); // 调用 uiPropertiesStore 中的方法
+}
 </script>
 
 <style scoped>

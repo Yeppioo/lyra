@@ -14,10 +14,19 @@ const defaultUIProperties: UIPropertiesState = {
   },
   defaultSearchKey: { key: '', show: '搜索...' },
   hotSearchTips: [],
+  showFullScreenLyrics: false, // 新增：控制全屏歌词显示状态
 };
 
 export const useUIPropertiesStore = defineStore('uiProperties', () => {
   const uiProperties = ref<UIPropertiesState>({ ...defaultUIProperties });
+
+  function toggleFullScreenLyrics(visible?: boolean) {
+    if (typeof visible === 'boolean') {
+      uiProperties.value.showFullScreenLyrics = visible;
+    } else {
+      uiProperties.value.showFullScreenLyrics = !uiProperties.value.showFullScreenLyrics;
+    }
+  }
 
   async function fetchPersonalizedSongs(): Promise<void> {
     try {
@@ -65,5 +74,6 @@ export const useUIPropertiesStore = defineStore('uiProperties', () => {
     uiProperties,
     fetchPersonalizedSongs,
     fetchSearchData,
+    toggleFullScreenLyrics, // 暴露方法
   };
 });
