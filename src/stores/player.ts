@@ -16,7 +16,7 @@ export function setCurrentSong(
       name: '默认歌单',
       songs: [],
       songIndex: 0,
-      canDelete: false,
+      canDelete: true, // 将默认歌单的 canDelete 设置为 true
     });
   }
   if (!state.playListGroup[0].songs) {
@@ -44,7 +44,7 @@ const defaultPlayerState: PlayerState = {
       name: '默认歌单',
       songs: [],
       songIndex: 0,
-      canDelete: false,
+      canDelete: true, // 将默认歌单的 canDelete 设置为 true
     },
   ],
   groupIndex: 0,
@@ -283,6 +283,45 @@ export const usePlayerStore = defineStore('player', () => {
     }
   }
 
+  function deleteSong(songId: number, groupIndex: number) {
+    const group = state.value.playListGroup[groupIndex];
+    if (!group) return;
+
+    const songIndex = group.songs.findIndex((s) => s.id === songId);
+    if (songIndex !== -1) {
+      const isCurrentSong = currentSongId.value === songId && state.value.groupIndex === groupIndex;
+      group.songs.splice(songIndex, 1);
+
+      if (isCurrentSong) {
+        if (group.songs.length > 0) {
+          // 如果删除的是当前播放歌曲，且歌单中还有其他歌曲
+          // 尝试播放下一首，如果删除的是最后一首，则播放新的第一首
+          group.songIndex = Math.min(songIndex, group.songs.length - 1);
+          currentSongId.value = group.songs[group.songIndex].id;
+        } else {
+          // 如果歌单为空，则清空当前播放歌曲
+          currentSongId.value = null;
+        }
+      } else if (groupIndex === state.value.groupIndex && songIndex < group.songIndex) {
+        // 如果删除的歌曲在当前播放歌曲之前，则当前播放歌曲的索引需要减1
+        group.songIndex--;
+      }
+    }
+  }
+
+  function switchPlaylist(newGroupIndex: number) {
+    if (newGroupIndex < 0 || newGroupIndex >= state.value.playListGroup.length) return;
+
+    state.value.groupIndex = newGroupIndex;
+    const newGroup = state.value.playListGroup[newGroupIndex];
+    if (newGroup && newGroup.songs.length > 0) {
+      newGroup.songIndex = 0; // 切换歌单后从第一首开始播放
+      currentSongId.value = newGroup.songs[newGroup.songIndex].id;
+    } else {
+      currentSongId.value = null;
+    }
+  }
+
   return {
     state,
     currentSong,
@@ -296,5 +335,7 @@ export const usePlayerStore = defineStore('player', () => {
     setVolume: (val: number) => (volume.value = val),
     setPlayMode: (mode: 'order' | 'repeat' | 'random' | 'single' | 'list') =>
       (state.value.playMode = mode),
+    deleteSong, // 暴露 deleteSong action
+    switchPlaylist, // 暴露 switchPlaylist action
   };
 });

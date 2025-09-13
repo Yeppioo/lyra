@@ -147,17 +147,34 @@
       </div>
     </div>
 
-    <!-- 歌单弹出框 (待实现) -->
+    <!-- 歌单弹出框 -->
     <div v-if="showPlaylistPopup" class="playlist-popup">
-      <h3>播放列表</h3>
-      <ul>
+      <div class="playlist-header">
+        <h3 class="playlist-title">播放列表</h3>
+        <a-select
+          v-model:value="playerStore.state.groupIndex"
+          style="width: 120px"
+          @change="playerStore.switchPlaylist"
+          :options="
+            playerStore.state.playListGroup.map((group, idx) => ({ value: idx, label: group.name }))
+          "></a-select>
+      </div>
+      <ul class="song-list">
         <li
           v-for="(song, index) in playerStore.state.playListGroup[playerStore.state.groupIndex]
             ?.songs"
           :key="song.id"
           :class="{ 'current-playing': song.id === playerStore.currentSong?.id }"
           @click="playSongFromPlaylist(song.id, index)">
-          {{ song.name }} - {{ song.artist }}
+          <span class="song-info"> {{ song.name }} - {{ song.artist }} </span>
+          <span class="song-duration">
+            {{ formatSecondsToMinutes(song.duration) }}
+          </span>
+          <font-awesome-icon
+            v-if="playerStore.state.playListGroup[playerStore.state.groupIndex]?.canDelete"
+            :icon="['fas', 'trash']"
+            class="delete-icon"
+            @click.stop="deleteSongFromPlaylist(song.id, playerStore.state.groupIndex)" />
         </li>
       </ul>
     </div>
@@ -323,12 +340,17 @@ function setPlayMode(mode: 'order' | 'repeat' | 'random' | 'single' | 'list') {
   showPlayModePopup.value = false; // 关闭弹出框
 }
 
+function deleteSongFromPlaylist(songId: number, groupIndex: number) {
+  playerStore.deleteSong(songId, groupIndex);
+}
+
 function playSongFromPlaylist(songId: number, index: number) {
   const group = playerStore.state.playListGroup[playerStore.state.groupIndex];
   if (group) {
     group.songIndex = index;
     playerStore.currentSongId = songId;
-    showPlaylistPopup.value = false;
+    // 播放歌曲后不需要关闭弹出框，用户可能想继续浏览或删除
+    // showPlaylistPopup.value = false;
   }
 }
 
@@ -375,6 +397,13 @@ watch(currentTime, (val) => {
 :deep(.ant-image-img) {
   height: 48px;
   width: 48px;
+}
+.current-playing span {
+  color: #70baff !important;
+}
+:deep(.ant-select-selection-item){
+  color: var(--y-text);
+  font-family: var(--y-font);
 }
 .info-text span {
   color: var(--y-text);
@@ -561,7 +590,7 @@ watch(currentTime, (val) => {
 .play-mode-popup,
 .playlist-popup {
   position: absolute;
-  bottom: 75px;
+  bottom: 80px;
   background-color: var(--y-com-bg);
   border-radius: 8px;
   padding: 10px;
@@ -580,7 +609,8 @@ watch(currentTime, (val) => {
   font-family: var(--y-font);
   color: var(--y-text);
 }
-.mode-item.active span , .mode-item.active svg{
+.mode-item.active span,
+.mode-item.active svg {
   color: #70baff !important;
 }
 .volume-slider {
@@ -622,24 +652,48 @@ watch(currentTime, (val) => {
 }
 
 .playlist-popup {
-  right: 0;
-  width: 250px;
-  max-height: 300px;
+  right: 10px;
+  max-width: 300px;
+  width: calc(100vw - 20px);
+  display: flex;
+  flex-direction: column;
+  padding: 0; /* 移除整体 padding，让 header 和 list 自己控制 */
+}
+
+.playlist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px; /* 头部内边距 */
+  border-bottom: 1px solid var(--y-background);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.playlist-header .playlist-title {
+  color: var(--y-text);
+  margin: 0;
+  font-size: 16px;
+  margin-left: 8px;
+}
+:deep(.ant-select-selector) {
+  background-color: transparent !important;
+}
+
+.song-list {
+  list-style: none;
+  padding: 0 10px 10px 10px; /* 列表内边距，底部留出空间 */
+  margin: 0;
+  flex-grow: 1;
+  max-height: 363px; /* 调整最大高度，留出头部空间 */
   overflow-y: auto;
 }
 
-.playlist-popup h3 {
-  color: var(--y-text);
-  margin-bottom: 10px;
-}
-
-.playlist-popup ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
 .playlist-popup li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 8px;
   cursor: pointer;
   color: var(--y-text);
@@ -653,7 +707,35 @@ watch(currentTime, (val) => {
 }
 
 .playlist-popup li.current-playing {
-  color: var(--y-active-color);
+  color: #70baff; /* 使用主题色 */
   font-weight: bold;
+}
+
+.song-info {
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 10px; /* 为时间留出空间 */
+}
+
+.song-duration {
+  font-size: 12px;
+  color: #909092;
+  margin-left: auto; /* 将时间推到右边 */
+  flex-shrink: 0; /* 防止时间被挤压 */
+}
+
+.delete-icon {
+  margin-left: 10px;
+  color: var(--y-text);
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.delete-icon:hover {
+  color: #ff4d4f; /* 删除按钮的悬停颜色 */
+  opacity: 1;
 }
 </style>
