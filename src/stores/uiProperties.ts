@@ -15,16 +15,27 @@ const defaultUIProperties: UIPropertiesState = {
   defaultSearchKey: { key: '', show: '搜索...' },
   hotSearchTips: [],
   showFullScreenLyrics: false, // 新增：控制全屏歌词显示状态
+  isFullScreen: false, // 新增：控制网页全屏状态
 };
 
 export const useUIPropertiesStore = defineStore('uiProperties', () => {
   const uiProperties = ref<UIPropertiesState>({ ...defaultUIProperties });
+  const isFullScreen = ref(false); // 单独管理全屏状态
 
   function toggleFullScreenLyrics(visible?: boolean) {
     if (typeof visible === 'boolean') {
       uiProperties.value.showFullScreenLyrics = visible;
     } else {
       uiProperties.value.showFullScreenLyrics = !uiProperties.value.showFullScreenLyrics;
+    }
+  }
+
+  function toggleFullScreen() {
+    isFullScreen.value = !isFullScreen.value;
+    if (isFullScreen.value) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
     }
   }
 
@@ -72,8 +83,10 @@ export const useUIPropertiesStore = defineStore('uiProperties', () => {
 
   return {
     uiProperties,
+    isFullScreen, // 暴露 isFullScreen 状态
     fetchPersonalizedSongs,
     fetchSearchData,
     toggleFullScreenLyrics, // 暴露方法
+    toggleFullScreen, // 暴露全屏切换方法
   };
 });

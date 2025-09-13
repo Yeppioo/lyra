@@ -51,6 +51,7 @@ const defaultPlayerState: PlayerState = {
   playMode: 'order',
   volume: 50, // 默认音量
   currentSong: null, // 新增 currentSong 属性
+  isPlaying: false, // 新增：播放状态
 };
 
 export const usePlayerStore = defineStore('player', () => {
@@ -64,6 +65,8 @@ export const usePlayerStore = defineStore('player', () => {
   const currentSongId = ref<number | null>(null); // 用于监听歌曲ID变化
   const currentSong = shallowRef<CurrentSong | null>(null); // 使用 shallowRef 避免深度响应式开销
   const volume = ref(loadedState.volume ?? defaultPlayerState.volume); // 音量
+  const isPlaying = ref(false); // 播放状态
+  const audioElement = shallowRef<HTMLAudioElement | null>(null); // 新增：用于存储 audio 元素的引用
 
   // 页面加载时，如果 localStorage 中有歌曲，设置 currentSongId
   if (loadedState.playListGroup && loadedState.playListGroup.length > 0) {
@@ -193,10 +196,23 @@ export const usePlayerStore = defineStore('player', () => {
   // currentSong 现在是 ref，不再是 computed
   // 播放/暂停由组件管理
 
-  // 播放/暂停由组件管理
-  function play() {}
+  function play() {
+    if (audioElement.value) {
+      audioElement.value.play();
+      isPlaying.value = true;
+    }
+  }
 
-  function pause() {}
+  function pause() {
+    if (audioElement.value) {
+      audioElement.value.pause();
+      isPlaying.value = false;
+    }
+  }
+
+  function setAudioElement(element: HTMLAudioElement | null) {
+    audioElement.value = element;
+  }
 
   // 下一首
   function next() {
@@ -326,16 +342,36 @@ export const usePlayerStore = defineStore('player', () => {
     state,
     currentSong,
     currentSongId, // 暴露 currentSongId
+    isPlaying, // 暴露 isPlaying 状态
     play,
     pause,
-    next,
-    prev,
+    togglePlay: () => {
+      if (isPlaying.value) {
+        pause();
+      } else {
+        play();
+      }
+    }, // 切换播放状态
+    playNext: next, // 暴露 next 方法为 playNext
+    playPrevious: prev, // 暴露 prev 方法为 playPrevious
+    seek: (time: number) => {
+      if (currentSong.value && audioElement.value) {
+        audioElement.value.currentTime = time / 1000; // currentTime 是秒
+        currentSong.value.currentTime = time;
+      }
+    }, // 暴露 seek 方法
     onSongEnded,
     volume,
-    setVolume: (val: number) => (volume.value = val),
+    setVolume: (val: number) => {
+      volume.value = val;
+      if (audioElement.value) {
+        audioElement.value.volume = val / 100;
+      }
+    },
     setPlayMode: (mode: 'order' | 'repeat' | 'random' | 'single' | 'list') =>
       (state.value.playMode = mode),
     deleteSong, // 暴露 deleteSong action
     switchPlaylist, // 暴露 switchPlaylist action
+    setAudioElement, // 暴露 setAudioElement 方法
   };
 });

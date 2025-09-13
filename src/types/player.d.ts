@@ -34,4 +34,5 @@ export interface PlayerState {
   playMode: 'order' | 'repeat' | 'random' | 'single' | 'list';
   volume: number; // 0-100
   currentSong: CurrentSong | null;
+  isPlaying: boolean; // 新增：播放状态
 }

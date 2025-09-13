@@ -61,12 +61,12 @@
           </div>
         </div>
         <div class="control">
-          <button class="control-button" @click="playerStore.prev()">
+          <button class="control-button" @click="playerStore.playPrevious()">
             <font-awesome-icon size="1x" :icon="['fas', 'backward-step']" />
           </button>
 
           <button class="play-button" @click="togglePlay">
-            <i :class="{ 'playing-icon': isPlaying }">
+            <i :class="{ 'playing-icon': playerStore.isPlaying }">
               <svg
                 class="play-icon"
                 xmlns="http://www.w3.org/2000/svg"
@@ -86,7 +86,7 @@
               </svg>
             </i>
           </button>
-          <button class="control-button" @click="playerStore.next()">
+          <button class="control-button" @click="playerStore.playNext()">
             <font-awesome-icon
               size="1x"
               style="position: relative; left: 0.5px"
@@ -196,12 +196,12 @@ const playerStore = usePlayerStore();
 const uiPropertiesStore = useUIPropertiesStore(); // 使用 uiPropertiesStore
 
 const audioRef = ref<HTMLAudioElement | null>(null);
-const isPlaying = ref(false);
 const showVolumePopup = ref(false);
 const showPlayModePopup = ref(false);
 const showPlaylistPopup = ref(false);
 const hoveredSongId = ref<number | null>(null); // 新增：用于跟踪鼠标悬停的歌曲ID
 // 移除 showFullScreenLyrics，因为它现在由 uiPropertiesStore 管理
+// 移除 isPlaying，因为它现在由 playerStore 管理
 
 // 计算属性，根据播放模式返回不同的图标
 const playModeIcon = computed(() => {
@@ -221,19 +221,6 @@ const playModeIcon = computed(() => {
   }
 });
 
-function playAudio() {
-  if (audioRef.value) {
-    audioRef.value.play();
-    isPlaying.value = true;
-  }
-}
-
-function pauseAudio() {
-  if (audioRef.value) {
-    audioRef.value.pause();
-    isPlaying.value = false;
-  }
-}
 
 const onProgressChange = (value: number) => {
   if (audioRef.value) {
@@ -242,16 +229,12 @@ const onProgressChange = (value: number) => {
 };
 
 function togglePlay() {
-  if (isPlaying.value) {
-    pauseAudio();
-  } else {
-    playAudio();
-  }
+  playerStore.togglePlay();
 }
 
 function onCanPlay() {
   if (playerStore.currentSong?.url) {
-    playAudio();
+    playerStore.play(); // 直接调用 playerStore 的 play 方法
     // 设置音量
     if (audioRef.value) {
       audioRef.value.volume = playerStore.volume / 100;
@@ -262,9 +245,11 @@ function onCanPlay() {
 function onAudioEnded() {
   playerStore.onSongEnded();
   // 如果是单曲循环模式，则重新播放
-  if (playerStore.state.playMode === 'repeat' && audioRef.value) {
-    audioRef.value.currentTime = 0;
-    playAudio();
+  if (playerStore.state.playMode === 'repeat') {
+    if (audioRef.value) {
+      audioRef.value.currentTime = 0;
+    }
+    playerStore.play(); // 直接调用 playerStore 的 play 方法
   }
 }
 
@@ -283,25 +268,18 @@ function onTimeUpdate(e: Event) {
 import { onMounted, onBeforeUnmount } from 'vue';
 onMounted(() => {
   if (audioRef.value) {
-    audioRef.value.addEventListener('play', handlePlayEvent);
-    audioRef.value.addEventListener('pause', handlePauseEvent);
+    playerStore.setAudioElement(audioRef.value); // 设置 audio 元素
+    // 移除事件监听，因为播放状态由 playerStore 管理
   }
 });
 
 onBeforeUnmount(() => {
   if (audioRef.value) {
-    audioRef.value.removeEventListener('play', handlePlayEvent);
-    audioRef.value.removeEventListener('pause', handlePauseEvent);
+    // 移除事件监听
   }
 });
 const previewType = false;
-const handlePlayEvent = () => {
-  isPlaying.value = true;
-};
-
-const handlePauseEvent = () => {
-  isPlaying.value = false;
-};
+// 移除 handlePlayEvent 和 handlePauseEvent
 
 // 监听 currentSong 变化，更新 document.title 并在有 URL 时自动播放
 watch(
@@ -314,14 +292,7 @@ watch(
 );
 
 // 监听音量变化，同步到 audio 元素
-watch(
-  () => playerStore.volume,
-  (newVolume) => {
-    if (audioRef.value) {
-      audioRef.value.volume = newVolume / 100;
-    }
-  }
-);
+// 移除对 playerStore.volume 的监听，因为现在由 playerStore 内部管理
 
 function toggleVolumePopup() {
   showVolumePopup.value = !showVolumePopup.value;
@@ -576,6 +547,7 @@ function toggleFullScreenLyrics() {
   background-color: #70baff;
   border-radius: 50%;
 }
+/* 移除播放/暂停按钮的旋转动画 */
 .play-button:hover i {
   transform: scale(1.1);
 }

@@ -5,6 +5,7 @@ export interface UIPropertiesState {
   defaultSearchKey: DefaultSearchTip;
   hotSearchTips: SearchTipGroup[];
   showFullScreenLyrics: boolean; // 新增：控制全屏歌词显示状态
+  isFullScreen: boolean; // 新增：控制网页全屏状态
 }
 
 import type { VNode } from 'vue';
