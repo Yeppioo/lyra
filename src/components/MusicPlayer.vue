@@ -37,15 +37,20 @@
       </div>
       <div class="main-section">
         <div class="info">
-          <a-image
-            :preview="false"
-            :fallback="fallbackImg"
-            :placeholder="true"
-            class="icon-img"
-            :width="48"
-            :height="48"
-            :src="playerStore.currentSong?.cover">
-          </a-image>
+          <div class="icon-container">
+            <div class="icon-mask">
+              <font-awesome-icon class="icon-mask-icon" size="xl" :icon="['fas', 'expand']" />
+            </div>
+            <a-image
+              :preview="previewType"
+              :fallback="fallbackImg"
+              :placeholder="true"
+              class="icon-img"
+              :width="48"
+              :height="48"
+              :src="playerStore.currentSong?.cover">
+            </a-image>
+          </div>
           <div class="info-text">
             <span class="song-name">
               {{ playerStore.currentSong?.name }}
@@ -165,13 +170,14 @@
             ?.songs"
           :key="song.id"
           :class="{ 'current-playing': song.id === playerStore.currentSong?.id }"
-          @click="playSongFromPlaylist(song.id, index)">
+          @click="playSongFromPlaylist(song.id, index)"
+          @mouseenter="hoveredSongId = song.id"
+          @mouseleave="hoveredSongId = null">
           <span class="song-info"> {{ song.name }} - {{ song.artist }} </span>
           <span class="song-duration">
             {{ formatSecondsToMinutes(song.duration) }}
           </span>
           <font-awesome-icon
-            v-if="playerStore.state.playListGroup[playerStore.state.groupIndex]?.canDelete"
             :icon="['fas', 'trash']"
             class="delete-icon"
             @click.stop="deleteSongFromPlaylist(song.id, playerStore.state.groupIndex)" />
@@ -192,6 +198,7 @@ const isPlaying = ref(false);
 const showVolumePopup = ref(false);
 const showPlayModePopup = ref(false);
 const showPlaylistPopup = ref(false);
+const hoveredSongId = ref<number | null>(null); // 新增：用于跟踪鼠标悬停的歌曲ID
 
 // 计算属性，根据播放模式返回不同的图标
 const playModeIcon = computed(() => {
@@ -284,7 +291,7 @@ onBeforeUnmount(() => {
     audioRef.value.removeEventListener('pause', handlePauseEvent);
   }
 });
-
+const previewType = false;
 const handlePlayEvent = () => {
   isPlaying.value = true;
 };
@@ -401,7 +408,7 @@ watch(currentTime, (val) => {
 .current-playing span {
   color: #70baff !important;
 }
-:deep(.ant-select-selection-item){
+:deep(.ant-select-selection-item) {
   color: var(--y-text);
   font-family: var(--y-font);
 }
@@ -458,6 +465,31 @@ watch(currentTime, (val) => {
 :deep(.icon-img) {
   border: 0;
   border-radius: 8px;
+  position: absolute;
+}
+.icon-mask svg {
+  color: #fff !important;
+}
+.icon-mask {
+  position: absolute;
+  z-index: 1;
+  width: 48px;
+  border-radius: 8px;
+  display: flex;
+  height: 48px;
+  background: rgba(0, 0, 0, 0.575);
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  opacity: 0;
+}
+.icon-mask:hover {
+  opacity: 1;
+}
+.icon-container {
+  width: 48px;
+  position: relative;
+  height: 48px;
 }
 .progress-text {
   font-size: 12px;
@@ -515,7 +547,7 @@ watch(currentTime, (val) => {
   align-items: center;
   justify-content: flex-end;
   position: relative;
-  top: -2px;
+  top: -5px;
 }
 .play-button {
   width: 42px;
@@ -730,12 +762,29 @@ watch(currentTime, (val) => {
   margin-left: 10px;
   color: var(--y-text);
   cursor: pointer;
-  opacity: 0.7;
+  opacity: 0; /* 默认隐藏 */
   transition: opacity 0.2s;
+}
+
+.playlist-popup li .delete-icon {
+  display: none;
+  opacity: 1;
+}
+.playlist-popup li:hover .delete-icon {
+  display: unset;
 }
 
 .delete-icon:hover {
   color: #ff4d4f; /* 删除按钮的悬停颜色 */
   opacity: 1;
 }
+/* .current-playing .song-info {
+  flex-grow: 1;
+  white-space: break-spaces;
+  text-wrap: auto;
+  overflow: hidden;
+  margin-right: 10px;
+  text-wrap-mode: wrap;
+  overflow-wrap: break-word;
+} */
 </style>
