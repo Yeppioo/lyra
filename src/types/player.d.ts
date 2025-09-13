@@ -32,5 +32,6 @@ export interface PlayerState {
   playListGroup: PlayListGroup[];
   groupIndex: number;
   playMode: 'order' | 'repeat' | 'random' | 'single' | 'list';
+  volume: number; // 0-100
   currentSong: CurrentSong | null;
 }

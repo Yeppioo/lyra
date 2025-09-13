@@ -23,7 +23,7 @@
             :step="1"
             :tip-formatter="formatSecondsToMinutes" />
           <a-slider
-            @afterChange="onProgressChange"
+            @change="onProgressChange"
             :tooltipOpen="false"
             class="progress-slider"
             id="progress-change-slider"
@@ -88,30 +88,123 @@
               :icon="['fas', 'forward-step']" />
           </button>
         </div>
+        <div class="right-section">
+          <button class="sub-control-button" @click="toggleVolumePopup">
+            <font-awesome-icon size="1x" :icon="['fas', 'volume-high']" />
+          </button>
+          <button class="sub-control-button" @click="togglePlayModePopup">
+            <font-awesome-icon size="1x" :icon="playModeIcon" />
+          </button>
+          <button class="sub-control-button" @click="togglePlaylistPopup">
+            <font-awesome-icon size="1x" :icon="['fas', 'list-ul']" />
+          </button>
+        </div>
       </div>
+    </div>
+
+    <!-- 音量控制弹出框 -->
+    <div v-if="showVolumePopup" class="volume-popup">
+      <a-slider
+        vertical
+        :min="0"
+        :max="100"
+        :step="1"
+        class="volume-slider"
+        v-model:value="playerStore.volume"
+        @afterChange="onVolumeChange" />
+      <span>{{ playerStore.volume }}%</span>
+    </div>
+
+    <!-- 播放模式弹出框 -->
+    <div v-if="showPlayModePopup" class="play-mode-popup">
+      <div
+        class="mode-item"
+        :class="{ active: playerStore.state.playMode === 'order' }"
+        @click="setPlayMode('order')">
+        <font-awesome-icon :icon="['fas', 'repeat']" />
+        <span>顺序播放</span>
+      </div>
+      <div
+        class="mode-item"
+        :class="{ active: playerStore.state.playMode === 'repeat' }"
+        @click="setPlayMode('repeat')">
+        <font-awesome-icon :icon="['fas', 'repeat']" />
+        <span>单曲循环</span>
+      </div>
+      <div
+        class="mode-item"
+        :class="{ active: playerStore.state.playMode === 'random' }"
+        @click="setPlayMode('random')">
+        <font-awesome-icon :icon="['fas', 'random']" />
+        <span>随机播放</span>
+      </div>
+      <div
+        class="mode-item"
+        :class="{ active: playerStore.state.playMode === 'list' }"
+        @click="setPlayMode('list')">
+        <font-awesome-icon :icon="['fas', 'repeat']" />
+        <span>列表循环</span>
+      </div>
+    </div>
+
+    <!-- 歌单弹出框 (待实现) -->
+    <div v-if="showPlaylistPopup" class="playlist-popup">
+      <h3>播放列表</h3>
+      <ul>
+        <li
+          v-for="(song, index) in playerStore.state.playListGroup[playerStore.state.groupIndex]
+            ?.songs"
+          :key="song.id"
+          :class="{ 'current-playing': song.id === playerStore.currentSong?.id }"
+          @click="playSongFromPlaylist(song.id, index)">
+          {{ song.name }} - {{ song.artist }}
+        </li>
+      </ul>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { usePlayerStore } from '@/stores/player';
 import { fallbackImg } from '@/stores/constant';
 
 const playerStore = usePlayerStore();
 
 const audioRef = ref<HTMLAudioElement | null>(null);
-// 页面加载后如果有 currentSong 自动播放
 const isPlaying = ref(false);
+const showVolumePopup = ref(false);
+const showPlayModePopup = ref(false);
+const showPlaylistPopup = ref(false);
+
+// 计算属性，根据播放模式返回不同的图标
+const playModeIcon = computed(() => {
+  switch (playerStore.state.playMode) {
+    case 'order':
+      return ['fas', 'repeat'];
+    case 'repeat':
+      return ['fas', 'repeat'];
+    case 'random':
+      return ['fas', 'random'];
+    case 'single':
+      return ['fas', 'repeat']; // 单曲循环的图标
+    case 'list':
+      return ['fas', 'repeat'];
+    default:
+      return ['fas', 'repeat'];
+  }
+});
 
 function playAudio() {
   if (audioRef.value) {
     audioRef.value.play();
+    isPlaying.value = true;
   }
 }
 
 function pauseAudio() {
   if (audioRef.value) {
     audioRef.value.pause();
+    isPlaying.value = false;
   }
 }
 
@@ -130,14 +223,22 @@ function togglePlay() {
 }
 
 function onCanPlay() {
-  // 可以在这里做自动播放或其他初始化
   if (playerStore.currentSong?.url) {
     playAudio();
+    // 设置音量
+    if (audioRef.value) {
+      audioRef.value.volume = playerStore.volume / 100;
+    }
   }
 }
 
 function onAudioEnded() {
   playerStore.onSongEnded();
+  // 如果是单曲循环模式，则重新播放
+  if (playerStore.state.playMode === 'repeat' && audioRef.value) {
+    audioRef.value.currentTime = 0;
+    playAudio();
+  }
 }
 
 function onTimeUpdate(e: Event) {
@@ -152,17 +253,28 @@ function onTimeUpdate(e: Event) {
 }
 
 // 监听 audio 的 play/pause 事件，自动同步 isPlaying
-import { onMounted } from 'vue';
+import { onMounted, onBeforeUnmount } from 'vue';
 onMounted(() => {
   if (audioRef.value) {
-    audioRef.value.addEventListener('play', () => {
-      isPlaying.value = true;
-    });
-    audioRef.value.addEventListener('pause', () => {
-      isPlaying.value = false;
-    });
+    audioRef.value.addEventListener('play', handlePlayEvent);
+    audioRef.value.addEventListener('pause', handlePauseEvent);
   }
 });
+
+onBeforeUnmount(() => {
+  if (audioRef.value) {
+    audioRef.value.removeEventListener('play', handlePlayEvent);
+    audioRef.value.removeEventListener('pause', handlePauseEvent);
+  }
+});
+
+const handlePlayEvent = () => {
+  isPlaying.value = true;
+};
+
+const handlePauseEvent = () => {
+  isPlaying.value = false;
+};
 
 // 监听 currentSong 变化，更新 document.title 并在有 URL 时自动播放
 watch(
@@ -174,6 +286,52 @@ watch(
   { immediate: true }
 );
 
+// 监听音量变化，同步到 audio 元素
+watch(
+  () => playerStore.volume,
+  (newVolume) => {
+    if (audioRef.value) {
+      audioRef.value.volume = newVolume / 100;
+    }
+  }
+);
+
+function toggleVolumePopup() {
+  showVolumePopup.value = !showVolumePopup.value;
+  showPlayModePopup.value = false;
+  showPlaylistPopup.value = false;
+}
+
+function togglePlayModePopup() {
+  showPlayModePopup.value = !showPlayModePopup.value;
+  showVolumePopup.value = false;
+  showPlaylistPopup.value = false;
+}
+
+function togglePlaylistPopup() {
+  showPlaylistPopup.value = !showPlaylistPopup.value;
+  showVolumePopup.value = false;
+  showPlayModePopup.value = false;
+}
+
+function onVolumeChange(value: number) {
+  playerStore.setVolume(value);
+}
+
+function setPlayMode(mode: 'order' | 'repeat' | 'random' | 'single' | 'list') {
+  playerStore.setPlayMode(mode);
+  showPlayModePopup.value = false; // 关闭弹出框
+}
+
+function playSongFromPlaylist(songId: number, index: number) {
+  const group = playerStore.state.playListGroup[playerStore.state.groupIndex];
+  if (group) {
+    group.songIndex = index;
+    playerStore.currentSongId = songId;
+    showPlaylistPopup.value = false;
+  }
+}
+
 const formatSecondsToMinutes = (seconds: number | undefined) => {
   if (!seconds) return '00:00';
   seconds = seconds / 1000;
@@ -182,7 +340,6 @@ const formatSecondsToMinutes = (seconds: number | undefined) => {
   const remainingSeconds = totalSeconds % 60;
   return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
-
 
 const currentTime = ref(0);
 
@@ -294,11 +451,16 @@ watch(currentTime, (val) => {
 .slider-container {
   width: 100%;
   position: relative;
-  margin-bottom: 30px;
+  margin-bottom: 32px;
 }
 .progress-slider {
   width: calc(100% - 10px);
   position: absolute;
+}
+/* 禁用 a-slider 的动画效果 */
+:deep(.ant-slider-track),
+:deep(.ant-slider-handle) {
+  transition: none !important;
 }
 
 .main-section {
@@ -319,6 +481,13 @@ watch(currentTime, (val) => {
   justify-content: center;
   margin-top: -6px;
 }
+.right-section {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+  top: -2px;
+}
 .play-button {
   width: 42px;
   height: 42px;
@@ -330,6 +499,7 @@ watch(currentTime, (val) => {
   padding: 0;
   border: 0;
   background-color: transparent;
+  outline: none; /* 移除蓝色圈圈 */
 }
 .play-button i {
   width: 38px;
@@ -364,7 +534,8 @@ watch(currentTime, (val) => {
 .playing-icon .pause-icon {
   display: block;
 }
-.control-button {
+.control-button,
+.sub-control-button {
   color: var(--y-text);
   cursor: pointer;
   width: 34px;
@@ -373,11 +544,116 @@ watch(currentTime, (val) => {
   border: 0;
   background-color: transparent;
   border-radius: 50%;
+  outline: none; /* 移除蓝色圈圈 */
+}
+
+.sub-control-button:hover svg {
+  color: #70baff !important;
 }
 .control-button:hover {
   background-color: #70baff;
   /* path {
     fill: white;
   } */
+}
+
+.volume-popup,
+.play-mode-popup,
+.playlist-popup {
+  position: absolute;
+  bottom: 75px;
+  background-color: var(--y-com-bg);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+
+.volume-popup span {
+  font-size: 14px;
+  width: 35px;
+  text-align: center;
+}
+.volume-popup span,
+.play-mode-popup span,
+.playlist-popup span {
+  font-family: var(--y-font);
+  color: var(--y-text);
+}
+.mode-item.active span , .mode-item.active svg{
+  color: #70baff !important;
+}
+.volume-slider {
+  margin-top: 10px;
+}
+
+.volume-popup {
+  right: 100px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.play-mode-popup {
+  right: 50px; /* 根据实际布局调整 */
+  width: 130px;
+}
+
+.play-mode-popup .mode-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  cursor: pointer;
+  color: var(--y-text);
+}
+
+.play-mode-popup .mode-item:hover {
+  background-color: var(--y-background);
+}
+
+.play-mode-popup .mode-item.active {
+  color: var(--y-active-color);
+}
+
+.play-mode-popup .mode-item span {
+  margin-left: 8px;
+}
+
+.playlist-popup {
+  right: 0;
+  width: 250px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.playlist-popup h3 {
+  color: var(--y-text);
+  margin-bottom: 10px;
+}
+
+.playlist-popup ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.playlist-popup li {
+  padding: 8px;
+  cursor: pointer;
+  color: var(--y-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.playlist-popup li:hover {
+  background-color: var(--y-background);
+}
+
+.playlist-popup li.current-playing {
+  color: var(--y-active-color);
+  font-weight: bold;
 }
 </style>

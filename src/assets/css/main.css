@@ -1,7 +1,7 @@
 @import './themes/public.css';
 @import './base.css';
-/* @import './hm_font.css'; */
-@import './components/segmented-menu.css';
+@import './components/index.css';
+@import './override/index.css';
 
 @font-face {
   font-family: ZhuZiAYuanJWD;

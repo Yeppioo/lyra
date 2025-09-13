@@ -2,7 +2,10 @@
 import { functions as neteaseGetSong } from '@/api/netease/getSong';
 import { functions as neteaseGetLyric } from '@/api/netease/getLyric';
 // 设置当前播放歌曲，自动初始化播放列表等
-export function setCurrentSong(song: PlayingSongInfo, playerStore: ReturnType<typeof usePlayerStore>) {
+export function setCurrentSong(
+  song: PlayingSongInfo,
+  playerStore: ReturnType<typeof usePlayerStore>
+) {
   const state = playerStore.state;
   // 初始化播放列表组
   if (!state.playListGroup) {
@@ -46,6 +49,7 @@ const defaultPlayerState: PlayerState = {
   ],
   groupIndex: 0,
   playMode: 'order',
+  volume: 50, // 默认音量
   currentSong: null, // 新增 currentSong 属性
 };
 
@@ -59,6 +63,7 @@ export const usePlayerStore = defineStore('player', () => {
   const state = ref<PlayerState>({ ...defaultPlayerState, ...loadedState });
   const currentSongId = ref<number | null>(null); // 用于监听歌曲ID变化
   const currentSong = shallowRef<CurrentSong | null>(null); // 使用 shallowRef 避免深度响应式开销
+  const volume = ref(loadedState.volume ?? defaultPlayerState.volume); // 音量
 
   // 页面加载时，如果 localStorage 中有歌曲，设置 currentSongId
   if (loadedState.playListGroup && loadedState.playListGroup.length > 0) {
@@ -70,101 +75,120 @@ export const usePlayerStore = defineStore('player', () => {
 
   let abortController: AbortController | null = null; // 用于取消之前的请求
 
-  watch(currentSongId, async (newId, oldId) => {
-    if (newId === null) {
-      currentSong.value = null;
-      return;
-    }
-
-    // 如果歌曲ID相同，则不重新获取
-    if (newId === oldId && currentSong.value?.id === newId && currentSong.value?.url) {
-      return;
-    }
-
-    // 取消之前的请求
-    if (abortController) {
-      abortController.abort();
-    }
-    abortController = new AbortController();
-    const signal = abortController.signal;
-
-    // 获取歌曲基础信息
-    const group = state.value.playListGroup[state.value.groupIndex];
-    const songInfo = group?.songs.find(s => s.id === newId);
-
-    if (!songInfo) {
-      currentSong.value = null;
-      return;
-    }
-
-    // 初始化 currentSong，先设置基础信息
-    currentSong.value = {
-      ...songInfo,
-      url: '', // 初始为空
-      lyric: '', // 初始为空
-      currentTime: 0,
-    };
-
-    // 异步获取歌曲URL和歌词
-    try {
-      const [songUrlResponse, lyricResponse] = await Promise.allSettled([
-        neteaseGetSong.getSongUrl(newId, 999000),
-        neteaseGetLyric.getLyric(newId),
-      ]);
-
-      // 检查请求是否已被取消
-      if (signal.aborted) {
-        console.log(`请求已取消，歌曲ID: ${newId}`);
+  watch(
+    currentSongId,
+    async (newId, oldId) => {
+      if (newId === null) {
+        currentSong.value = null;
         return;
       }
 
-      // 如果在请求过程中歌曲已切换，则放弃当前结果
-      if (currentSongId.value !== newId) {
-        console.log(`歌曲已切换，放弃旧请求结果，歌曲ID: ${newId}`);
+      // 如果歌曲ID相同，则不重新获取
+      if (newId === oldId && currentSong.value?.id === newId && currentSong.value?.url) {
         return;
       }
 
-      // 处理歌曲URL
-      if (songUrlResponse.status === 'fulfilled' && songUrlResponse.value.data.length > 0) {
-        const url = songUrlResponse.value.data[0].url;
-        if (url) {
-          currentSong.value = { ...currentSong.value, url };
+      // 取消之前的请求
+      if (abortController) {
+        abortController.abort();
+      }
+      abortController = new AbortController();
+      const signal = abortController.signal;
+
+      // 获取歌曲基础信息
+      const group = state.value.playListGroup[state.value.groupIndex];
+      const songInfo = group?.songs.find((s) => s.id === newId);
+
+      if (!songInfo) {
+        currentSong.value = null;
+        return;
+      }
+
+      // 初始化 currentSong，先设置基础信息
+      currentSong.value = {
+        ...songInfo,
+        url: '', // 初始为空
+        lyric: '', // 初始为空
+        currentTime: 0,
+      };
+
+      // 异步获取歌曲URL和歌词
+      try {
+        const [songUrlResponse, lyricResponse] = await Promise.allSettled([
+          neteaseGetSong.getSongUrl(newId, 999000),
+          neteaseGetLyric.getLyric(newId),
+        ]);
+
+        // 检查请求是否已被取消
+        if (signal.aborted) {
+          console.log(`请求已取消，歌曲ID: ${newId}`);
+          return;
         }
-      } else {
-        console.error('获取歌曲URL失败:', (songUrlResponse as PromiseRejectedResult).reason);
-      }
 
-      // 处理歌词
-      if (lyricResponse.status === 'fulfilled' && lyricResponse.value.lrc?.lyric) {
-        const lyric = lyricResponse.value.lrc.lyric;
-        currentSong.value = { ...currentSong.value, lyric };
-      } else if (lyricResponse.status === 'rejected') {
-        console.error('获取歌词失败:', (lyricResponse as PromiseRejectedResult).reason);
+        // 如果在请求过程中歌曲已切换，则放弃当前结果
+        if (currentSongId.value !== newId) {
+          console.log(`歌曲已切换，放弃旧请求结果，歌曲ID: ${newId}`);
+          return;
+        }
+
+        // 处理歌曲URL
+        if (songUrlResponse.status === 'fulfilled' && songUrlResponse.value.data.length > 0) {
+          const url = songUrlResponse.value.data[0].url;
+          if (url) {
+            currentSong.value = { ...currentSong.value, url };
+          }
+        } else {
+          console.error('获取歌曲URL失败:', (songUrlResponse as PromiseRejectedResult).reason);
+        }
+
+        // 处理歌词
+        if (lyricResponse.status === 'fulfilled' && lyricResponse.value.lrc?.lyric) {
+          const lyric = lyricResponse.value.lrc.lyric;
+          currentSong.value = { ...currentSong.value, lyric };
+        } else if (lyricResponse.status === 'rejected') {
+          console.error('获取歌词失败:', (lyricResponse as PromiseRejectedResult).reason);
+        }
+      } catch (error) {
+        if (signal.aborted) {
+          console.log(`请求已取消，歌曲ID: ${newId}`);
+        } else {
+          console.error('获取歌曲URL或歌词时发生错误:', error);
+        }
       }
-    } catch (error) {
-      if (signal.aborted) {
-        console.log(`请求已取消，歌曲ID: ${newId}`);
-      } else {
-        console.error('获取歌曲URL或歌词时发生错误:', error);
-      }
-    }
-  }, { immediate: true }); // 立即执行一次，处理初始 currentSongId
+    },
+    { immediate: true }
+  ); // 立即执行一次，处理初始 currentSongId
 
   // 监听 currentSong 的变化来更新 document.title
-  watch(currentSong, (newSong) => {
-    document.title = newSong ? `Lyra - ${newSong.name}` : 'Lyra';
-  }, { immediate: true });
+  watch(
+    currentSong,
+    (newSong) => {
+      document.title = newSong ? `Lyra - ${newSong.name}` : 'Lyra';
+    },
+    { immediate: true }
+  );
 
   // 只持久化歌单、groupIndex、playMode
   watch(
     state,
     (newState) => {
       const { playListGroup, groupIndex, playMode } = newState;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ playListGroup, groupIndex, playMode }));
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ playListGroup, groupIndex, playMode, volume: volume.value })
+      );
     },
     { deep: true }
   );
 
+  // 监听 volume 变化，持久化
+  watch(volume, (newVolume) => {
+    const { playListGroup, groupIndex, playMode } = state.value;
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ playListGroup, groupIndex, playMode, volume: newVolume })
+    );
+  });
 
   // currentSong 现在是 ref，不再是 computed
   // 播放/暂停由组件管理
@@ -268,5 +292,9 @@ export const usePlayerStore = defineStore('player', () => {
     next,
     prev,
     onSongEnded,
+    volume,
+    setVolume: (val: number) => (volume.value = val),
+    setPlayMode: (mode: 'order' | 'repeat' | 'random' | 'single' | 'list') =>
+      (state.value.playMode = mode),
   };
 });
