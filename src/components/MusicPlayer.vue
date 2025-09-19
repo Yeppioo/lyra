@@ -116,7 +116,7 @@
         :step="1"
         class="volume-slider"
         v-model:value="playerStore.volume"
-        @afterChange="onVolumeChange" />
+        @change="onVolumeChange" />
       <span>{{ playerStore.volume }}%</span>
     </div>
 
