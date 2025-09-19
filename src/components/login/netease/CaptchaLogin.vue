@@ -38,11 +38,13 @@ import { ref } from 'vue';
 import { message } from 'ant-design-vue';
 import { functions as neteaseLoginApi } from '@/api/netease/login';
 import { useSettingsStore } from '@/stores/settings';
+import { useUIPropertiesStore } from '@/stores/uiProperties'; // 导入 useUIPropertiesStore
 
 const phone = ref('');
 const captcha = ref('');
 const loging = ref(false);
 const settingsStore = useSettingsStore();
+const uiPropertiesStore = useUIPropertiesStore(); // 获取 uiPropertiesStore 实例
 
 const sendButtonText = ref('发送验证码');
 const isCountingDown = ref(false);
@@ -83,7 +85,9 @@ async function login() {
     const res = await neteaseLoginApi.loginByCellphone(phone.value, captcha.value);
     if (res.cookie) {
       settingsStore.settings.userinfo.netease.cookie = res.cookie;
+      uiPropertiesStore.uiProperties.loginStatus = 'loggedIn'; // 更新登录状态
       message.success('登录成功');
+      window.location.reload(); // 触发页面刷新
     } else {
       message.error('登录失败，请检查手机号或验证码');
     }

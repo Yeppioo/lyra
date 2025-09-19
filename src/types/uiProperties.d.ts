@@ -6,6 +6,9 @@ export interface UIPropertiesState {
   hotSearchTips: SearchTipGroup[];
   showFullScreenLyrics: boolean; // 新增：控制全屏歌词显示状态
   isFullScreen: boolean; // 新增：控制网页全屏状态
+  loginMessage: string; // 新增：登录消息
+  showLoginMessage: boolean; // 新增：控制登录消息显示状态
+  loginStatus: 'idle' | 'loggingIn' | 'loggedIn' | 'loginFailed' | 'loginExpired'; // 登录状态
 }
 
 import type { VNode } from 'vue';

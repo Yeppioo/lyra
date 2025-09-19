@@ -16,6 +16,9 @@ const defaultUIProperties: UIPropertiesState = {
   hotSearchTips: [],
   showFullScreenLyrics: false, // 新增：控制全屏歌词显示状态
   isFullScreen: false, // 新增：控制网页全屏状态
+  loginMessage: '', // 新增：登录消息
+  showLoginMessage: false, // 新增：控制登录消息显示状态
+  loginStatus: 'idle', // 新增：登录状态
 };
 
 export const useUIPropertiesStore = defineStore('uiProperties', () => {
@@ -37,6 +40,15 @@ export const useUIPropertiesStore = defineStore('uiProperties', () => {
     } else {
       document.exitFullscreen();
     }
+  }
+
+  function setLoginMessage(message: string, show: boolean = true) {
+    uiProperties.value.loginMessage = message;
+    uiProperties.value.showLoginMessage = show;
+  }
+
+  function setShowLoginMessage(show: boolean) {
+    uiProperties.value.showLoginMessage = show;
   }
 
   async function fetchPersonalizedSongs(): Promise<void> {
@@ -83,10 +95,12 @@ export const useUIPropertiesStore = defineStore('uiProperties', () => {
 
   return {
     uiProperties,
-    isFullScreen, // 暴露 isFullScreen 状态
     fetchPersonalizedSongs,
     fetchSearchData,
     toggleFullScreenLyrics, // 暴露方法
     toggleFullScreen, // 暴露全屏切换方法
+    setLoginMessage, // 暴露设置登录消息的方法
+    setShowLoginMessage, // 暴露设置登录消息显示状态的方法
+    loginStatus: uiProperties.value.loginStatus, // 暴露登录状态
   };
 });

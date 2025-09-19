@@ -105,16 +105,20 @@
                     {{ settingsStore.settings.userinfo.username }}
                   </span>
                   <span
-                    v-if="settingsStore.settings.userinfo.netease.cookie"
+                    v-if="uiPropertiesStore.uiProperties.loginStatus === 'loggedIn'"
                     style="font-size: 12px; color: var(--y-color-gray)">
                     已登录
+                  </span>
+                  <span v-else-if="uiPropertiesStore.uiProperties.loginStatus === 'loggingIn'"
+                    style="font-size: 12px; color: var(--y-color-gray)">
+                    登录中...
                   </span>
                   <span v-else style="font-size: 12px; color: var(--y-color-gray)"> 未登录 </span>
                 </div>
               </div>
               <a-divider style="margin: 4px 0" />
               <a-menu-item
-                v-if="!settingsStore.settings.userinfo.netease.cookie"
+                v-if="uiPropertiesStore.uiProperties.loginStatus !== 'loggedIn'"
                 style="padding: 7px 12px"
                 @click="handleMenuSelect({ key: '/auth/login' })">
                 <font-awesome-icon style="margin-right: 7px" :icon="['fas', 'key']" />
@@ -149,6 +153,7 @@ import { message } from 'ant-design-vue';
 import { navConfig } from '../../router/nav.config';
 import { useRouter } from 'vue-router';
 import { useSettingsStore } from '../../stores/settings';
+import { useUIPropertiesStore } from '../../stores/uiProperties'; // 导入 useUIPropertiesStore
 import SearcherBox from './SearcherBox.vue';
 import { logout } from '@/api/netease/login';
 
@@ -206,6 +211,8 @@ const goForward = () => {
   router.forward();
 };
 
+const uiPropertiesStore = useUIPropertiesStore(); // 获取 uiPropertiesStore 实例
+
 const handleLogout = async () => {
   try {
     await logout();
@@ -214,7 +221,9 @@ const handleLogout = async () => {
     settingsStore.settings.userinfo.netease.profile = null;
     settingsStore.settings.userinfo.username = '未登录';
     settingsStore.settings.userinfo.avatar = null;
+    uiPropertiesStore.uiProperties.loginStatus = 'loginExpired'; // 更新登录状态为过期
     message.success('已退出登录');
+    window.location.reload(); // 触发页面刷新
   } catch (error) {
     console.error('Logout failed:', error);
   }

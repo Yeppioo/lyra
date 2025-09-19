@@ -1,7 +1,7 @@
 <template>
   <main class="netease-login-container">
     <component :is="selectedComponent" />
-    <a @click="toggleMethod">使用 {{ methodTip }} 登录</a>
+    <a v-show="false" @click="toggleMethod">使用 {{ methodTip }} 登录</a>
   </main>
 </template>
 <script setup lang="ts">

@@ -152,6 +152,24 @@ async function getUserAccount(): Promise<UserAccountResponse> {
   return (await response.json()) as UserAccountResponse;
 }
 
+export interface LoginStatusResponse {
+  data: {
+    code: number;
+    account: UserAccountResponse['account'] | null;
+    profile: UserAccountResponse['profile'] | null;
+  };
+}
+
+async function getLoginStatus(): Promise<LoginStatusResponse> {
+  const response = await fetch(`${apiBase}/login/status?timestamp=${Date.now()}${realIpParam}`, {
+    credentials: 'include',
+  });
+  if (!response.ok) {
+    throw new Error(`Network response was not ok, status: ${response.status}`);
+  }
+  return (await response.json()) as LoginStatusResponse;
+}
+
 export const functions = {
   getQrCodeKey,
   createQrCodeImage,
@@ -159,6 +177,7 @@ export const functions = {
   sendCaptcha,
   loginByCellphone,
   getUserAccount,
+  getLoginStatus, // Add new function here
 };
 
 export async function logout(): Promise<void> {

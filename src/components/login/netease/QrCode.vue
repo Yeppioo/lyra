@@ -77,7 +77,7 @@ const startPolling = () => {
           stopPolling();
           break;
         case 801:
-          statusText.value = '等待扫码';
+          statusText.value = '请使用网易云音乐APP扫码登录';
           break;
         case 802:
           statusText.value = '待确认';
@@ -93,6 +93,7 @@ const startPolling = () => {
             settingsStore.updateUserInfo(accountInfo.profile);
             message.success('登录成功');
             router.push('/'); // 登录成功后跳转到主页
+            window.location.reload(); // 触发页面刷新
           }
           break;
       }
