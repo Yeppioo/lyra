@@ -80,6 +80,7 @@ interface SuggestResponse {
     songs?: Song[];
     playlists?: Playlist[];
     order: string[];
+    allMatch?: { keyword: string; type: number }[]; // 新增的搜索关键词建议
   };
 }
 
@@ -121,24 +122,46 @@ async function getSuggestKeyword(
   keywords: string,
   signal?: AbortSignal
 ): Promise<SearchTipGroup[]> {
-  const response = await fetch(`${apiBase}/search/suggest?keywords=${keywords}&${realIpParam}`, {
-    signal,
-  });
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
+  const [suggestResponse, mobileSuggestResponse] = await Promise.all([
+    fetch(`${apiBase}/search/suggest?keywords=${keywords}&${realIpParam}`, { signal }),
+    fetch(`${apiBase}/search/suggest?keywords=${keywords}&type=mobile&${realIpParam}`, { signal }),
+  ]);
+
+  if (!suggestResponse.ok) {
+    throw new Error('Network response for general suggest was not ok');
   }
-  const data = (await response.json()) as SuggestResponse;
+  if (!mobileSuggestResponse.ok) {
+    throw new Error('Network response for mobile suggest was not ok');
+  }
+
+  const suggestData = (await suggestResponse.json()) as SuggestResponse;
+  const mobileSuggestData = (await mobileSuggestResponse.json()) as SuggestResponse;
 
   const result: SearchTipGroup[] = [];
 
-  if (data.result.order) {
-    for (const type of data.result.order) {
+  // 处理搜索关键词建议 (type=mobile)
+  if (mobileSuggestData.result.allMatch && mobileSuggestData.result.allMatch.length > 0) {
+    result.push({
+      name: '搜索建议',
+      items: mobileSuggestData.result.allMatch.map((match) => ({
+        key: match.keyword,
+        iconType: 0,
+        type: 'keyword',
+        obj: null,
+      })),
+      icon: h(FontAwesomeIcon, { icon: ['fas', 'magnifying-glass'], size: 'lg' }),
+    });
+  }
+
+  // 处理单曲、歌手、专辑、歌单建议
+  if (suggestData.result.order) {
+    for (const type of suggestData.result.order) {
       switch (type) {
         case 'songs':
-          if (data.result.songs && data.result.songs.length > 0) {
+          if (suggestData.result.songs && suggestData.result.songs.length > 0) {
             result.push({
               name: '单曲',
-              items: data.result.songs.map((song) => ({
+              items: suggestData.result.songs.map((song) => ({
                 key: song.name + ' - ' + song.artists.map((artist) => artist.name).join(', '),
                 iconType: 0,
                 type: 'song',
@@ -150,10 +173,10 @@ async function getSuggestKeyword(
           break;
 
         case 'artists':
-          if (data.result.artists && data.result.artists.length > 0) {
+          if (suggestData.result.artists && suggestData.result.artists.length > 0) {
             result.push({
               name: '歌手',
-              items: data.result.artists.map((artist) => ({
+              items: suggestData.result.artists.map((artist) => ({
                 key: artist.name,
                 iconType: 0,
                 type: 'artist',
@@ -165,10 +188,10 @@ async function getSuggestKeyword(
           break;
 
         case 'albums':
-          if (data.result.albums && data.result.albums.length > 0) {
+          if (suggestData.result.albums && suggestData.result.albums.length > 0) {
             result.push({
               name: '专辑',
-              items: data.result.albums.map((album) => ({
+              items: suggestData.result.albums.map((album) => ({
                 key: album.name + ' - ' + album.artist.name,
                 iconType: 0,
                 type: 'album',
@@ -180,10 +203,10 @@ async function getSuggestKeyword(
           break;
 
         case 'playlists':
-          if (data.result.playlists && data.result.playlists.length > 0) {
+          if (suggestData.result.playlists && suggestData.result.playlists.length > 0) {
             result.push({
               name: '歌单',
-              items: data.result.playlists.map((playlist) => ({
+              items: suggestData.result.playlists.map((playlist) => ({
                 key: playlist.name,
                 iconType: 0,
                 type: 'playlist',

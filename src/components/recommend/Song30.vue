@@ -19,13 +19,15 @@
                 ?.name
             }}</span
           >
-          <span class="song-artists">
-            {{
-              uiProperties.personalized.song30.songs[
+          <div class="ar-name-container">
+            <template
+              v-for="a in uiProperties.personalized.song30.songs[
                 uiProperties.personalized.song30.selectedindex
-              ]?.artist.join(',')
-            }}</span
-          >
+              ]?.artist"
+              :key="a.id">
+              <a @click="jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
+            </template>
+          </div>
         </div>
         <div class="control-box">
           <i class="play-button-container">
@@ -70,13 +72,15 @@
                 ?.name
             }}</span
           >
-          <span class="song-artists">
-            {{
-              uiProperties.personalized.song30.songs[
+          <div class="ar-name-container">
+            <template
+              v-for="a in uiProperties.personalized.song30.songs[
                 uiProperties.personalized.song30.selectedindex
-              ]?.artist.join(',')
-            }}</span
-          >
+              ]?.artist"
+              :key="a.id">
+              <a @click="jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
+            </template>
+          </div>
         </div>
       </div>
       <div class="bottom">
@@ -118,6 +122,7 @@ const uiPropertiesStore = useUIPropertiesStore();
 const { uiProperties } = storeToRefs(uiPropertiesStore);
 import { functions as getSongApi } from '@/api/netease/getSong';
 import { message } from 'ant-design-vue';
+import router from '@/router';
 
 const dislike = () => {
   console.log('dislike');
@@ -130,6 +135,10 @@ const next = () => {
   )
     uiProperties.value.personalized.song30.selectedindex = 0;
 };
+const jumpArtist = (id: number) => {
+  router.push(`/artist/${id}`);
+};
+
 const play = async () => {
   const song =
     uiProperties.value.personalized.song30.songs[
@@ -144,13 +153,19 @@ const play = async () => {
       message.error('无法获取播放地址');
       return;
     }
-
+    const artists = [];
+    for (const a of song.artist) {
+      artists.push({
+        id: a.id,
+        name: a.name,
+      });
+    }
     setCurrentSong(
       {
         id: song.id,
         duration: urlRes.data[0].time,
         name: song.name,
-        artist: song.artist.join(','),
+        artist: artists,
         cover: song.pic,
       },
       usePlayerStore()
@@ -227,6 +242,15 @@ const play = async () => {
 
   box-shadow: 0 0 24px 5px rgba(0, 0, 0, 5%);
 }
+.ar-name-container {
+  display: flex;
+  flex-direction: row;
+  /* margin-left: 3px; */
+  flex-wrap: wrap;
+  word-wrap: break-word;
+  overflow: hidden;
+  max-height: 90px;
+}
 .song-name {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -251,9 +275,11 @@ const play = async () => {
   flex-direction: column;
   justify-content: space-between;
 }
-.song-artists {
-  font-size: 15px;
+.ar-name {
+  font-size: 18px;
   font-family: var(--y-font);
+  color: #fff;
+  padding: 0;
   display: -webkit-box;
   word-wrap: break-word;
   text-wrap: auto;
@@ -262,6 +288,18 @@ const play = async () => {
   line-clamp: 1;
   text-overflow: ellipsis;
   overflow: hidden;
+  opacity: 0.75;
+}
+.ar-name ~ .ar-name::before {
+  content: ',';
+  color: #fff !important;
+  margin: 0 5px;
+}
+.ar-name::before {
+  position: static !important;
+}
+.ar-name:hover {
+  opacity: 1;
 }
 .play-button-container {
   width: 42px;

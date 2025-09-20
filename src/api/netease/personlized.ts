@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { ArtistEntry } from '@/types/player';
 import { apiSettings } from '../config';
 
 const { neteaseApiBase: apiBase, realIP } = apiSettings;
@@ -8,7 +8,7 @@ interface SongEntry {
   id: number;
   name: string;
   pic: string;
-  artist: string[];
+  artist: ArtistEntry[];
   reason: string;
 }
 
@@ -29,11 +29,22 @@ export async function getPersonalizedSongs(): Promise<SongEntry[]> {
   if (!data.data) {
     return [];
   }
-  return data.data.dailySongs.map((song: any) => ({
-    id: song.id,
-    name: song.name,
-    pic: song.al.picUrl,
-    artist: song.ar.map((artist: any) => artist.name),
-    reason: song.reason,
-  }));
+  const songs = [];
+  for (const song of data.data.dailySongs) {
+    const artists = [] as ArtistEntry[];
+    for (const artist of song.ar) {
+      artists.push({
+        id: artist.id,
+        name: artist.name,
+      });
+    }
+    songs.push({
+      id: song.id,
+      name: song.name,
+      pic: song.al.picUrl,
+      artist: artists,
+      reason: song.reason,
+    });
+  }
+  return songs;
 }

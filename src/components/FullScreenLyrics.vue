@@ -8,7 +8,11 @@
           </div>
           <div class="song-info-title">
             <span class="song-name-title">{{ currentSong?.name }}</span>
-            <span class="artist-name-title">{{ currentSong?.artist }}</span>
+            <div class="ar-name-container">
+              <template v-for="a in playerStore.currentSong?.artist" :key="a.id">
+                <a @click="jumpArtist(a.id)" class="ar-name-title">{{ a.name }}</a>
+              </template>
+            </div>
           </div>
         </div>
         <div class="header-right">
@@ -30,7 +34,11 @@
             </div>
             <div class="song-info">
               <span class="song-name">{{ currentSong?.name }}</span>
-              <span class="artist-name">{{ currentSong?.artist }}</span>
+              <div class="ar-name-container">
+                <template v-for="a in playerStore.currentSong?.artist" :key="a.id">
+                  <a @click="jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
+                </template>
+              </div>
             </div>
             <div class="player-controls">
               <!-- 播放进度条 -->
@@ -148,6 +156,7 @@
 import { ref, watch, computed, onMounted, onBeforeUnmount } from 'vue';
 import { usePlayerStore } from '@/stores/player';
 import { useUIPropertiesStore } from '@/stores/uiProperties';
+import router from '@/router';
 
 interface Word {
   time: number;
@@ -180,7 +189,9 @@ const activeWordIndex = ref(-1);
 const currentSong = computed(() => playerStore.currentSong);
 const lyrics = computed(() => playerStore.currentSong?.lyric || '');
 const yrcLyrics = computed(() => playerStore.currentSong?.yrcLyric || '');
-
+const jumpArtist = (id: number) => {
+  router.push(`/artist/${id}`);
+};
 // 解析歌词，将时间戳和歌词文本分离
 const parsedLyrics = computed<LyricLine[]>(() => {
   const result: LyricLine[] = [];
@@ -470,10 +481,16 @@ function onProgressChange(value: number) {
   color: #fefefe;
 }
 
-.song-info .artist-name {
+.song-info .ar-name {
   font-size: 18px;
   color: var(--y-text-light);
   display: block;
+  opacity: 0.75;
+  cursor: pointer;
+  padding: 0;
+}
+.song-info > .ar-name-container {
+  justify-content: center;
 }
 .mobile-controls {
   display: none;
@@ -554,10 +571,17 @@ function onProgressChange(value: number) {
   top: -45px;
   display: none;
 }
-
+/* .header-left {
+  opacity: 0;
+  pointer-events: none;
+} */
 @media (max-width: 768px) {
   .lyrics-main-content {
     padding: 0 60px;
+  }
+  .header-left {
+    opacity: 1;
+    pointer-events: unset;
   }
   .lyrics-content {
     margin-bottom: 85px;
@@ -674,8 +698,34 @@ function onProgressChange(value: number) {
 .song-name-title {
   font-size: 15px;
 }
-.artist-name-title {
+.ar-name ~ .ar-name::before,
+.ar-name-title ~ .ar-name-title::before {
+  content: ',';
+  margin: 0 5px;
+  color: #fff !important;
+  opacity: 0.75 !important;
+}
+.ar-name-title::before,
+.ar-name::before {
+  position: static !important;
+}
+.ar-name-title:hover,
+.ar-name:hover {
+  opacity: 1;
+  color: #fff !important;
+}
+.ar-name-container {
+  display: flex;
+  flex-direction: row;
+  max-width: calc(100vw - 310px);
+  white-space: wrap;
+  overflow: hidden;
+}
+.ar-name-title {
   margin-top: 2px;
   font-size: 12px;
+  cursor: pointer;
+  opacity: 0.75;
+  padding: 0;
 }
 </style>

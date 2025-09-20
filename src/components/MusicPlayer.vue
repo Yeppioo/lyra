@@ -55,9 +55,11 @@
             <span class="song-name">
               {{ playerStore.currentSong?.name }}
             </span>
-            <span class="artist-name">
-              {{ playerStore.currentSong?.artist }}
-            </span>
+            <div class="ar-name-container">
+              <template v-for="a in playerStore.currentSong?.artist" :key="a.id">
+                <a @click="jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
+              </template>
+            </div>
           </div>
         </div>
         <div class="control">
@@ -173,7 +175,7 @@
           @click="playSongFromPlaylist(song.id, index)"
           @mouseenter="hoveredSongId = song.id"
           @mouseleave="hoveredSongId = null">
-          <span class="song-info"> {{ song.name }} - {{ song.artist }} </span>
+          <span class="song-info"> {{ song.name }} - {{ song.artist.map(a => a.name).join(" , ") }} </span>
           <span class="song-duration">
             {{ formatSecondsToMinutes(song.duration) }}
           </span>
@@ -231,6 +233,10 @@ function togglePlay() {
   playerStore.togglePlay();
 }
 
+const jumpArtist = (id: number) => {
+  router.push(`/artist/${id}`);
+};
+
 function onCanPlay() {
   if (playerStore.currentSong?.url) {
     playerStore.play(); // 直接调用 playerStore 的 play 方法
@@ -265,6 +271,7 @@ function onTimeUpdate(e: Event) {
 
 // 监听 audio 的 play/pause 事件，自动同步 isPlaying
 import { onMounted, onBeforeUnmount } from 'vue';
+import router from '@/router';
 onMounted(() => {
   if (audioRef.value) {
     playerStore.setAudioElement(audioRef.value); // 设置 audio 元素
@@ -389,7 +396,8 @@ function toggleFullScreenLyrics() {
   color: var(--y-text);
   font-family: var(--y-font);
 }
-.info-text span {
+.info-text span,
+.ar-name {
   color: var(--y-text);
   font-family: var(--y-font);
   line-height: 1.3;
@@ -402,10 +410,32 @@ function toggleFullScreenLyrics() {
   text-overflow: ellipsis;
   overflow: hidden;
 }
-.artist-name {
+.ar-name {
   margin-top: 2px;
   font-size: 12px;
   color: #909092 !important;
+  padding: 0;
+  min-width: 35px;
+  font-family: var(--y-font);
+  cursor: pointer;
+}
+.ar-name ~ .ar-name::before {
+  content: ',';
+  margin: 0 4px 0 3px;
+  color: #909092 !important;
+}
+.ar-name::before {
+  position: static !important;
+}
+.ar-name:hover {
+  color: #1677ff !important;
+}
+.ar-name-container {
+  display: flex;
+  flex-direction: row;
+  max-width: calc(100vw - 310px);
+  white-space: wrap;
+  overflow: hidden;
 }
 .song-name {
   font-size: 15px;

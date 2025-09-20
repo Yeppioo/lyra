@@ -52,6 +52,12 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: '/artist/:key',
+      name: 'artist',
+      component: () => import('../views/ArtistView.vue'),
+      props: true,
+    },
   ],
 });
 

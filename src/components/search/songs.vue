@@ -36,9 +36,11 @@
                   <span>MV</span>
                 </div>
               </div>
-              <span class="ar-name">{{
-                item.artists.map((a: { name: any }) => a.name).join(', ')
-              }}</span>
+              <div class="ar-name-container">
+                <template v-for="a in item.artists" :key="a.id">
+                  <a @click="jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
+                </template>
+              </div>
             </div>
             <span class="album">{{ item.album.name }}</span>
             <span class="duration">{{ formatSecondsToMinutes(item.duration / 1000) }}</span>
@@ -71,6 +73,7 @@ import {
 import { useRoute } from 'vue-router';
 import { message } from 'ant-design-vue';
 import { fallbackImg } from '@/stores/constant';
+import router from '@/router';
 
 const route = useRoute();
 const songsList = ref<any[]>([]);
@@ -98,7 +101,9 @@ const fetchSongs = async (page: number, key: string) => {
   songsList.value = result.songs;
   loading.value = false;
 };
-
+const jumpArtist = (id: number) => {
+  router.push(`/artist/${id}`);
+};
 const formatSecondsToMinutes = (seconds: number) => {
   const totalSeconds = Math.floor(seconds);
   const minutes = Math.floor(totalSeconds / 60);
@@ -132,12 +137,19 @@ const handleMenuItemClick = async (key: number, cover: string) => {
       return;
     }
 
+    const artists = [];
+    for (const a of song.artists) {
+      artists.push({
+        id: a.id,
+        name: a.name,
+      });
+    }
     setCurrentSong(
       {
         id: songId,
         duration: song.duration,
         name: song.name,
-        artist: song.artists[0].name,
+        artist: artists,
         cover: cover,
       },
       playerStore
@@ -173,7 +185,12 @@ watch(
   margin-left: 8px;
   margin-top: 4px;
 }
-
+.ar-name-container {
+  display: flex;
+  max-width: 300px;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
 .song-name-container {
   line-height: 1.5 !important;
   display: flex;
@@ -182,6 +199,14 @@ watch(
   position: absolute;
   right: 22px;
   display: none;
+}
+.ar-name ~ .ar-name::before {
+  content: ',';
+  margin: 0 5px;
+  color: var(--y-text) !important;
+}
+.ar-name::before {
+  position: static !important;
 }
 .duration {
   position: absolute;
@@ -222,6 +247,11 @@ watch(
   word-wrap: break-word;
   text-wrap: auto;
   line-height: 1.1 !important;
+  max-width: 300px;
+  padding: 0;
+}
+.ar-name:hover {
+  color: #1677ff !important;
 }
 .album {
   line-height: 1.3 !important;

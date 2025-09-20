@@ -2,7 +2,7 @@ export interface SongInfo {
   id: number;
   duration: number;
   name: string;
-  artist: string;
+  artist: ArtistEntry[];
   cover: string;
 }
 
@@ -10,8 +10,13 @@ export interface PlayingSongInfo {
   id: number;
   duration: number;
   name: string;
-  artist: string;
+  artist: ArtistEntry[];
   cover: string;
+}
+
+export interface ArtistEntry {
+  id: number;
+  name: string;
 }
 
 export interface CurrentSong extends SongInfo {

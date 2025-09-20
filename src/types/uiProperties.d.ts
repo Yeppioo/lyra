@@ -26,7 +26,7 @@ export interface SearchTipGroup {
 
 export interface SearchTipEntry {
   key: string;
-  type: 'hot' | 'album' | 'artist' | 'song' | 'playlist' | 'string';
+  type: 'hot' | 'album' | 'artist' | 'song' | 'playlist' | 'string' | 'keyword';
   obj?: unknown;
   iconType?: number;
   rank?: number;
