@@ -75,7 +75,6 @@ import router from '@/router';
 import { artist } from '@/api/netease';
 import { functions as getSongApi } from '@/api/netease/getSong';
 
-
 const route = useRoute();
 const songsList = ref<any[]>([]);
 const currentPage = ref(1);
