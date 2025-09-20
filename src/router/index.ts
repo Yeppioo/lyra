@@ -46,7 +46,7 @@ const router = createRouter({
         },
         {
           path: 'playlist/:key',
-          name: 'search-videos',
+          name: 'search-playlist',
           component: () => import('../components/search/playlists.vue'),
           props: true,
         },

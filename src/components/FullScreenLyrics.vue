@@ -659,7 +659,7 @@ function onProgressChange(value: number) {
   margin-left: 10px;
 }
 .song-info-title span {
-  color: var(--y-text);
+  color: #fefefe;
   font-family: var(--y-font);
   line-height: 1.1;
   display: -webkit-box;
