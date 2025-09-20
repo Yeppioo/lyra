@@ -175,7 +175,9 @@
           @click="playSongFromPlaylist(song.id, index)"
           @mouseenter="hoveredSongId = song.id"
           @mouseleave="hoveredSongId = null">
-          <span class="song-info"> {{ song.name }} - {{ song.artist.map(a => a.name).join(" , ") }} </span>
+          <span class="song-info">
+            {{ song.name }} - {{ song.artist.map((a) => a.name).join(' , ') }}
+          </span>
           <span class="song-duration">
             {{ formatSecondsToMinutes(song.duration) }}
           </span>

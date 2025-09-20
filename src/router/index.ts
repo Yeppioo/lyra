@@ -53,7 +53,7 @@ const router = createRouter({
       ],
     },
     {
-      path: '/artist/:key',
+      path: '/artist/:id',
       name: 'artist',
       component: () => import('../views/ArtistView.vue'),
       props: true,
