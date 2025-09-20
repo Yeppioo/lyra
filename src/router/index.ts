@@ -10,6 +10,21 @@ const router = createRouter({
       component: () => import('../views/HomeView.vue'),
     },
     {
+      path: '/album/:key',
+      name: 'album-view',
+      component: () => import('../views/AlbumView.vue'),
+    },
+    {
+      path: '/song/:key',
+      name: 'song-view',
+      component: () => import('../views/SongView.vue'),
+    },
+    {
+      path: '/video/:key',
+      name: 'video-view',
+      component: () => import('../views/VideoView.vue'),
+    },
+    {
       path: '/auth/login',
       name: 'login',
       component: () => import('../views/LoginView.vue'),

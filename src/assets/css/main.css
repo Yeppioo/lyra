@@ -37,7 +37,7 @@ a,
   margin-top: 55px;
 }
 #app-view > #app-container {
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
 }
 @media (max-width: 930px) {

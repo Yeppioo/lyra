@@ -214,7 +214,7 @@ watch(
   border-radius: 10px;
 }
 .mv-cover-wrapper:hover :deep(img) {
-    transform: scale(1.1);
+  transform: scale(1.1);
 }
 
 .play-icon-overlay {
