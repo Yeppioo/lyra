@@ -17,9 +17,9 @@ export const getArtistDetail = (id: number) => {
  * 获取歌手 MV
  * @param id 歌手 id
  */
-export const getArtistMv = (id: number) => {
+export const getArtistMv = (id: number, limit = 30, offset = 0) => {
   return axios.get(`${neteaseApiBase}/artist/mv`, {
-    params: { id },
+    params: { id, limit, offset },
   });
 };
 

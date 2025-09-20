@@ -227,7 +227,7 @@ watch(
   transition: opacity 0.3s ease;
 }
 
-.album-item:hover .play-icon-overlay {
+.album-cover-wrapper:hover .play-icon-overlay {
   opacity: 1;
 }
 
@@ -283,7 +283,7 @@ watch(
   z-index: 1;
 }
 
-.album-item:hover .publish-time-overlay {
+.album-cover-wrapper:hover .publish-time-overlay {
   opacity: 0;
 }
 
