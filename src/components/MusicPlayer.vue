@@ -759,8 +759,8 @@ function toggleFullScreenLyrics() {
   color: #ff4d4f; /* 删除按钮的悬停颜色 */
   opacity: 1;
 }
-.control-button:hover > svg{
-color: #fff !important;
+.control-button:hover > svg {
+  color: #fff !important;
 }
 /* .current-playing .song-info {
   flex-grow: 1;

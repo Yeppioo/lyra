@@ -2,6 +2,15 @@
   <Transition name="full-screen-lyrics">
     <div v-if="visible" class="full-screen-lyrics-container">
       <div class="lyrics-header">
+        <div class="header-left">
+          <div class="cover-title">
+            <img :src="currentSong?.cover" alt="Album Cover" class="cover-img" />
+          </div>
+          <div class="song-info-title">
+            <span class="song-name-title">{{ currentSong?.name }}</span>
+            <span class="artist-name-title">{{ currentSong?.artist }}</span>
+          </div>
+        </div>
         <div class="header-right">
           <font-awesome-icon
             :icon="['fas', 'expand']"
@@ -17,13 +26,79 @@
         <div class="left-section">
           <div class="left-container">
             <div class="cover-container">
-            <img :src="currentSong?.cover" alt="Album Cover" class="cover-img" />
+              <img :src="currentSong?.cover" alt="Album Cover" class="cover-img" />
+            </div>
+            <div class="song-info">
+              <span class="song-name">{{ currentSong?.name }}</span>
+              <span class="artist-name">{{ currentSong?.artist }}</span>
+            </div>
+            <div class="player-controls">
+              <!-- 播放进度条 -->
+              <div class="progress-bar-container">
+                <span class="current-time">{{ formatTime(currentSong?.currentTime || 0) }}</span>
+                <div class="slider-container">
+                  <a-slider
+                    :tooltipOpen="false"
+                    class="progress-slider"
+                    :value="currentSong?.currentTime"
+                    id="progress-slider"
+                    :max="playerStore.currentSong?.duration || 0"
+                    :step="1000"
+                    :tip-formatter="formatTime" />
+                  <a-slider
+                    @change="onProgressChange"
+                    :tooltipOpen="false"
+                    class="progress-slider"
+                    id="progress-change-slider"
+                    :max="playerStore.currentSong?.duration || 0"
+                    :step="1000"
+                    :tip-formatter="formatTime" />
+                </div>
+                <span class="duration">{{
+                  formatTime(playerStore.currentSong?.duration || 0)
+                }}</span>
+              </div>
+              <!-- 播放控制按钮 -->
+              <div class="control-buttons">
+                <font-awesome-icon
+                  :icon="['fas', 'step-backward']"
+                  class="control-icon"
+                  @click="playerStore.playPrevious()" />
+                <font-awesome-icon
+                  :icon="['fas', playerStore.isPlaying ? 'pause' : 'play']"
+                  class="control-icon play-pause"
+                  @click="togglePlay()" />
+                <font-awesome-icon
+                  :icon="['fas', 'step-forward']"
+                  class="control-icon"
+                  @click="playerStore.playNext()" />
+              </div>
+            </div>
           </div>
-          <div class="song-info">
-            <span class="song-name">{{ currentSong?.name }}</span>
-            <span class="artist-name">{{ currentSong?.artist }}</span>
+        </div>
+        <div class="right-section">
+          <div class="lyrics-content" ref="lyricsContentRef">
+            <p
+              v-for="(line, lineIndex) in parsedLyrics"
+              :key="lineIndex"
+              :class="{ active: lineIndex === activeLineIndex }"
+              class="lyrics-line">
+              <template v-if="line.words && line.words.length > 0 && false">
+                <!-- TODO: 逐字歌词解析 -->
+                <span
+                  v-for="(word, wordIndex) in line.words"
+                  :key="`${lineIndex}-${wordIndex}`"
+                  :class="{
+                    active: lineIndex === activeLineIndex && wordIndex === activeWordIndex,
+                  }"
+                  class="lyrics-word"
+                  >{{ word.text }}</span
+                >
+              </template>
+              <template v-else>{{ line.text }}</template>
+            </p>
           </div>
-          <div class="player-controls">
+          <div class="player-controls mobile-controls">
             <!-- 播放进度条 -->
             <div class="progress-bar-container">
               <span class="current-time">{{ formatTime(currentSong?.currentTime || 0) }}</span>
@@ -62,30 +137,6 @@
                 class="control-icon"
                 @click="playerStore.playNext()" />
             </div>
-          </div>
-          </div>
-        </div>
-        <div class="right-section">
-          <div class="lyrics-content" ref="lyricsContentRef">
-            <p
-              v-for="(line, lineIndex) in parsedLyrics"
-              :key="lineIndex"
-              :class="{ active: lineIndex === activeLineIndex }"
-              class="lyrics-line">
-              <template v-if="line.words && line.words.length > 0 && false">
-                <!-- TODO: 逐字歌词解析 -->
-                <span
-                  v-for="(word, wordIndex) in line.words"
-                  :key="`${lineIndex}-${wordIndex}`"
-                  :class="{
-                    active: lineIndex === activeLineIndex && wordIndex === activeWordIndex,
-                  }"
-                  class="lyrics-word"
-                  >{{ word.text }}</span
-                >
-              </template>
-              <template v-else>{{ line.text }}</template>
-            </p>
           </div>
         </div>
       </div>
@@ -336,9 +387,9 @@ function onProgressChange(value: number) {
 
 .lyrics-header {
   display: flex;
-  justify-content: flex-end; /* 将内容推到右边 */
+  justify-content: space-between;
   align-items: center;
-  padding: 25px 30px 0 0;
+  padding: 25px 30px 0 30px;
   position: relative;
   z-index: 10;
 }
@@ -380,8 +431,14 @@ function onProgressChange(value: number) {
 }
 
 .cover-container {
-  width: min(350px, calc(100vh - 320px)); /* 根据高度动态调整宽度，最大350px，为控制区留出更多空间 */
-  height: min(350px, calc(100vh - 320px)); /* 根据高度动态调整高度，最大350px，为控制区留出更多空间 */
+  width: min(
+    350px,
+    calc(100vh - 320px)
+  ); /* 根据高度动态调整宽度，最大350px，为控制区留出更多空间 */
+  height: min(
+    350px,
+    calc(100vh - 320px)
+  ); /* 根据高度动态调整高度，最大350px，为控制区留出更多空间 */
   aspect-ratio: 1 / 1; /* 保持正方形 */
   border-radius: 12px; /* 圆角 */
   overflow: hidden;
@@ -418,7 +475,9 @@ function onProgressChange(value: number) {
   color: var(--y-text-light);
   display: block;
 }
-
+.mobile-controls {
+  display: none;
+}
 .player-controls {
   display: flex;
   flex-direction: column;
@@ -489,11 +548,22 @@ function onProgressChange(value: number) {
   max-height: 100%; /* 歌词区域高度自适应 */
 }
 
+.mobile-controls {
+  max-width: unset;
+  position: relative;
+  top: -45px;
+  display: none;
+}
+
 @media (max-width: 768px) {
   .lyrics-main-content {
     padding: 0 60px;
   }
-
+  .lyrics-content {
+    margin-bottom: 85px;
+    margin-top: 20px;
+    margin-left: 5px;
+  }
   .left-section {
     display: none;
   }
@@ -501,11 +571,13 @@ function onProgressChange(value: number) {
   .right-section {
     padding: 0;
   }
-}
 
-@media (max-width: 768px) {
   .lyrics-main-content {
     display: block;
+  }
+
+  .mobile-controls {
+    display: flex;
   }
 }
 
@@ -568,5 +640,42 @@ function onProgressChange(value: number) {
 
 .lyrics-word.active {
   color: #ffffff;
+}
+.cover-title {
+  width: 44px;
+  height: 44px;
+  aspect-ratio: 1 / 1; /* 保持正方形 */
+  border-radius: 8px; /* 圆角 */
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+.header-left {
+  display: flex;
+  align-items: center;
+}
+.song-info-title {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+}
+.song-info-title span {
+  color: var(--y-text);
+  font-family: var(--y-font);
+  line-height: 1.1;
+  display: -webkit-box;
+  word-wrap: break-word;
+  text-wrap: auto;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.song-name-title {
+  font-size: 15px;
+}
+.artist-name-title {
+  margin-top: 2px;
+  font-size: 12px;
 }
 </style>
