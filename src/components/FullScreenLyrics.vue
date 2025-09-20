@@ -66,11 +66,23 @@
         <div class="right-section">
           <div class="lyrics-content" ref="lyricsContentRef">
             <p
-              v-for="(line, index) in parsedLyrics"
-              :key="index"
-              :class="{ active: index === activeLineIndex }"
+              v-for="(line, lineIndex) in parsedLyrics"
+              :key="lineIndex"
+              :class="{ active: lineIndex === activeLineIndex }"
               class="lyrics-line">
-              {{ line.text }}
+              <template v-if="line.words && line.words.length > 0 && false">
+                <!-- TODO: 逐字歌词解析 -->
+                <span
+                  v-for="(word, wordIndex) in line.words"
+                  :key="`${lineIndex}-${wordIndex}`"
+                  :class="{
+                    active: lineIndex === activeLineIndex && wordIndex === activeWordIndex,
+                  }"
+                  class="lyrics-word"
+                  >{{ word.text }}</span
+                >
+              </template>
+              <template v-else>{{ line.text }}</template>
             </p>
           </div>
         </div>
@@ -83,6 +95,19 @@
 import { ref, watch, computed, onMounted, onBeforeUnmount } from 'vue';
 import { usePlayerStore } from '@/stores/player';
 import { useUIPropertiesStore } from '@/stores/uiProperties';
+
+interface Word {
+  time: number;
+  duration: number;
+  text: string;
+}
+
+interface LyricLine {
+  time: number;
+  duration: number;
+  text: string;
+  words?: Word[];
+}
 
 let intervalId: ReturnType<typeof setInterval> | null = null; // 用于存储定时器ID
 
@@ -97,28 +122,70 @@ const emit = defineEmits(['close']);
 
 const lyricsContentRef = ref<HTMLElement | null>(null);
 const activeLineIndex = ref(-1);
+const activeWordIndex = ref(-1);
 
 const currentSong = computed(() => playerStore.currentSong);
 const lyrics = computed(() => playerStore.currentSong?.lyric || '');
+const yrcLyrics = computed(() => playerStore.currentSong?.yrcLyric || '');
 
 // 解析歌词，将时间戳和歌词文本分离
-const parsedLyrics = computed(() => {
-  const lines = lyrics.value.split('\n');
-  const result: { time: number; text: string }[] = [];
+const parsedLyrics = computed<LyricLine[]>(() => {
+  const result: LyricLine[] = [];
+  const rawLyric = yrcLyrics.value || lyrics.value; // 优先使用逐字歌词
+
+  if (!rawLyric) return [];
+
+  const lines = rawLyric.split('\n');
+
   lines.forEach((line: string) => {
-    const match = line.match(/\[(\d{2}):(\d{2})\.(\d{2,3})\](.*)/);
-    if (match) {
-      const minutes = parseInt(match[1]);
-      const seconds = parseInt(match[2]);
-      const milliseconds = parseInt(match[3].padEnd(3, '0')); // 统一为3位
-      const time = minutes * 60 * 1000 + seconds * 1000 + milliseconds;
-      const text = match[4].trim();
-      if (text) {
-        result.push({ time, text });
+    // 尝试解析JSON元数据
+    if (line.startsWith('{"t":')) {
+      try {
+        JSON.parse(line); // 尝试解析，如果成功则跳过此行，因为是元数据
+        return;
+      } catch {
+        // 不是JSON，继续按歌词处理
       }
-    } else if (line.trim()) {
-      // 处理没有时间戳的歌词行
-      result.push({ time: -1, text: line.trim() });
+    }
+
+    // 逐字歌词格式: [16210,3460](16210,670,0)还(16880,410,0)没...
+    const yrcMatch = line.match(/^\[(\d+),(\d+)\](.*)/);
+    if (yrcMatch) {
+      const lineTime = parseInt(yrcMatch[1]);
+      const lineDuration = parseInt(yrcMatch[2]);
+      const rawWords = yrcMatch[3];
+      const words: Word[] = [];
+      let lineText = '';
+
+      // 解析逐字歌词
+      const wordRegex = /\((\d+),(\d+),(\d+)\)([^(\[]+)/g;
+      let wordMatch;
+      while ((wordMatch = wordRegex.exec(rawWords)) !== null) {
+        const wordTime = parseInt(wordMatch[1]);
+        const wordDuration = parseInt(wordMatch[2]);
+        const wordText = wordMatch[4];
+        words.push({ time: wordTime, duration: wordDuration, text: wordText });
+        lineText += wordText;
+      }
+      if (lineText) {
+        result.push({ time: lineTime, duration: lineDuration, text: lineText, words });
+      }
+    } else {
+      // 普通歌词格式: [00:18.610]歌词文本
+      const lrcMatch = line.match(/\[(\d{2}):(\d{2})\.(\d{2,3})\](.*)/);
+      if (lrcMatch) {
+        const minutes = parseInt(lrcMatch[1]);
+        const seconds = parseInt(lrcMatch[2]);
+        const milliseconds = parseInt(lrcMatch[3].padEnd(3, '0')); // 统一为3位
+        const time = minutes * 60 * 1000 + seconds * 1000 + milliseconds;
+        const text = lrcMatch[4].trim();
+        if (text) {
+          result.push({ time, duration: 0, text }); // 普通歌词没有逐字时长
+        }
+      } else if (line.trim()) {
+        // 处理没有时间戳的歌词行
+        result.push({ time: -1, duration: 0, text: line.trim() });
+      }
     }
   });
   return result;
@@ -141,23 +208,38 @@ onBeforeUnmount(() => {
 
 async function updateLyricsPosition() {
   const newTime = playerStore.currentSong?.currentTime;
-  if (!props.visible || !newTime) {
+  if (!props.visible || newTime === undefined || newTime === null) {
     activeLineIndex.value = -1;
+    activeWordIndex.value = -1;
     return;
   }
 
-  const currentTimeMs = newTime; // currentTime 已经是毫秒
+  const currentTimeMs = newTime;
 
-  let foundIndex = -1;
+  let foundLineIndex = -1;
+  let foundWordIndex = -1;
+
   for (let i = 0; i < parsedLyrics.value.length; i++) {
-    if (parsedLyrics.value[i].time !== -1 && currentTimeMs >= parsedLyrics.value[i].time) {
-      foundIndex = i;
-    } else if (parsedLyrics.value[i].time === -1 && foundIndex === -1) {
+    const line = parsedLyrics.value[i];
+    if (line.time !== -1 && currentTimeMs >= line.time) {
+      foundLineIndex = i;
+      // 如果是逐字歌词，进一步查找当前激活的字
+      if (line.words && line.words.length > 0) {
+        for (let j = 0; j < line.words.length; j++) {
+          const word = line.words[j];
+          if (currentTimeMs >= word.time && currentTimeMs < word.time + word.duration) {
+            foundWordIndex = j;
+            break;
+          }
+        }
+      }
+    } else if (line.time === -1 && foundLineIndex === -1) {
       // 如果是纯文本歌词，且还没有找到带时间戳的歌词，则默认高亮第一行
-      foundIndex = 0;
+      foundLineIndex = 0;
     }
   }
-  activeLineIndex.value = foundIndex;
+  activeLineIndex.value = foundLineIndex;
+  activeWordIndex.value = foundWordIndex;
 
   // 滚动歌词到视图中央
   if (lyricsContentRef.value && activeLineIndex.value !== -1) {
@@ -258,7 +340,13 @@ function onProgressChange(value: number) {
   position: relative;
   z-index: 10;
 }
-
+.lyrics-word {
+  font-size: calc(30px - 4px);
+  color: rgba(255, 255, 255, 0.15);
+  transition:
+    color 0.3s ease-in-out,
+    font-size 0.3s ease-in-out;
+}
 .header-right {
   display: flex;
   align-items: center;
@@ -468,5 +556,13 @@ function onProgressChange(value: number) {
 
 .full-screen-lyrics-leave-to {
   transform: translateY(100%);
+}
+.lyrics-word {
+  display: inline-block;
+  transition: color 0.1s ease-in-out;
+}
+
+.lyrics-word.active {
+  color: #ffffff;
 }
 </style>

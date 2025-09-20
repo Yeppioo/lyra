@@ -144,10 +144,18 @@ export const usePlayerStore = defineStore('player', () => {
           console.error('获取歌曲URL失败:', (songUrlResponse as PromiseRejectedResult).reason);
         }
 
+        console.log(lyricResponse);
+
         // 处理歌词
-        if (lyricResponse.status === 'fulfilled' && lyricResponse.value.lrc?.lyric) {
-          const lyric = lyricResponse.value.lrc.lyric;
-          currentSong.value = { ...currentSong.value, lyric };
+        if (lyricResponse.status === 'fulfilled') {
+          const lyric = lyricResponse.value.lrc?.lyric;
+          const yrcLyric = lyricResponse.value.yrc?.lyric;
+          if (lyric) {
+            currentSong.value = { ...currentSong.value, lyric };
+          }
+          if (yrcLyric) {
+            currentSong.value = { ...currentSong.value, yrcLyric };
+          }
         } else if (lyricResponse.status === 'rejected') {
           console.error('获取歌词失败:', (lyricResponse as PromiseRejectedResult).reason);
         }

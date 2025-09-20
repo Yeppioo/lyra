@@ -109,7 +109,8 @@
                     style="font-size: 12px; color: var(--y-color-gray)">
                     已登录
                   </span>
-                  <span v-else-if="uiPropertiesStore.uiProperties.loginStatus === 'loggingIn'"
+                  <span
+                    v-else-if="uiPropertiesStore.uiProperties.loginStatus === 'loggingIn'"
                     style="font-size: 12px; color: var(--y-color-gray)">
                     登录中...
                   </span>

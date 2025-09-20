@@ -17,6 +17,7 @@ export interface PlayingSongInfo {
 export interface CurrentSong extends SongInfo {
   url: string;
   lyric: string;
+  yrcLyric?: string; // 新增逐字歌词
   currentTime: number;
 }
 

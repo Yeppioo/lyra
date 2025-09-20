@@ -232,7 +232,7 @@ defineExpose({
   font-size: 15px;
 }
 .search-tip-container {
-  max-height: min(561px,calc(100vh - 200px));
+  max-height: min(561px, calc(100vh - 200px));
   overflow: scroll;
   min-width: 230px;
   max-width: 360px;

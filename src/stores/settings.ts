@@ -63,7 +63,9 @@ export const useSettingsStore = defineStore('settings', () => {
     { immediate: true }
   );
 
-  async function checkLoginStatus(uiPropertiesStore: ReturnType<typeof useUIPropertiesStore>): Promise<void> {
+  async function checkLoginStatus(
+    uiPropertiesStore: ReturnType<typeof useUIPropertiesStore>
+  ): Promise<void> {
     // 如果本地没有账户信息，则跳过登录状态检查
     if (!settings.value.userinfo.netease.account) {
       console.log('本地无账户信息，跳过登录状态检查');
@@ -79,7 +81,11 @@ export const useSettingsStore = defineStore('settings', () => {
       try {
         const response: LoginStatusResponse = await neteaseLoginApi.getLoginStatus();
         if (response.data.code === 200) {
-          if (response.data.profile && response.data.account && !response.data.account.anonimousUser) {
+          if (
+            response.data.profile &&
+            response.data.account &&
+            !response.data.account.anonimousUser
+          ) {
             settings.value.userinfo.netease.account = response.data.account;
             settings.value.userinfo.netease.profile = response.data.profile;
             settings.value.userinfo.username = response.data.profile.nickname;
@@ -106,7 +112,7 @@ export const useSettingsStore = defineStore('settings', () => {
       }
       attempts++;
       if (attempts < maxAttempts) {
-        await new Promise(resolve => setTimeout(resolve, 1000)); // 等待1秒后重试
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // 等待1秒后重试
       }
     }
     uiPropertiesStore.uiProperties.loginStatus = 'loginFailed';

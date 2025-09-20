@@ -12,6 +12,10 @@ export interface LyricResponse {
     version: number;
     lyric: string;
   };
+  yrc?: {
+    version: number;
+    lyric: string;
+  };
   code: number;
 }
 
@@ -22,7 +26,7 @@ export interface LyricResponse {
  */
 async function getLyric(id: number): Promise<LyricResponse> {
   try {
-    const response = await fetch(`${apiBase}/lyric?id=${id}&${realIpParam}`);
+    const response = await fetch(`${apiBase}/lyric/new?id=${id}&${realIpParam}`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
