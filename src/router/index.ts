@@ -57,6 +57,32 @@ const router = createRouter({
       name: 'artist',
       component: () => import('../views/ArtistView.vue'),
       props: true,
+      children: [
+        {
+          path: 'song',
+          name: 'song',
+          component: () => import('../components/artist/hot-song.vue'),
+          props: true,
+        },
+        {
+          path: 'album',
+          name: 'album',
+          component: () => import('../components/artist/album.vue'),
+          props: true,
+        },
+        {
+          path: 'mv',
+          name: 'mv',
+          component: () => import('../components/artist/mv.vue'),
+          props: true,
+        },
+        {
+          path: 'all-song',
+          name: 'all-song',
+          component: () => import('../components/artist/all-song.vue'),
+          props: true,
+        },
+      ],
     },
   ],
 });

@@ -190,7 +190,7 @@ const currentSong = computed(() => playerStore.currentSong);
 const lyrics = computed(() => playerStore.currentSong?.lyric || '');
 const yrcLyrics = computed(() => playerStore.currentSong?.yrcLyric || '');
 const jumpArtist = (id: number) => {
-  router.push(`/artist/${id}`);
+  router.push(`/artist/${id}/song`);
 };
 // 解析歌词，将时间戳和歌词文本分离
 const parsedLyrics = computed<LyricLine[]>(() => {

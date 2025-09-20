@@ -236,7 +236,7 @@ function togglePlay() {
 }
 
 const jumpArtist = (id: number) => {
-  router.push(`/artist/${id}`);
+  router.push(`/artist/${id}/song`);
 };
 
 function onCanPlay() {

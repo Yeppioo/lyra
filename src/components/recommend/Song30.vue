@@ -136,7 +136,7 @@ const next = () => {
     uiProperties.value.personalized.song30.selectedindex = 0;
 };
 const jumpArtist = (id: number) => {
-  router.push(`/artist/${id}`);
+  router.push(`/artist/${id}/song`);
 };
 
 const play = async () => {

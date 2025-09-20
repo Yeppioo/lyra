@@ -102,7 +102,7 @@ const fetchSongs = async (page: number, key: string) => {
   loading.value = false;
 };
 const jumpArtist = (id: number) => {
-  router.push(`/artist/${id}`);
+  router.push(`/artist/${id}/song`);
 };
 const formatSecondsToMinutes = (seconds: number) => {
   const totalSeconds = Math.floor(seconds);
