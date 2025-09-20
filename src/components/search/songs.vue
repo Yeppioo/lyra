@@ -62,7 +62,6 @@
 <!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script setup lang="ts">
 import { usePlayerStore, setCurrentSong } from '@/stores/player';
-import { functions as getSongApi } from '@/api/netease/getSong';
 
 import { onMounted, ref, watch } from 'vue';
 import {
@@ -92,7 +91,6 @@ const fetchSongs = async (page: number, key: string) => {
   loading.value = true;
   songsList.value = [...new Array(3)].map(() => ({ loading: true, name: {}, picture: {} }));
   const result: SearchResult = await neteaseApi.searchSongs(key, page);
-  console.log(result);
 
   cachedPages.set(page, result.songs);
   if (result.count > 0 && songCount.value === 0) {
@@ -128,15 +126,6 @@ const handleMenuItemClick = async (key: number, cover: string) => {
   const song = songsList.value.find((s: any) => s.id == songId);
   if (!song) return;
   try {
-    const urlRes = await getSongApi.getSongUrl(songId);
-    console.log('urlRes', urlRes);
-
-    const url = urlRes.data?.[0]?.url;
-    if (!url) {
-      message.error('无法获取播放地址');
-      return;
-    }
-
     const artists = [];
     for (const a of song.artists) {
       artists.push({
@@ -296,15 +285,15 @@ watch(
   top: -3px;
 }
 .songs-search-result :deep(.ant-menu-item) {
-  height: 80px;
   background: var(--y-com-bg) !important;
   margin-bottom: 15px;
   padding: 16px;
+  display: inline-table !important;
+  align-items: center !important;
   border: rgb(239, 239, 245) 1px solid;
 }
 [theme-dark] .songs-search-result :deep(.ant-menu-item) {
   border: rgba(255, 255, 255, 0.09) 1px solid;
-  display: inline-table;
 }
 .songs-search-result :deep(.ant-menu) {
   border: 0;

@@ -37,7 +37,9 @@
     </a-menu>
   </div>
 
-  <RouterView />
+  <div class="view">
+    <RouterView />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -59,7 +61,8 @@ const route = useRoute();
 const data: Ref<ArtistDetailResponse['data'] | null> = ref(null);
 const artistId = ref(-1);
 onMounted(() => {
-  const id = route.params.id as string;
+  const id = route.params.key as string;
+  updateSelectedKeys();
   if (id) {
     artistId.value = parseInt(id);
     fetchArtistData(artistId.value);
@@ -69,7 +72,7 @@ onMounted(() => {
 const selectedKeys = ref<string[]>(['song']);
 
 const updateSelectedKeys = () => {
-  const type = route.params.type as string;
+  const type = route.name as string;
   if (type) {
     selectedKeys.value = [type];
   } else {
@@ -78,11 +81,11 @@ const updateSelectedKeys = () => {
 };
 
 const handleMenuSelect = ({ key }: { key: string }) => {
-  router.push(`/artist/${route.params.id}/${key}`);
+  router.push(`/artist/${route.params.key}/${key}`);
 };
 
 watch(
-  () => route.params.id,
+  () => route.params.key,
   (newId) => {
     updateSelectedKeys();
     if (newId) {
@@ -109,7 +112,11 @@ const fetchArtistData = async (id: number) => {
   justify-content: center;
 }
 * {
+  color: var(--y-text);
   font-family: var(--y-font);
+}
+h2 {
+  color: var(--y-text) !important;
 }
 .artistData {
   display: flex;
@@ -141,12 +148,10 @@ const fetchArtistData = async (id: number) => {
   font-size: 36px;
   font-weight: 700;
   margin-bottom: 0;
-  color: #e0e0e0; /* Light color for dark background */
 }
 
 .occupation {
   font-size: 16px;
-  color: #b0b0b0; /* Slightly lighter than name */
 }
 
 .num {
@@ -162,7 +167,6 @@ const fetchArtistData = async (id: number) => {
   display: flex;
   align-items: center;
   font-size: 15px;
-  color: #d0d0d0;
 }
 
 .num .svg-inline--fa {
@@ -180,7 +184,9 @@ const fetchArtistData = async (id: number) => {
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
-  color: #c0c0c0;
   font-size: 14px;
+}
+.view {
+  margin-top: 15px;
 }
 </style>

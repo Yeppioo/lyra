@@ -27,7 +27,9 @@ const theme = computed(() => {
   <ConfigProvider :locale="zhCN" :theme="theme">
     <NavBar />
     <div id="app-view" :class="{ showPlayer: playerStore.currentSong }">
-      <RouterView />
+      <div id="app-container">
+        <RouterView />
+      </div>
     </div>
     <MusicPlayer />
     <FullScreenLyrics

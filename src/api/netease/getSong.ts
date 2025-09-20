@@ -106,7 +106,32 @@ async function getSongUrls(ids: string[], br: number = 999000): Promise<GetSongR
   }
 }
 
+async function getSongPics(ids: string[]): Promise<string[]> {
+  try {
+    const idsParam = ids.join(',');
+    const response = await fetch(`${apiBase}/song/detail?ids=${idsParam}&${realIpParam}`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Validate response structure
+    if (data.code !== undefined && data.data !== undefined) {
+      return [];
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return data.songs.map((song: any) => song.al.picUrl);
+  } catch (error) {
+    console.error('Error fetching song URLs:', error);
+    throw error;
+  }
+}
+
 export const functions = {
   getSongUrl,
   getSongUrls,
+  getSongPics,
 };

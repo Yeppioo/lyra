@@ -55,7 +55,6 @@ export const useUIPropertiesStore = defineStore('uiProperties', () => {
     try {
       getPersonalizedSongs()
         .then((data) => {
-          console.log('获取推荐歌曲成功：', data);
           uiProperties.value.personalized.song30.songs = data || [];
           if (data && data.length > 0) {
             uiProperties.value.personalized.song30.loading = false;

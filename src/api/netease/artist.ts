@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { type AxiosResponse } from 'axios';
 import { apiSettings } from '../config';
 
 const neteaseApiBase = apiSettings.neteaseApiBase;
@@ -39,11 +39,11 @@ export const getArtistAlbum = (id: number, limit = 30, offset = 0) => {
  * 获取歌手热门 50 首歌曲
  * @param id 歌手 id
  */
-export const getArtistTopSongs = (id: number) => {
+export function getArtistTopSongs(id: string): Promise<AxiosResponse> {
   return axios.get(`${neteaseApiBase}/artist/top/song`, {
     params: { id },
   });
-};
+}
 
 /**
  * 获取歌手全部歌曲
@@ -52,8 +52,13 @@ export const getArtistTopSongs = (id: number) => {
  * @param limit 取出歌单数量 , 默认为 50
  * @param offset 偏移数量 , 用于分页 , 如 :( 评论页数 -1)*50, 其中 50 为 limit 的值
  */
-export const getArtistAllSongs = (id: number, order?: 'hot' | 'time', limit = 50, offset = 0) => {
+export function getArtistAllSongs(
+  id: string,
+  order?: 'hot' | 'time',
+  limit = 50,
+  offset = 0
+): Promise<AxiosResponse> {
   return axios.get(`${neteaseApiBase}/artist/songs`, {
     params: { id, order, limit, offset },
   });
-};
+}

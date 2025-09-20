@@ -144,8 +144,6 @@ export const usePlayerStore = defineStore('player', () => {
           console.error('获取歌曲URL失败:', (songUrlResponse as PromiseRejectedResult).reason);
         }
 
-        console.log(lyricResponse);
-
         // 处理歌词
         if (lyricResponse.status === 'fulfilled') {
           const lyric = lyricResponse.value.lrc?.lyric;

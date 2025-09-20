@@ -36,7 +36,7 @@ a,
   margin: 0 auto;
   margin-top: 55px;
 }
-#app-view > .container {
+#app-view > #app-container {
   max-width: 1200px;
   margin: 0 auto;
 }

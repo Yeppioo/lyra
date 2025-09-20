@@ -91,7 +91,6 @@ export const useSettingsStore = defineStore('settings', () => {
             settings.value.userinfo.username = response.data.profile.nickname;
             settings.value.userinfo.avatar = response.data.profile.avatarUrl;
             uiPropertiesStore.uiProperties.loginStatus = 'loggedIn';
-            console.log('登录成功', response.data);
             return;
           } else {
             // 匿名用户或未登录，清空本地存储的账户信息

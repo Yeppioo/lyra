@@ -146,13 +146,6 @@ const play = async () => {
     ];
   try {
     const urlRes = await getSongApi.getSongUrl(song.id);
-    console.log('urlRes', urlRes);
-
-    const url = urlRes.data?.[0]?.url;
-    if (!url) {
-      message.error('无法获取播放地址');
-      return;
-    }
     const artists = [];
     for (const a of song.artist) {
       artists.push({
