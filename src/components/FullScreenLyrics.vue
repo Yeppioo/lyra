@@ -15,7 +15,8 @@
       </div>
       <div class="lyrics-main-content">
         <div class="left-section">
-          <div class="cover-container">
+          <div class="left-container">
+            <div class="cover-container">
             <img :src="currentSong?.cover" alt="Album Cover" class="cover-img" />
           </div>
           <div class="song-info">
@@ -61,6 +62,7 @@
                 class="control-icon"
                 @click="playerStore.playNext()" />
             </div>
+          </div>
           </div>
         </div>
         <div class="right-section">
@@ -374,11 +376,13 @@ function onProgressChange(value: number) {
   align-items: center;
   justify-content: center;
   padding-right: 50px;
+  margin-bottom: 50px;
 }
 
 .cover-container {
-  width: 350px; /* 正方形宽度 */
-  height: 350px; /* 正方形高度 */
+  width: min(350px, calc(100vh - 320px)); /* 根据高度动态调整宽度，最大350px，为控制区留出更多空间 */
+  height: min(350px, calc(100vh - 320px)); /* 根据高度动态调整高度，最大350px，为控制区留出更多空间 */
+  aspect-ratio: 1 / 1; /* 保持正方形 */
   border-radius: 12px; /* 圆角 */
   overflow: hidden;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);

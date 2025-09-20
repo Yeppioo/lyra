@@ -32,10 +32,13 @@ a,
 }
 
 #app-view {
-  max-width: 1200px;
   padding: 0 50px !important;
   margin: 0 auto;
   margin-top: 55px;
+}
+#app-view > .container {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 @media (max-width: 930px) {
   #app-view {

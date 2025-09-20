@@ -631,6 +631,7 @@ function toggleFullScreenLyrics() {
   right: 100px;
   height: 150px;
   display: flex;
+  user-select: none;
   align-items: center;
   justify-content: center;
   flex-direction: column;
@@ -639,6 +640,7 @@ function toggleFullScreenLyrics() {
 .play-mode-popup {
   right: 50px; /* 根据实际布局调整 */
   width: 130px;
+  user-select: none;
 }
 
 .play-mode-popup .mode-item {
@@ -662,6 +664,7 @@ function toggleFullScreenLyrics() {
 }
 
 .playlist-popup {
+  user-select: none;
   right: 10px;
   max-width: 300px;
   width: calc(100vw - 20px);
@@ -755,6 +758,9 @@ function toggleFullScreenLyrics() {
 .delete-icon:hover {
   color: #ff4d4f; /* 删除按钮的悬停颜色 */
   opacity: 1;
+}
+.control-button:hover > svg{
+color: #fff !important;
 }
 /* .current-playing .song-info {
   flex-grow: 1;
