@@ -706,6 +706,7 @@ function onProgressChange(value: number) {
 .ar-name-title::before,
 .ar-name::before {
   position: static !important;
+  display: inline;
 }
 .ar-name-title:hover,
 .ar-name:hover {

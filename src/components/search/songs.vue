@@ -27,15 +27,18 @@
           <div class="info">
             <div class="basic-info">
               <div class="song-name-container">
-                <span class="song-name">
+                <a @click="jumper.jumpSong(item.id)" class="song-name no-before">
                   {{ item.name }}
-                </span>
+                </a>
                 <div v-if="item.requireVip" class="vip-tag tag">
                   <span>VIP</span>
                 </div>
-                <div v-if="item.hasMv" class="mv-tag tag">
+                <a
+                  v-if="item.hasMv"
+                  @click="jumper.jumpVideo(item.mvId)"
+                  class="mv-tag tag no-before">
                   <span>MV</span>
-                </div>
+                </a>
               </div>
               <div class="ar-name-container">
                 <template v-for="a in item.artists" :key="a.id">
@@ -43,7 +46,9 @@
                 </template>
               </div>
             </div>
-            <span class="album">{{ item.album.name }}</span>
+            <a class="album no-before" @click="jumper.jumpAlbum(item.album.id)">{{
+              item.album.name
+            }}</a>
             <span class="duration">{{ formatSecondsToMinutes(item.duration / 1000) }}</span>
             <font-awesome-icon class="more-button" size="xl" :icon="['fas', 'ellipsis']" />
           </div>
@@ -195,6 +200,7 @@ watch(
 }
 .ar-name::before {
   position: static !important;
+  display: inline;
 }
 .duration {
   position: absolute;
@@ -238,7 +244,9 @@ watch(
   max-width: 300px;
   padding: 0;
 }
-.ar-name:hover {
+.ar-name:hover,
+.song-name:hover,
+.album:hover {
   color: #1677ff !important;
 }
 .album {
@@ -308,7 +316,7 @@ watch(
 .songs-search-result :deep(.ant-menu-item-active) {
   border: #70baff 1px solid !important;
 }
-.vip-tag {
+.vip-tag{
   background: #f55e551f;
 }
 .vip-tag span {
@@ -325,6 +333,12 @@ watch(
 }
 [theme-dark] .mv-tag span {
   color: #f0a020 !important;
+}
+.mv-tag:hover {
+  background: #98c3ff !important;
+}
+.mv-tag:hover span {
+  color: #1677ff !important;
 }
 @media (max-width: 734px) {
   .album,

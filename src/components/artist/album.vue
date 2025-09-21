@@ -171,6 +171,7 @@ watch(
 }
 .ar-name::before {
   position: static !important;
+  display: inline;
 }
 .ar-name:hover {
   color: #1677ff !important;

@@ -16,27 +16,26 @@
         </a-skeleton>
         <div class="item" v-else>
           <a-image
-            v-show="false"
             :fallback="fallbackImg"
             :placeholder="true"
             class="icon-img"
             :width="48"
+            :preview="false"
             :height="48"
             :src="item.picUrl">
           </a-image>
-          <!-- <span class="number">{{ item.rank }}</span> -->
           <div class="info">
             <div class="basic-info">
               <div class="song-name-container">
-                <span class="song-name">
+                <a @click="jumper.jumpSong(item.id)" class="song-name no-before">
                   {{ item.name }}
-                </span>
+                </a>
                 <div v-if="item.requireVip" class="vip-tag tag">
                   <span>VIP</span>
                 </div>
-                <div v-if="item.hasMv" class="mv-tag tag">
+                <a @click="jumper.jumpVideo(item.mvId)" v-if="item.hasMv" class="mv-tag tag no-before">
                   <span>MV</span>
-                </div>
+                </a>
               </div>
               <div class="ar-name-container">
                 <template v-for="a in item.artists" :key="a.id">
@@ -44,7 +43,9 @@
                 </template>
               </div>
             </div>
-            <span class="album">{{ item.album.name }}</span>
+            <a @click="jumper.jumpAlbum(item.album.id)" class="album no-before">{{
+              item.album.name
+            }}</a>
             <span class="duration">{{ formatSecondsToMinutes(item.duration / 1000) }}</span>
             <font-awesome-icon class="more-button" size="xl" :icon="['fas', 'ellipsis']" />
           </div>
@@ -229,6 +230,7 @@ watch(
 }
 .ar-name::before {
   position: static !important;
+  display: inline;
 }
 .number {
   width: 30px;
@@ -374,5 +376,16 @@ watch(
   .more-button {
     display: unset;
   }
+}
+.mv-tag:hover {
+  background: #98c3ff !important;
+}
+.mv-tag:hover span {
+  color: #1677ff !important;
+}
+.ar-name:hover,
+.album:hover,
+.song-name:hover {
+  color: #1677ff !important;
 }
 </style>

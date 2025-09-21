@@ -13,11 +13,19 @@
       </div>
       <div class="right-box">
         <div class="info-box">
-          <span class="song-name">
+          <a
+            @click="
+              jumper.jumpSong(
+                uiProperties.personalized.song30.songs[
+                  uiProperties.personalized.song30.selectedindex
+                ]?.id
+              )
+            "
+            class="song-name">
             {{
               uiProperties.personalized.song30.songs[uiProperties.personalized.song30.selectedindex]
                 ?.name
-            }}</span
+            }}</a
           >
           <div class="ar-name-container">
             <template
@@ -66,11 +74,19 @@
             alt="song pic" />
         </div>
         <div class="info-box">
-          <span class="song-name">
+          <a
+            @click="
+              jumper.jumpSong(
+                uiProperties.personalized.song30.songs[
+                  uiProperties.personalized.song30.selectedindex
+                ]?.id
+              )
+            "
+            class="song-name">
             {{
               uiProperties.personalized.song30.songs[uiProperties.personalized.song30.selectedindex]
                 ?.name
-            }}</span
+            }}</a
           >
           <div class="ar-name-container">
             <template
@@ -242,6 +258,7 @@ const play = async () => {
   max-height: 90px;
 }
 .song-name {
+  color: #c9cdd4;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   font-size: 26px;
@@ -252,6 +269,12 @@ const play = async () => {
   overflow: hidden;
   font-family: var(--y-font);
   line-height: 1.35;
+}
+.song-name::before {
+  display: none;
+}
+.song-name:hover {
+  color: #fff;
 }
 .info-box {
   margin-left: 20px;
@@ -287,6 +310,7 @@ const play = async () => {
 }
 .ar-name::before {
   position: static !important;
+  display: inline;
 }
 .ar-name:hover {
   opacity: 1;

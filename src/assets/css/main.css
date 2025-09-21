@@ -10,10 +10,13 @@
   font-weight: lighter;
 }
 
-a,
-.green {
+a {
   text-decoration: none;
   transition: 0.3s;
+}
+a.no-before::before {
+  content: '';
+  display: none;
 }
 
 * {

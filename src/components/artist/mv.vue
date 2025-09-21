@@ -15,7 +15,7 @@
             <font-awesome-icon :icon="['fas', 'play-circle']" size="3x" class="play-icon" />
           </div>
           <div class="play-count-overlay">
-            <font-awesome-icon :icon="['fas', 'play']" /> {{ formatNumber(item.playCount) }}
+            <font-awesome-icon class="play-icon" :icon="['fas', 'play']" /> {{ formatNumber(item.playCount) }}
           </div>
           <div class="duration-overlay">
             {{ formatMsToMinutes(item.duration) }}
@@ -176,6 +176,7 @@ watch(
 }
 .ar-name::before {
   position: static !important;
+  display: inline;
 }
 .ar-name:hover {
   color: #1677ff !important;
