@@ -96,7 +96,7 @@
           <font-awesome-icon :icon="['fas', 'chevron-down']" /> 展开评论
         </button>
         <button v-if="showAllComments" @click="showAllComments = false" class="toggle-button">
-           <font-awesome-icon :icon="['fas', 'chevron-up']" /> 收起评论
+          <font-awesome-icon :icon="['fas', 'chevron-up']" /> 收起评论
         </button>
       </div>
     </div>
@@ -162,7 +162,7 @@
           <font-awesome-icon :icon="['fas', 'chevron-down']" /> 展开推荐
         </button>
         <button v-if="showAllSimiSongs" @click="showAllSimiSongs = false" class="toggle-button">
-           <font-awesome-icon :icon="['fas', 'chevron-up']" /> 收起推荐
+          <font-awesome-icon :icon="['fas', 'chevron-up']" /> 收起推荐
         </button>
       </div>
     </div>
@@ -224,7 +224,6 @@ const formatSecondsToMinutes = (seconds: number) => {
 };
 
 const fetchInfo = async () => {
-
   hotComments.value = [];
   simiSongs.value = [];
   songDetail.value = null;
@@ -258,7 +257,7 @@ const fetchInfo = async () => {
         mvId: s.mvid,
         requireVip: s.fee === 1,
         picUrl: s.album.picUrl,
-      } as FormattedSimiSong)
+      }) as FormattedSimiSong
   );
   loading.value = false; // Set loading to false after fetching
 };
@@ -577,7 +576,7 @@ const handleMenuItemClick = async (key: number, cover: string) => {
   margin-top: 0px;
   margin-left: 5px;
 }
-.songs-search-result .ant-menu{
+.songs-search-result .ant-menu {
   background: transparent;
 }
 .toggle-button {
@@ -592,8 +591,6 @@ const handleMenuItemClick = async (key: number, cover: string) => {
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-
-
 
 .comment-item {
   background: var(--y-com-bg) !important;
@@ -742,7 +739,8 @@ const handleMenuItemClick = async (key: number, cover: string) => {
 .info {
   display: flex;
   margin-left: 16px;
-  align-items: center;margin-top: 3px;
+  align-items: center;
+  margin-top: 3px;
 }
 .basic-info {
   display: flex;

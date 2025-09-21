@@ -9,6 +9,7 @@ import * as searchSongs from './searchSongs';
 import * as comment from './comment';
 import * as songWiki from './songWiki';
 import * as simi from './simi';
+import * as mv from './mv';
 
 export {
   artist,
@@ -22,4 +23,5 @@ export {
   comment,
   songWiki,
   simi,
+  mv,
 };

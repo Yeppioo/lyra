@@ -16,7 +16,10 @@ import {
 } from '@fortawesome/vue-fontawesome';
 library.add(fas);
 
+
 const app = createApp(App);
+
+
 
 app.component('font-awesome-icon', FontAwesomeIcon);
 app.component('font-awesome-layers', FontAwesomeLayers);
