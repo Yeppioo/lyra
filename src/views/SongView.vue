@@ -6,7 +6,7 @@
         <img :src="songDetail.al.picUrl" alt="Album Cover" />
       </div>
       <div class="song-info">
-        <h1 class="song-name">{{ songDetail.name }}</h1>
+        <h1 class="song-name-title">{{ songDetail.name }}</h1>
         <div class="artist-info">
           <font-awesome-icon class="icon user" :icon="['fas', 'user']" />
           <div class="ar-name-container">
@@ -16,7 +16,7 @@
           </div>
         </div>
         <div class="album-info">
-          <font-awesome-icon class="icon album" :icon="['fas', 'compact-disc']" />
+          <font-awesome-icon class="icon album-icon" :icon="['fas', 'compact-disc']" />
           <a @click="jumpAlbum(songDetail.al.id)" class="link">
             {{ songDetail.al.name }}
           </a>
@@ -101,16 +101,69 @@
       </div>
     </div>
 
-    <div v-if="simiSongs.length > 0" class="similar-songs-section">
+    <div v-if="simiSongs.length > 0" class="songs-search-result">
       <h2 class="section-title">相似推荐</h2>
-      <div class="similar-songs-grid">
-        <div v-for="song in simiSongs" :key="song.id" class="similar-song-item">
-          <img :src="song.album.picUrl" alt="Album Cover" class="similar-song-cover" />
-          <div class="similar-song-info">
-            <p class="similar-song-name">{{ song.name }}</p>
-            <p class="similar-song-artist">{{ song.artists.map((a) => a.name).join(', ') }}</p>
+      <a-menu :disabled="loading" v-model:selectedKeys="current" mode="vertical">
+        <a-menu-item
+          @click="handleMenuItemClick(item.id, item.picUrl)"
+          :disabled="loading"
+          v-for="item in displayedSimiSongs"
+          :key="item.id">
+          <a-skeleton avatar :title="false" v-if="loading" active>
+            <a-list-item-meta>
+              <template #avatar>
+                <a-avatar />
+              </template>
+            </a-list-item-meta>
+          </a-skeleton>
+          <div class="item" v-else>
+            <a-image
+              :fallback="fallbackImg"
+              :placeholder="true"
+              class="icon-img"
+              :width="48"
+              :preview="false"
+              :height="48"
+              :src="item.picUrl">
+            </a-image>
+            <div class="info">
+              <div class="basic-info">
+                <div class="song-name-container">
+                  <a @click.stop="jumpSong(item.id)" class="song-name no-before">
+                    {{ item.name }}
+                  </a>
+                  <div v-if="item.requireVip" class="vip-tag tag">
+                    <span>VIP</span>
+                  </div>
+                  <a
+                    @click.stop="jumpVideo(item.mvId)"
+                    v-if="item.hasMv"
+                    class="mv-tag tag no-before">
+                    <span>MV</span>
+                  </a>
+                </div>
+                <div class="ar-name-container">
+                  <template v-for="a in item.artists" :key="a.id">
+                    <a @click.stop="jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
+                  </template>
+                </div>
+              </div>
+              <a @click.stop="jumpAlbum(item.album.id)" class="album no-before">{{
+                item.album.name
+              }}</a>
+              <span class="duration">{{ formatSecondsToMinutes(item.duration / 1000) }}</span>
+              <font-awesome-icon class="more-button" size="xl" :icon="['fas', 'ellipsis']" />
+            </div>
           </div>
-        </div>
+        </a-menu-item>
+      </a-menu>
+      <div v-if="simiSongs.length > 1" class="comment-toggle-buttons">
+        <button v-if="!showAllSimiSongs" @click="showAllSimiSongs = true" class="toggle-button">
+          <font-awesome-icon :icon="['fas', 'chevron-down']" /> 展开推荐
+        </button>
+        <button v-if="showAllSimiSongs" @click="showAllSimiSongs = false" class="toggle-button">
+           <font-awesome-icon :icon="['fas', 'chevron-up']" /> 收起推荐
+        </button>
       </div>
     </div>
   </main>
@@ -120,12 +173,21 @@
 import { onMounted, ref, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { getSong, comment, simi } from '@/api/netease';
-import { jumpArtist, jumpAlbum } from '@/utils/jumper';
+import { jumpArtist, jumpAlbum, jumpSong, jumpVideo } from '@/utils/jumper';
 import type { SongDetail } from '@/api/netease/getSong';
 import type { HotComment } from '@/api/netease/comment';
 import type { SimiSong } from '@/api/netease/simi';
 import { setCurrentSong, usePlayerStore } from '@/stores/player';
 import type { SongWikiSummaryResponseData } from '@/api/netease/songWiki';
+import { message } from 'ant-design-vue';
+import { fallbackImg } from '@/stores/constant';
+
+interface FormattedSimiSong extends SimiSong {
+  picUrl: string;
+  hasMv: boolean;
+  mvId: number;
+  requireVip: boolean;
+}
 
 const route = useRoute();
 
@@ -133,9 +195,12 @@ const currentId = ref('');
 const songDetail = ref<SongDetail | null>(null);
 const hotComments = ref<HotComment[]>([]);
 const songWikiSummary = ref<SongWikiSummaryResponseData | null>(null);
-const simiSongs = ref<SimiSong[]>([]);
+const simiSongs = ref<FormattedSimiSong[]>([]);
 const showAllComments = ref(false); // 新增：控制评论展开/收起状态
+const showAllSimiSongs = ref(false); // 新增：控制相似推荐展开/收起状态
 const playerStore = usePlayerStore();
+const loading = ref(true); // Added for similar songs section
+const current = ref<string[]>([]); // Added for similar songs section
 
 const displayedComments = computed(() => {
   if (showAllComments.value) {
@@ -144,8 +209,28 @@ const displayedComments = computed(() => {
   return hotComments.value.slice(0, 1); // 默认只显示第一条评论
 });
 
+const displayedSimiSongs = computed(() => {
+  if (showAllSimiSongs.value) {
+    return simiSongs.value;
+  }
+  return simiSongs.value.slice(0, 1); // 默认只显示前3条相似推荐
+});
+
+const formatSecondsToMinutes = (seconds: number) => {
+  const totalSeconds = Math.floor(seconds);
+  const minutes = Math.floor(totalSeconds / 60);
+  const remainingSeconds = totalSeconds % 60;
+  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+};
+
 const fetchInfo = async () => {
+
+  hotComments.value = [];
+  simiSongs.value = [];
+  songDetail.value = null;
+
   if (!currentId.value) return;
+  loading.value = true; // Set loading to true before fetching
   const songDetailResponse = await getSong.getSongDetail(currentId.value);
   if (songDetailResponse.songs && songDetailResponse.songs.length > 0) {
     songDetail.value = songDetailResponse.songs[0];
@@ -157,7 +242,25 @@ const fetchInfo = async () => {
 
   // 获取相似歌曲
   const simiResponse = await simi.getSimiSongs(currentId.value);
-  simiSongs.value = simiResponse.songs;
+  simiSongs.value = simiResponse.songs.map(
+    (s: SimiSong) =>
+      ({
+        id: s.id,
+        name: s.name,
+        artists: s.artists,
+        duration: s.duration,
+        album: {
+          id: s.album.id,
+          name: s.album.name,
+          picUrl: s.album.picUrl,
+        },
+        hasMv: s.mvid !== 0,
+        mvId: s.mvid,
+        requireVip: s.fee === 1,
+        picUrl: s.album.picUrl,
+      } as FormattedSimiSong)
+  );
+  loading.value = false; // Set loading to false after fetching
 };
 
 onMounted(() => {
@@ -187,6 +290,33 @@ const playCurrent = () => {
       },
       playerStore
     );
+  }
+};
+
+const handleMenuItemClick = async (key: number, cover: string) => {
+  const songId = key;
+  const song = simiSongs.value.find((s) => s.id == songId);
+  if (!song) return;
+  try {
+    const artists = [];
+    for (const a of song.artists) {
+      artists.push({
+        id: a.id,
+        name: a.name,
+      });
+    }
+    setCurrentSong(
+      {
+        id: songId,
+        duration: song.duration,
+        name: song.name,
+        artist: artists,
+        cover: cover,
+      },
+      playerStore
+    );
+  } catch {
+    message.error('播放失败');
   }
 };
 </script>
@@ -230,7 +360,7 @@ const playCurrent = () => {
   justify-content: flex-start;
 }
 
-.song-name {
+.song-name-title {
   font-size: 36px;
   color: var(--y-text);
   line-height: 1.3;
@@ -291,13 +421,12 @@ const playCurrent = () => {
 .ar-name,
 .album-info > a {
   margin-top: 2px;
-  font-size: 16px;
+  font-size: 14px;
   color: #909092 !important;
   padding: 0;
   min-width: 35px;
   font-family: var(--y-font);
   cursor: pointer;
-  margin-left: 1px;
 }
 .ar-name ~ .ar-name::before {
   content: ',';
@@ -323,7 +452,7 @@ const playCurrent = () => {
   -webkit-line-clamp: 3;
   line-clamp: 3;
 }
-.icon.album {
+.icon.album-icon {
   color: #faad14;
   width: 22px;
   margin-left: 2px;
@@ -448,10 +577,12 @@ const playCurrent = () => {
   margin-top: 0px;
   margin-left: 5px;
 }
-
+.songs-search-result .ant-menu{
+  background: transparent;
+}
 .toggle-button {
   background-color: transparent;
-  color: white;
+  color: var(--y-text);
   border: none;
   border-radius: 6px;
   position: relative;
@@ -469,7 +600,7 @@ const playCurrent = () => {
   border-radius: 8px;
   padding: 15px;
   margin-bottom: 15px;
-  border: 1px solid;
+  border: 1px solid transparent;
 }
 .comment-item:hover {
   border: #70baff 1px solid !important;
@@ -518,58 +649,190 @@ const playCurrent = () => {
 }
 
 /* Similar Songs Styles */
-.similar-songs-section {
-  margin-top: 40px;
+.songs-search-result {
+  overflow: clip;
+  padding-bottom: 40px;
 }
-
-.similar-songs-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 20px;
+.songs-search-result :deep(.ant-pagination-options) {
+  display: none;
 }
-
-.similar-song-item {
-  background-color: var(--y-background-card);
+.songs-search-result :deep(.icon-img) {
+  width: 48px;
+  height: 48px;
   border-radius: 8px;
-  padding: 15px;
+}
+.songs-search-result :deep(.ant-pagination-item-link) {
+  height: 32px;
+  display: block;
+  position: relative;
+  top: -3px;
+}
+.songs-search-result :deep(.ant-menu-item) {
+  background: var(--y-com-bg) !important;
+  margin-bottom: 15px;
+  padding: 16px;
+  border: rgb(239, 239, 245) 1px solid;
+  display: inline-table !important;
+  align-items: center !important;
+}
+[theme-dark] .songs-search-result :deep(.ant-menu-item) {
+  border: rgba(255, 255, 255, 0.09) 1px solid;
+}
+
+.songs-search-result :deep(.ant-menu) {
+  border: 0;
+}
+.songs-search-result :deep(.ant-menu-item-selected) {
+  border: #70baff 1px solid !important;
+  background: #70baff1f !important;
+  span {
+    color: #70baff;
+  }
+}
+
+.songs-search-result :deep(.ant-menu-item-active) {
+  border: #70baff 1px solid !important;
+}
+.tag span {
+  line-height: 1;
+  font-size: 10px;
+}
+.tag {
+  padding: 0 7.3px;
+  border-radius: 91px;
+  height: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  margin-top: 4px;
+}
+.ar-name-container {
+  display: flex;
+  max-width: 300px;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.song-name-container {
+  line-height: 1.5 !important;
+  display: flex;
+}
+.more-button {
+  position: absolute;
+  right: 22px;
+  display: none;
+}
+.ar-name ~ .ar-name::before {
+  content: ',';
+  margin: 0 5px;
+  color: var(--y-text) !important;
+}
+.ar-name::before {
+  position: static !important;
+  display: inline;
+}
+.duration {
+  position: absolute;
+  right: 24px;
+}
+.album {
+  position: absolute;
+  left: 400px;
+}
+.info {
+  display: flex;
+  margin-left: 16px;
+  align-items: center;margin-top: 3px;
+}
+.basic-info {
   display: flex;
   flex-direction: column;
+  position: relative;
+  top: -2px;
+  margin-right: 40px;
+}
+.basic-info span {
+  font-family: var(--y-font);
+  text-overflow: ellipsis;
+  line-height: 1;
+  overflow: clip;
+  max-width: 280px;
+}
+.ar-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+  word-wrap: break-word;
+  text-wrap: auto;
+  line-height: 1.1 !important;
+  max-width: 300px;
+  padding: 0;
+}
+.ar-name:hover,
+.album:hover,
+.song-name:hover {
+  color: #1677ff !important;
+}
+.album {
+  line-height: 1.3 !important;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  word-wrap: break-word;
+  text-wrap: auto;
+  margin-right: 75px;
+  text-overflow: ellipsis;
+  overflow: clip;
+}
+.song-name {
+  font-size: 16px;
+  line-height: 1.5 !important;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+  word-wrap: break-word;
+  text-wrap: auto;
+}
+
+.item {
+  display: flex;
+  flex-direction: row;
   align-items: center;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease;
 }
-
-.similar-song-item:hover {
-  transform: translateY(-5px);
+.vip-tag {
+  background: #f55e551f;
 }
-
-.similar-song-cover {
-  width: 120px;
-  height: 120px;
-  border-radius: 6px;
-  object-fit: cover;
-  margin-bottom: 10px;
+.vip-tag span {
+  color: #f55e55 !important;
 }
-
-.similar-song-info {
-  width: 100%;
+.mv-tag {
+  background: rgba(242, 201, 125, 0.16);
 }
-
-.similar-song-name {
-  font-weight: bold;
-  color: var(--y-text);
-  margin-bottom: 5px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.mv-tag span {
+  color: #ffa600 !important;
 }
-
-.similar-song-artist {
-  color: var(--y-text-light);
-  font-size: 14px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+[theme-dark] .mv-tag {
+  background: rgba(240, 160, 32, 0.15);
+}
+[theme-dark] .mv-tag span {
+  color: #f0a020 !important;
+}
+.mv-tag:hover {
+  background: #98c3ff !important;
+}
+.mv-tag:hover span {
+  color: #1677ff !important;
+}
+@media (max-width: 734px) {
+  .album,
+  .duration {
+    display: none;
+  }
+  .more-button {
+    display: unset;
+  }
 }
 </style>
