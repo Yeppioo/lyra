@@ -42,6 +42,99 @@ export interface SongUrlData {
   time: number;
 }
 
+export interface SongDetail {
+  name: string;
+  mainTitle: string;
+  additionalTitle: string;
+  id: number;
+  ar: {
+    id: number;
+    name: string;
+    tns: [];
+    alias: [];
+  }[];
+  alia: [];
+  pop: number;
+  st: number;
+  rt: string;
+  fee: number;
+  v: number;
+  crbt: null;
+  cf: string;
+  al: {
+    id: number;
+    name: string;
+    picUrl: string;
+    tns: [];
+    pic_str: string;
+    pic: number;
+  };
+  dt: number;
+  h: {
+    br: number;
+    fid: number;
+    size: number;
+    vd: number;
+    sr: number;
+  };
+  m: {
+    br: number;
+    fid: number;
+    size: number;
+    vd: number;
+    sr: number;
+  };
+  l: {
+    br: number;
+    fid: number;
+    size: number;
+    vd: number;
+    sr: number;
+  };
+  sq: {
+    br: number;
+    fid: number;
+    size: number;
+    vd: number;
+    sr: number;
+  };
+  hr: null;
+  a: null;
+  cd: string;
+  no: number;
+  rtUrl: null;
+  ftype: number;
+  rtUrls: [];
+  djId: number;
+  copyright: number;
+  s_id: number;
+  mark: number;
+  originCoverType: number;
+  originSongSimpleData: null;
+  tagPicList: null;
+  resourceState: boolean;
+  version: number;
+  songJumpInfo: null;
+  entertainmentTags: null;
+  awardTags: null;
+  displayTags: null;
+  single: number;
+  noCopyrightRcmd: null;
+  mv: number;
+  cp: number;
+  rtype: number;
+  rurl: null;
+  mst: number;
+  publishTime: number;
+}
+
+export interface SongDetailResponse {
+  songs: SongDetail[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  privileges: any[];
+  code: number;
+}
+
 export interface GetSongResponse {
   data: SongUrlData[];
   code: number;
@@ -134,4 +227,33 @@ export const functions = {
   getSongUrl,
   getSongUrls,
   getSongPics,
+  getSongDetail,
 };
+
+/**
+ * Get song detail
+ * @param ids - Song IDs to get detail for (comma separated)
+ * @returns Promise<SongDetailResponse> - Song detail data
+ */
+export async function getSongDetail(ids: string): Promise<SongDetailResponse> {
+  try {
+    const response = await fetch(`${apiBase}/song/detail?ids=${ids}&${realIpParam}`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Validate response structure
+    if (data.code !== undefined && data.songs !== undefined) {
+      return data as SongDetailResponse;
+    }
+
+    // Fallback for unexpected response format
+    throw new Error('Invalid response format from song detail API');
+  } catch (error) {
+    console.error('Error fetching song detail:', error);
+    throw error;
+  }
+}

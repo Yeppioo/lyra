@@ -176,7 +176,7 @@ watch(
 .ar-name:hover {
   color: #1677ff !important;
 }
-*{
+* {
   user-select: none;
 }
 .ar-name-container {

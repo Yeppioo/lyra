@@ -7,10 +7,24 @@
             <img :src="currentSong?.cover" alt="Album Cover" class="cover-img" />
           </div>
           <div class="song-info-title">
-            <a  @click.stop="jumper.jumpSong(currentSong?.id as unknown as string);closeLyrics()" class="song-name-title no-before">{{ currentSong?.name }}</a>
+            <a
+              @click.stop="
+                jumper.jumpSong(currentSong?.id as unknown as string);
+                closeLyrics();
+              "
+              class="song-name-title no-before"
+              >{{ currentSong?.name }}</a
+            >
             <div class="ar-name-container ar-name-container-title">
               <template v-for="a in playerStore.currentSong?.artist" :key="a.id">
-                <a @click.stop="jumper.jumpArtist(a.id);closeLyrics()" class="ar-name-title">{{ a.name }}</a>
+                <a
+                  @click.stop="
+                    jumper.jumpArtist(a.id);
+                    closeLyrics();
+                  "
+                  class="ar-name-title"
+                  >{{ a.name }}</a
+                >
               </template>
             </div>
           </div>
@@ -33,10 +47,24 @@
               <img :src="currentSong?.cover" alt="Album Cover" class="cover-img" />
             </div>
             <div class="song-info">
-              <a @click.stop="jumper.jumpSong(currentSong?.id as unknown as string);closeLyrics()" class="song-name">{{ currentSong?.name }}</a>
+              <a
+                @click.stop="
+                  jumper.jumpSong(currentSong?.id as unknown as string);
+                  closeLyrics();
+                "
+                class="song-name"
+                >{{ currentSong?.name }}</a
+              >
               <div class="ar-name-container">
                 <template v-for="a in playerStore.currentSong?.artist" :key="a.id">
-                  <a @click.stop="jumper.jumpArtist(a.id);closeLyrics()" class="ar-name">{{ a.name }}</a>
+                  <a
+                    @click.stop="
+                      jumper.jumpArtist(a.id);
+                      closeLyrics();
+                    "
+                    class="ar-name"
+                    >{{ a.name }}</a
+                  >
                 </template>
               </div>
             </div>
@@ -479,14 +507,15 @@ function onProgressChange(value: number) {
   margin-bottom: 8px;
   color: #fefefe;
 }
-.song-name{
+.song-name {
   color: #f0f0f0 !important;
 }
 .song-name:hover {
   color: #fff !important;
 }
-.song-info{
-  display: flex;    flex-direction: column;
+.song-info {
+  display: flex;
+  flex-direction: column;
 }
 .song-info .ar-name {
   font-size: 18px;

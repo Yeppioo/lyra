@@ -237,7 +237,7 @@ watch(
 .mv-cover-wrapper:hover .play-icon-overlay {
   opacity: 1;
 }
-*{
+* {
   user-select: none;
 }
 .play-icon {

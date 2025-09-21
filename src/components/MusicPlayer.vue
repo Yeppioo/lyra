@@ -559,7 +559,7 @@ function toggleFullScreenLyrics() {
   align-items: center;
   justify-content: flex-end;
   position: relative;
-  top: -5px;
+  top: -3px;
 }
 .play-button {
   width: 42px;

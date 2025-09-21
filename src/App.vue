@@ -43,7 +43,8 @@ html {
   background: var(--y-bg);
 }
 #app-view {
-  overflow: scroll;
+  overflow-y: scroll;
+  overflow-x: hidden;
   height: calc(100vh - 54px);
 }
 .showPlayer {

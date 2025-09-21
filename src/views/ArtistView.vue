@@ -189,4 +189,16 @@ h2 {
 .view {
   margin-top: 15px;
 }
+
+@media (max-width: 784px) {
+  .artistData {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .num {
+    justify-content: center;
+  }
+}
 </style>
