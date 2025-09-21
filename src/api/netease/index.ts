@@ -6,5 +6,20 @@ import * as login from './login';
 import * as personlized from './personlized';
 import * as search from './search';
 import * as searchSongs from './searchSongs';
+import * as comment from './comment';
+import * as songWiki from './songWiki';
+import * as simi from './simi';
 
-export { artist, checkSong, getLyric, getSong, login, personlized, search, searchSongs };
+export {
+  artist,
+  checkSong,
+  getLyric,
+  getSong,
+  login,
+  personlized,
+  search,
+  searchSongs,
+  comment,
+  songWiki,
+  simi,
+};
