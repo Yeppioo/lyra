@@ -24,7 +24,7 @@
           <div class="album-name">{{ item.name }}</div>
           <div class="ar-name-container">
             <template v-for="a in item.artist" :key="a.id">
-              <a @click="jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
+              <a @click="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
             </template>
           </div>
         </div>
@@ -49,7 +49,7 @@ import { message } from 'ant-design-vue';
 import { fallbackImg } from '@/stores/constant';
 import { artist } from '@/api/netease';
 import { formatTimestampToDate } from '@/utils/time';
-import router from '@/router';
+import * as jumper from '@/utils/jumper';
 
 const route = useRoute();
 const albumList = ref<any[]>([]);
@@ -57,9 +57,7 @@ const currentPage = ref(1);
 const loading = ref(true);
 const cachedPages = new Map<number, any[]>();
 const albumCount = ref(0);
-const jumpArtist = (id: number) => {
-  router.push(`/artist/${id}/song`);
-};
+
 const fetchAlbums = async (page: number, artistId: string) => {
   if (cachedPages.has(page)) {
     albumList.value = cachedPages.get(page) || [];

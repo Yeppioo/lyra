@@ -10,7 +10,7 @@
             <span class="song-name-title">{{ currentSong?.name }}</span>
             <div class="ar-name-container">
               <template v-for="a in playerStore.currentSong?.artist" :key="a.id">
-                <a @click="jumpArtist(a.id)" class="ar-name-title">{{ a.name }}</a>
+                <a @click="jumper.jumpArtist(a.id)" class="ar-name-title">{{ a.name }}</a>
               </template>
             </div>
           </div>
@@ -36,7 +36,7 @@
               <span class="song-name">{{ currentSong?.name }}</span>
               <div class="ar-name-container">
                 <template v-for="a in playerStore.currentSong?.artist" :key="a.id">
-                  <a @click="jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
+                  <a @click="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
                 </template>
               </div>
             </div>
@@ -156,7 +156,7 @@
 import { ref, watch, computed, onMounted, onBeforeUnmount } from 'vue';
 import { usePlayerStore } from '@/stores/player';
 import { useUIPropertiesStore } from '@/stores/uiProperties';
-import router from '@/router';
+import * as jumper from '@/utils/jumper';
 
 interface Word {
   time: number;
@@ -189,9 +189,7 @@ const activeWordIndex = ref(-1);
 const currentSong = computed(() => playerStore.currentSong);
 const lyrics = computed(() => playerStore.currentSong?.lyric || '');
 const yrcLyrics = computed(() => playerStore.currentSong?.yrcLyric || '');
-const jumpArtist = (id: number) => {
-  router.push(`/artist/${id}/song`);
-};
+
 // 解析歌词，将时间戳和歌词文本分离
 const parsedLyrics = computed<LyricLine[]>(() => {
   const result: LyricLine[] = [];

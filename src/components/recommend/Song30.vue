@@ -25,7 +25,7 @@
                 uiProperties.personalized.song30.selectedindex
               ]?.artist"
               :key="a.id">
-              <a @click="jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
+              <a @click="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
             </template>
           </div>
         </div>
@@ -78,7 +78,7 @@
                 uiProperties.personalized.song30.selectedindex
               ]?.artist"
               :key="a.id">
-              <a @click="jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
+              <a @click="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
             </template>
           </div>
         </div>
@@ -122,7 +122,7 @@ const uiPropertiesStore = useUIPropertiesStore();
 const { uiProperties } = storeToRefs(uiPropertiesStore);
 import { functions as getSongApi } from '@/api/netease/getSong';
 import { message } from 'ant-design-vue';
-import router from '@/router';
+import * as jumper from '@/utils/jumper';
 
 const dislike = () => {
   console.log('dislike');
@@ -134,9 +134,6 @@ const next = () => {
     uiProperties.value.personalized.song30.songs.length
   )
     uiProperties.value.personalized.song30.selectedindex = 0;
-};
-const jumpArtist = (id: number) => {
-  router.push(`/artist/${id}/song`);
 };
 
 const play = async () => {

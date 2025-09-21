@@ -57,7 +57,7 @@
             </span>
             <div class="ar-name-container">
               <template v-for="a in playerStore.currentSong?.artist" :key="a.id">
-                <a @click="jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
+                <a @click="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
               </template>
             </div>
           </div>
@@ -235,10 +235,6 @@ function togglePlay() {
   playerStore.togglePlay();
 }
 
-const jumpArtist = (id: number) => {
-  router.push(`/artist/${id}/song`);
-};
-
 function onCanPlay() {
   if (playerStore.currentSong?.url) {
     playerStore.play(); // 直接调用 playerStore 的 play 方法
@@ -273,7 +269,7 @@ function onTimeUpdate(e: Event) {
 
 // 监听 audio 的 play/pause 事件，自动同步 isPlaying
 import { onMounted, onBeforeUnmount } from 'vue';
-import router from '@/router';
+import * as jumper from '@/utils/jumper';
 onMounted(() => {
   if (audioRef.value) {
     playerStore.setAudioElement(audioRef.value); // 设置 audio 元素

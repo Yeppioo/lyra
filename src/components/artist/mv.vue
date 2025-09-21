@@ -25,7 +25,7 @@
         <div class="mv-info">
           <div class="mv-name">{{ item.name }}</div>
           <div class="ar-name-container">
-            <a @click="jumpArtist(item.artist.id)" class="ar-name">{{ item.artist.name }}</a>
+            <a @click="jumper.jumpArtist(item.artist.id)" class="ar-name">{{ item.artist.name }}</a>
           </div>
         </div>
       </div>
@@ -49,7 +49,7 @@ import { message } from 'ant-design-vue';
 import { fallbackImg } from '@/stores/constant';
 import { artist } from '@/api/netease';
 import { formatNumber, formatMsToMinutes } from '@/utils/time';
-import router from '@/router';
+import * as jumper from '@/utils/jumper';
 
 const route = useRoute();
 const mvList = ref<any[]>([]);
@@ -57,9 +57,6 @@ const currentPage = ref(1);
 const loading = ref(true);
 const cachedPages = new Map<number, any[]>();
 const mvCount = ref(0);
-const jumpArtist = (id: number) => {
-  router.push(`/artist/${id}/song`);
-};
 const fetchMVs = async (page: number, artistId: string) => {
   if (cachedPages.has(page)) {
     mvList.value = cachedPages.get(page) || [];

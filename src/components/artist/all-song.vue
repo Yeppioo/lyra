@@ -40,7 +40,7 @@
               </div>
               <div class="ar-name-container">
                 <template v-for="a in item.artists" :key="a.id">
-                  <a @click="jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
+                  <a @click="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
                 </template>
               </div>
             </div>
@@ -71,7 +71,7 @@ import { type SongEntry } from '@/api/netease/searchSongs';
 import { useRoute } from 'vue-router';
 import { message } from 'ant-design-vue';
 import { fallbackImg } from '@/stores/constant';
-import router from '@/router';
+import * as jumper from '@/utils/jumper';
 import { artist } from '@/api/netease';
 import { functions as getSongApi } from '@/api/netease/getSong';
 
@@ -134,9 +134,6 @@ const fetchSongs = async (page: number, key: string) => {
   cachedPages.set(page, songList);
   songsList.value = songList;
   loading.value = false;
-};
-const jumpArtist = (id: number) => {
-  router.push(`/artist/${id}/song`);
 };
 const formatSecondsToMinutes = (seconds: number) => {
   const totalSeconds = Math.floor(seconds);
