@@ -27,7 +27,7 @@
           <div class="info">
             <div class="basic-info">
               <div class="song-name-container">
-                <a @click="jumper.jumpSong(item.id)" class="song-name no-before">
+                <a @click.stop="jumper.jumpSong(item.id)" class="song-name no-before">
                   {{ item.name }}
                 </a>
                 <div v-if="item.requireVip" class="vip-tag tag">
@@ -35,18 +35,18 @@
                 </div>
                 <a
                   v-if="item.hasMv"
-                  @click="jumper.jumpVideo(item.mvId)"
+                  @click.stop="jumper.jumpVideo(item.mvId)"
                   class="mv-tag tag no-before">
                   <span>MV</span>
                 </a>
               </div>
               <div class="ar-name-container">
                 <template v-for="a in item.artists" :key="a.id">
-                  <a @click="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
+                  <a @click.stop="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
                 </template>
               </div>
             </div>
-            <a class="album no-before" @click="jumper.jumpAlbum(item.album.id)">{{
+            <a class="album no-before" @click.stop="jumper.jumpAlbum(item.album.id)">{{
               item.album.name
             }}</a>
             <span class="duration">{{ formatSecondsToMinutes(item.duration / 1000) }}</span>
@@ -316,7 +316,7 @@ watch(
 .songs-search-result :deep(.ant-menu-item-active) {
   border: #70baff 1px solid !important;
 }
-.vip-tag{
+.vip-tag {
   background: #f55e551f;
 }
 .vip-tag span {

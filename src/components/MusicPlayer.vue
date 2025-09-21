@@ -52,12 +52,14 @@
             </a-image>
           </div>
           <div class="info-text">
-            <span class="song-name">
+            <a
+              @click.stop="jumper.jumpSong(playerStore.currentSong?.id)"
+              class="song-name no-before">
               {{ playerStore.currentSong?.name }}
-            </span>
+            </a>
             <div class="ar-name-container">
               <template v-for="a in playerStore.currentSong?.artist" :key="a.id">
-                <a @click="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
+                <a @click.stop="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
               </template>
             </div>
           </div>
@@ -395,7 +397,8 @@ function toggleFullScreenLyrics() {
   font-family: var(--y-font);
 }
 .info-text span,
-.ar-name {
+.ar-name,
+.song-name {
   color: var(--y-text);
   font-family: var(--y-font);
   line-height: 1.3;
@@ -416,6 +419,7 @@ function toggleFullScreenLyrics() {
   min-width: 35px;
   font-family: var(--y-font);
   cursor: pointer;
+  margin-left: 1px;
 }
 .ar-name ~ .ar-name::before {
   content: ',';
@@ -426,8 +430,10 @@ function toggleFullScreenLyrics() {
   position: static !important;
   display: inline;
 }
-.ar-name:hover {
+.ar-name:hover,
+.song-name:hover {
   color: #1677ff !important;
+  cursor: pointer;
 }
 .ar-name-container {
   display: flex;

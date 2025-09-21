@@ -7,10 +7,10 @@
             <img :src="currentSong?.cover" alt="Album Cover" class="cover-img" />
           </div>
           <div class="song-info-title">
-            <span class="song-name-title">{{ currentSong?.name }}</span>
-            <div class="ar-name-container">
+            <a  @click.stop="jumper.jumpSong(currentSong?.id as unknown as string);closeLyrics()" class="song-name-title no-before">{{ currentSong?.name }}</a>
+            <div class="ar-name-container ar-name-container-title">
               <template v-for="a in playerStore.currentSong?.artist" :key="a.id">
-                <a @click="jumper.jumpArtist(a.id)" class="ar-name-title">{{ a.name }}</a>
+                <a @click.stop="jumper.jumpArtist(a.id);closeLyrics()" class="ar-name-title">{{ a.name }}</a>
               </template>
             </div>
           </div>
@@ -33,10 +33,10 @@
               <img :src="currentSong?.cover" alt="Album Cover" class="cover-img" />
             </div>
             <div class="song-info">
-              <span class="song-name">{{ currentSong?.name }}</span>
+              <a @click.stop="jumper.jumpSong(currentSong?.id as unknown as string);closeLyrics()" class="song-name">{{ currentSong?.name }}</a>
               <div class="ar-name-container">
                 <template v-for="a in playerStore.currentSong?.artist" :key="a.id">
-                  <a @click="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
+                  <a @click.stop="jumper.jumpArtist(a.id);closeLyrics()" class="ar-name">{{ a.name }}</a>
                 </template>
               </div>
             </div>
@@ -473,12 +473,21 @@ function onProgressChange(value: number) {
 }
 .song-info .song-name {
   font-size: 28px;
+  cursor: pointer;
   font-weight: bold;
   display: block;
   margin-bottom: 8px;
   color: #fefefe;
 }
-
+.song-name{
+  color: #f0f0f0 !important;
+}
+.song-name:hover {
+  color: #fff !important;
+}
+.song-info{
+  display: flex;    flex-direction: column;
+}
 .song-info .ar-name {
   font-size: 18px;
   color: var(--y-text-light);
@@ -489,6 +498,9 @@ function onProgressChange(value: number) {
 }
 .song-info > .ar-name-container {
   justify-content: center;
+}
+.ar-name-container-title {
+  margin-left: 1px;
 }
 .mobile-controls {
   display: none;
@@ -679,6 +691,7 @@ function onProgressChange(value: number) {
   display: flex;
   flex-direction: column;
   margin-left: 10px;
+  margin-top: 3px;
 }
 .song-info-title span {
   color: #fefefe;
@@ -695,6 +708,12 @@ function onProgressChange(value: number) {
 }
 .song-name-title {
   font-size: 15px;
+  color: #f0f0f0 !important;
+  line-height: 1.2;
+  cursor: pointer;
+}
+.song-name-title:hover {
+  color: #fff !important;
 }
 .ar-name ~ .ar-name::before,
 .ar-name-title ~ .ar-name-title::before {
@@ -721,7 +740,6 @@ function onProgressChange(value: number) {
   overflow: hidden;
 }
 .ar-name-title {
-  margin-top: 2px;
   font-size: 12px;
   cursor: pointer;
   opacity: 0.75;

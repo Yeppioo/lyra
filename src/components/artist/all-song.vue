@@ -27,23 +27,26 @@
           <div class="info">
             <div class="basic-info">
               <div class="song-name-container">
-                <a @click="jumper.jumpSong(item.id)" class="song-name no-before">
+                <a @click.stop="jumper.jumpSong(item.id)" class="song-name no-before">
                   {{ item.name }}
                 </a>
                 <div v-if="item.requireVip" class="vip-tag tag">
                   <span>VIP</span>
                 </div>
-                <a @click="jumper.jumpVideo(item.mvId)" v-if="item.hasMv" class="mv-tag tag no-before">
+                <a
+                  @click.stop="jumper.jumpVideo(item.mvId)"
+                  v-if="item.hasMv"
+                  class="mv-tag tag no-before">
                   <span>MV</span>
                 </a>
               </div>
               <div class="ar-name-container">
                 <template v-for="a in item.artists" :key="a.id">
-                  <a @click="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
+                  <a @click.stop="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
                 </template>
               </div>
             </div>
-            <a @click="jumper.jumpAlbum(item.album.id)" class="album no-before">{{
+            <a @click.stop="jumper.jumpAlbum(item.album.id)" class="album no-before">{{
               item.album.name
             }}</a>
             <span class="duration">{{ formatSecondsToMinutes(item.duration / 1000) }}</span>

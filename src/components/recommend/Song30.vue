@@ -33,7 +33,7 @@
                 uiProperties.personalized.song30.selectedindex
               ]?.artist"
               :key="a.id">
-              <a @click="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
+              <a @click.stop="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
             </template>
           </div>
         </div>
@@ -94,7 +94,7 @@
                 uiProperties.personalized.song30.selectedindex
               ]?.artist"
               :key="a.id">
-              <a @click="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
+              <a @click.stop="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
             </template>
           </div>
         </div>

@@ -4,7 +4,7 @@
     <div class="mv-list">
       <div class="mv-item" v-for="item in mvList" :key="item.id">
         <a-skeleton-image v-if="loading" active />
-        <div v-else class="mv-cover-wrapper">
+        <div @click.stop="jumper.jumpVideo(item.id)" v-else class="mv-cover-wrapper">
           <a-image
             :fallback="fallbackImg"
             :placeholder="true"
@@ -15,7 +15,8 @@
             <font-awesome-icon :icon="['fas', 'play-circle']" size="3x" class="play-icon" />
           </div>
           <div class="play-count-overlay">
-            <font-awesome-icon class="play-icon" :icon="['fas', 'play']" /> {{ formatNumber(item.playCount) }}
+            <font-awesome-icon class="play-icon" :icon="['fas', 'play']" />
+            {{ formatNumber(item.playCount) }}
           </div>
           <div class="duration-overlay">
             {{ formatMsToMinutes(item.duration) }}
@@ -25,7 +26,9 @@
         <div class="mv-info">
           <div class="mv-name">{{ item.name }}</div>
           <div class="ar-name-container">
-            <a @click="jumper.jumpArtist(item.artist.id)" class="ar-name">{{ item.artist.name }}</a>
+            <a @click.stop="jumper.jumpArtist(item.artist.id)" class="ar-name">{{
+              item.artist.name
+            }}</a>
           </div>
         </div>
       </div>
@@ -234,7 +237,9 @@ watch(
 .mv-cover-wrapper:hover .play-icon-overlay {
   opacity: 1;
 }
-
+*{
+  user-select: none;
+}
 .play-icon {
   color: white; /* 播放图标为白色 */
 }

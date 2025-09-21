@@ -4,7 +4,7 @@
     <div class="album-list">
       <div class="album-item" v-for="item in albumList" :key="item.id">
         <a-skeleton-image v-if="loading" active />
-        <div v-else class="album-cover-wrapper">
+        <div @click.stop="jumper.jumpAlbum(item.id)" v-else class="album-cover-wrapper">
           <a-image
             :fallback="fallbackImg"
             :placeholder="true"
@@ -24,7 +24,7 @@
           <div class="album-name">{{ item.name }}</div>
           <div class="ar-name-container">
             <template v-for="a in item.artist" :key="a.id">
-              <a @click="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
+              <a @click.stop="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
             </template>
           </div>
         </div>
@@ -175,6 +175,9 @@ watch(
 }
 .ar-name:hover {
   color: #1677ff !important;
+}
+*{
+  user-select: none;
 }
 .ar-name-container {
   display: flex;
