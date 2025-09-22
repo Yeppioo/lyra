@@ -65,37 +65,20 @@
           </div>
         </div>
         <div class="control">
-          <button class="control-button" @click="playerStore.playPrevious()">
-            <font-awesome-icon size="1x" :icon="['fas', 'backward-step']" />
-          </button>
-
-          <button class="play-button" @click="togglePlay">
-            <i :class="{ 'playing-icon': playerStore.isPlaying }">
-              <svg
-                class="play-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                xmlns:xlink="http://www.w3.org/1999/xlink"
-                height="100%"
-                viewBox="128 61 829 902"
-                width="100%">
-                <path
-                  d="M224.5,963C211.167,963 198.667,960.5 187,955.5C175.333,950.5 165.083,943.667 156.25,935C147.417,926.333 140.5,916.167 135.5,904.5C130.5,892.833 128,880.333 128,867L128,157C128,143.667 130.5,131.167 135.5,119.5C140.5,107.833 147.333,97.6667 156,89C164.667,80.3334 174.833,73.5001 186.5,68.5C198.167,63.5001 210.667,61.0001 224,61C232,61.0001 240,62.0001 248,64C256,66.0001 263.5,69.0001 270.5,73L907.5,428C922.833,436.667 934.833,448.417 943.5,463.25C952.167,478.083 956.5,494.333 956.5,512C956.5,530 952.25,546.333 943.75,561C935.25,575.667 923.167,587.333 907.5,596L271,951C264,955 256.5,958 248.5,960C240.5,962 232.5,963 224.5,963Z"
-                  fill="#ffffff"
-                  fill-opacity="1"></path>
-              </svg>
-              <svg class="pause-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-                <path
-                  d="M176 96C149.5 96 128 117.5 128 144L128 496C128 522.5 149.5 544 176 544L240 544C266.5 544 288 522.5 288 496L288 144C288 117.5 266.5 96 240 96L176 96zM400 96C373.5 96 352 117.5 352 144L352 496C352 522.5 373.5 544 400 544L464 544C490.5 544 512 522.5 512 496L512 144C512 117.5 490.5 96 464 96L400 96z"
-                  fill="#ffffff" />
-              </svg>
-            </i>
-          </button>
-          <button class="control-button" @click="playerStore.playNext()">
+          <div class="control-buttons">
             <font-awesome-icon
-              size="1x"
-              style="position: relative; left: 0.5px"
-              :icon="['fas', 'forward-step']" />
-          </button>
+              :icon="['fas', 'step-backward']"
+              class="control-icon"
+              @click="playerStore.playPrevious()" />
+            <font-awesome-icon
+              :icon="['fas', playerStore.isPlaying ? 'pause' : 'play']"
+              class="control-icon play-pause"
+              @click="togglePlay()" />
+            <font-awesome-icon
+              :icon="['fas', 'step-forward']"
+              class="control-icon"
+              @click="playerStore.playNext()" />
+          </div>
         </div>
         <div class="right-section">
           <button class="sub-control-button" @click="toggleVolumePopup">
@@ -535,7 +518,26 @@ function toggleFullScreenLyrics() {
 :deep(.ant-slider-handle) {
   transition: none !important;
 }
+.control-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 按钮之间的间距 */
+}
 
+.control-icon {
+  font-size: 22px;
+  color: var(--y-text);
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+  opacity: 0.85;
+}
+.play-pause {
+  font-size: 28px;
+}
+
+.control-icon:hover {
+  opacity: 1;
+}
 .main-section {
   width: 100%;
   padding: 0 5vw;
@@ -584,9 +586,6 @@ function toggleFullScreenLyrics() {
 /* 移除播放/暂停按钮的旋转动画 */
 .play-button:hover i {
   transform: scale(1.1);
-}
-.pause-icon {
-  display: none;
 }
 .play-button i {
   display: flex;

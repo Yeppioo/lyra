@@ -7,20 +7,26 @@
 
         <div class="infos">
           <div class="info-item" v-if="mvDetail?.playCount">
-            <font-awesome-icon class="info-icon" :icon="['fas', 'video']" size="lg" />
-            <span class="info-text" style="  margin-left: 8px;"> {{ formatNumber(mvDetail?.playCount) }}</span>
+            <font-awesome-icon class="info-icon" :icon="['fas', 'video']" size="1x" />
+            <span class="info-text" style="margin-left: 8px">
+              {{ formatNumber(mvDetail?.playCount) }}</span
+            >
           </div>
 
           <div class="info-item" v-if="mvDetail?.playCount">
             <font-awesome-icon
               class="info-icon"
               :icon="['fas', 'square-arrow-up-right']"
-              size="lg" />
-            <span style="  margin-left: 6px;" class="info-text"> {{ formatNumber(mvDetail?.shareCount) }}</span>
+              size="1x" />
+            <span style="margin-left: 6px" class="info-text">
+              {{ formatNumber(mvDetail?.shareCount) }}</span
+            >
           </div>
           <div class="info-item" v-if="mvDetail?.playCount">
-            <font-awesome-icon class="info-icon" :icon="['fas', 'message']" size="lg" />
-            <span style="  margin-left: 8px;" class="info-text"> {{ formatNumber(mvDetail?.commentCount) }}</span>
+            <font-awesome-icon class="info-icon" :icon="['fas', 'message']" size="1x" />
+            <span style="margin-left: 8px" class="info-text">
+              {{ formatNumber(mvDetail?.commentCount) }}</span
+            >
           </div>
         </div>
       </div>
@@ -135,7 +141,7 @@ watch(
 }
 
 .mv-title {
-  font-size: 30px;
+  font-size: 22px;
   margin-bottom: 0px;
   color: var(--y-text);
   text-align: center;
@@ -153,11 +159,15 @@ watch(
 .infos {
   margin-left: 0px;
   margin-bottom: 10px;
-  display: flex
-;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
-.info-item{
+.info-item {
   margin-right: 15px;
+}
+@media (max-width: 632px) {
+.video-view{
+  padding: 0;
+}
 }
 </style>

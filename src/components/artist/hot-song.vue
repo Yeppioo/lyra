@@ -211,12 +211,17 @@ watch(
   top: -2px;
   margin-right: 40px;
 }
-.basic-info span {
+.basic-info a {
   font-family: var(--y-font);
   text-overflow: ellipsis;
   line-height: 1;
   overflow: clip;
   max-width: 280px;
+}
+@media (max-width: 734px) {
+  .basic-info a {
+    max-width: 528px;
+  }
 }
 .ar-name {
   display: -webkit-box;
