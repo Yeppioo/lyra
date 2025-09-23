@@ -15,3 +15,7 @@ export function jumpVideo(id: string | number) {
 export function jumpSong(id: string | number) {
   router.push(`/song/${id}`);
 }
+
+export function jumpUser(id: string | number) {
+  router.push(`/user/${id}`);
+}

@@ -78,19 +78,7 @@
 
     <div v-if="hotComments.length > 0" class="hot-comments-section">
       <h2 class="section-title">热门评论</h2>
-      <div v-for="comment in displayedComments" :key="comment.commentId" class="comment-item">
-        <div class="comment-user-info">
-          <img :src="comment.user.avatarUrl" alt="User Avatar" class="user-avatar" />
-          <span class="nickname">{{ comment.user.nickname }}</span>
-        </div>
-        <p class="comment-content">{{ comment.content }}</p>
-        <div class="comment-meta">
-          <span class="time">{{ comment.timeStr }}</span>
-          <span class="liked-count">
-            <font-awesome-icon :icon="['fas', 'thumbs-up']" /> {{ comment.likedCount }}
-          </span>
-        </div>
-      </div>
+      <CommentList :comments="displayedComments as any[]" />
       <div v-if="hotComments.length > 1" class="comment-toggle-buttons">
         <button v-if="!showAllComments" @click="showAllComments = true" class="toggle-button">
           <font-awesome-icon :icon="['fas', 'chevron-down']" /> 展开评论
@@ -127,6 +115,7 @@ import type { SimiSong } from '@/api/netease/simi';
 import { setCurrentSong, usePlayerStore } from '@/stores/player'; // Re-added setCurrentSong
 import type { SongWikiSummaryResponseData } from '@/api/netease/songWiki';
 import SongList, { type SongListItem } from '@/components/common/SongList.vue';
+import CommentList from '@/components/common/CommentList.vue';
 
 const route = useRoute();
 
@@ -188,7 +177,7 @@ const fetchInfo = async () => {
         mvId: s.mvid,
         requireVip: s.fee === 1,
         picUrl: s.album.picUrl,
-      }) as FormattedSimiSong
+      })
   );
   loading.value = false; // Set loading to false after fetching
 };
@@ -230,7 +219,12 @@ const playCurrent = () => {
   max-width: 1200px;
   margin: 0 auto;
 }
-
+.songs-list-container :deep(.ant-menu){
+  background-color: transparent;
+}
+.songs-list-container{
+  padding: 0;
+}
 .song-detail-container {
   display: flex;
   align-items: flex-start;
