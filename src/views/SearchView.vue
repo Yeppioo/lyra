@@ -58,6 +58,7 @@ onMounted(() => {
   margin-right: 20px;
   font-family: var(--y-font);
 }
+
 .title .label {
   font-size: 20px;
   color: var(--y-text);
