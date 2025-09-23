@@ -36,10 +36,10 @@ const fetchSongs = async (page: number, key: string) => {
   songsList.value = []; // Clear songsList for loading state
   const result: SearchResult = await neteaseApi.searchSongs(key, page);
 
-  const mappedSongs: SongListItem[] = result.songs.map(s => ({
+  const mappedSongs: SongListItem[] = result.songs.map((s) => ({
     id: s.id,
     name: s.name,
-    artists: s.artists.map(a => ({ id: a.id, name: a.name })),
+    artists: s.artists.map((a) => ({ id: a.id, name: a.name })),
     album: {
       id: s.album.id,
       name: s.album.name,
@@ -83,7 +83,6 @@ watch(
 </script>
 
 <style scoped>
-
 .songs-search-result {
   overflow: clip;
   padding-bottom: 40px;

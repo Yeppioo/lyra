@@ -1,17 +1,17 @@
 <template>
-    <div v-for="comment in comments" :key="comment.commentId" class="comment-item">
-      <div class="comment-user-info">
-        <img :src="comment.user.avatarUrl" alt="User Avatar" class="user-avatar" />
-        <a @click="jumpUser(comment.user.userId)" class="nickname">{{ comment.user.nickname }}</a>
-      </div>
-      <p class="comment-content">{{ comment.content }}</p>
-      <div class="comment-meta">
-        <span class="time">{{ comment.timeStr }}</span>
-        <span class="liked-count">
-          <font-awesome-icon :icon="['fas', 'thumbs-up']" /> {{ comment.likedCount }}
-        </span>
-      </div>
+  <div v-for="comment in comments" :key="comment.commentId" class="comment-item">
+    <div class="comment-user-info">
+      <img :src="comment.user.avatarUrl" alt="User Avatar" class="user-avatar" />
+      <a @click="jumpUser(comment.user.userId)" class="nickname">{{ comment.user.nickname }}</a>
     </div>
+    <p class="comment-content">{{ comment.content }}</p>
+    <div class="comment-meta">
+      <span class="time">{{ comment.timeStr }}</span>
+      <span class="liked-count">
+        <font-awesome-icon :icon="['fas', 'thumbs-up']" /> {{ comment.likedCount }}
+      </span>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -71,8 +71,8 @@ defineProps<{
   font-family: var(--y-font);
   cursor: pointer;
 }
-.nickname:hover{
-  color: #1677FF;
+.nickname:hover {
+  color: #1677ff;
 }
 .comment-content {
   color: var(--y-text);

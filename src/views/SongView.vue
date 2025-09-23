@@ -149,37 +149,40 @@ const fetchInfo = async () => {
   songDetail.value = null;
 
   if (!currentId.value) return;
-  loading.value = true; // Set loading to true before fetching
-  const songDetailResponse = await getSong.getSongDetail(currentId.value);
-  if (songDetailResponse.songs && songDetailResponse.songs.length > 0) {
-    songDetail.value = songDetailResponse.songs[0];
-  }
 
-  // 获取热门评论
-  const commentsResponse = await comment.getHotComments(currentId.value, 0); // type 0 for song
-  hotComments.value = commentsResponse.hotComments;
-
-  // 获取相似歌曲
-  const simiResponse = await simi.getSimiSongs(currentId.value);
-  simiSongs.value = simiResponse.songs.map(
-    (s: SimiSong) =>
-      ({
-        id: s.id,
-        name: s.name,
-        artists: s.artists.map(a => ({ id: a.id, name: a.name })), // Map artists to match SongListItem
-        duration: s.duration,
-        album: {
-          id: s.album.id,
-          name: s.album.name,
-          picUrl: s.album.picUrl,
-        },
-        hasMv: s.mvid !== 0,
-        mvId: s.mvid,
-        requireVip: s.fee === 1,
+  (async () => {
+    loading.value = true; // Set loading to true before fetching
+    const simiResponse = await simi.getSimiSongs(currentId.value);
+    simiSongs.value = simiResponse.songs.map((s: SimiSong) => ({
+      id: s.id,
+      name: s.name,
+      artists: s.artists.map((a) => ({ id: a.id, name: a.name })), // Map artists to match SongListItem
+      duration: s.duration,
+      album: {
+        id: s.album.id,
+        name: s.album.name,
         picUrl: s.album.picUrl,
-      })
-  );
-  loading.value = false; // Set loading to false after fetching
+      },
+      hasMv: s.mvid !== 0,
+      mvId: s.mvid,
+      requireVip: s.fee === 1,
+      picUrl: s.album.picUrl,
+    }));
+    loading.value = false; // Set loading to false after fetching
+  })();
+
+  (async () => {
+    const songDetailResponse = await getSong.getSongDetail(currentId.value);
+    if (songDetailResponse.songs && songDetailResponse.songs.length > 0) {
+      songDetail.value = songDetailResponse.songs[0];
+    }
+  })();
+
+  (async () => {
+    // 获取热门评论
+    const commentsResponse = await comment.getHotComments(currentId.value, 0); // type 0 for song
+    hotComments.value = commentsResponse.hotComments;
+  })();
 };
 
 onMounted(() => {
@@ -219,10 +222,10 @@ const playCurrent = () => {
   max-width: 1200px;
   margin: 0 auto;
 }
-.songs-list-container :deep(.ant-menu){
+.songs-list-container :deep(.ant-menu) {
   background-color: transparent;
 }
-.songs-list-container{
+.songs-list-container {
   padding: 0;
 }
 .song-detail-container {

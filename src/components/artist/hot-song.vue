@@ -46,21 +46,24 @@ const fetchSongs = async (key: string) => {
   songsList.value = []; // Clear songsList for loading state
 
   const result: { data: ArtistTopSongsResponse } = await artist.getArtistTopSongs(key);
-  songsList.value = result.data.songs.map((s: SongResponse) => ({
-    id: s.id,
-    name: s.name,
-    artists: s.ar.map((a: ArtistResponse) => ({ id: a.id, name: a.name })),
-    duration: s.dt,
-    album: {
-      id: s.al.id,
-      name: s.al.name,
-      picUrl: s.al.picUrl,
-    },
-    hasMv: s.mv !== 0,
-    mvId: s.mv,
-    requireVip: s.fee === 1,
-    picUrl: s.al.picUrl,
-  }) as SongListItem);
+  songsList.value = result.data.songs.map(
+    (s: SongResponse) =>
+      ({
+        id: s.id,
+        name: s.name,
+        artists: s.ar.map((a: ArtistResponse) => ({ id: a.id, name: a.name })),
+        duration: s.dt,
+        album: {
+          id: s.al.id,
+          name: s.al.name,
+          picUrl: s.al.picUrl,
+        },
+        hasMv: s.mv !== 0,
+        mvId: s.mv,
+        requireVip: s.fee === 1,
+        picUrl: s.al.picUrl,
+      }) as SongListItem
+  );
   loading.value = false;
 };
 

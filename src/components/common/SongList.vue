@@ -2,7 +2,7 @@
   <div class="songs-list-container">
     <a-menu :disabled="loading" v-model:selectedKeys="current" mode="vertical">
       <template v-if="loading">
-        <a-menu-item v-for="i in 3" :key="`skeleton-${i}`">
+        <a-menu-item v-for="i in (loadingCount ?? 3)" :key="`skeleton-${i}`">
           <a-skeleton avatar :title="false" active>
             <a-list-item-meta>
               <template #avatar>
@@ -60,7 +60,9 @@
         </a-menu-item>
       </template>
     </a-menu>
-    <div v-if="showPagination && totalSongs > pageSize" style="display: flex; justify-content: center; margin-top: 10px">
+    <div
+      v-if="showPagination && totalSongs > pageSize"
+      style="display: flex; justify-content: center; margin-top: 10px">
       <a-pagination
         @change="onPageChange"
         :defaultPageSize="pageSize"
@@ -109,6 +111,7 @@ interface SongListProps {
   totalSongs?: number;
   currentPage?: number;
   pageSize?: number;
+  loadingCount?: number;
 }
 
 const props = withDefaults(defineProps<SongListProps>(), {
@@ -168,7 +171,6 @@ const onPageChange = (page: number) => {
 <style scoped>
 .songs-list-container {
   overflow: clip;
-  padding-bottom: 40px;
 }
 .songs-list-container :deep(.ant-pagination-options) {
   display: none;
@@ -183,6 +185,9 @@ const onPageChange = (page: number) => {
   display: block;
   position: relative;
   top: -3px;
+}
+.songs-list-container :deep(.ant-menu) {
+  background: transparent;
 }
 .songs-list-container :deep(.ant-menu-item) {
   background: var(--y-com-bg) !important;

@@ -18,6 +18,13 @@ const router = createRouter({
       path: '/song/:key',
       name: 'song-view',
       component: () => import('../views/SongView.vue'),
+      props: true,
+    },
+    {
+      path: '/song/:key/comment',
+      name: 'song-comment',
+      component: () => import('../views/comment/SongComment.vue'),
+      props: true,
     },
     {
       path: '/video/:key',

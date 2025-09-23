@@ -60,7 +60,12 @@ const fetchSongs = async (page: number, key: string) => {
   }
   loading.value = true;
   songsList.value = []; // Clear songsList for loading state
-  const result: { data: ArtistAllSongsResponse } = await artist.getArtistAllSongs(key, 'hot', 15, (page - 1) * 15);
+  const result: { data: ArtistAllSongsResponse } = await artist.getArtistAllSongs(
+    key,
+    'hot',
+    15,
+    (page - 1) * 15
+  );
 
   const songList: SongListItem[] = result.data.songs.map(
     (s: SongResponse) =>
