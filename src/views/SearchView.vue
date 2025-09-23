@@ -26,9 +26,9 @@ const router = useRouter();
 const selectedKeys = ref<string[]>(['songs']);
 
 const updateSelectedKeys = () => {
-  const type = route.params.type as string;
+  const type = route.name as string;
   if (type) {
-    selectedKeys.value = [type];
+    selectedKeys.value = [type.replace('search-', '')];
   } else {
     selectedKeys.value = ['songs']; // 默认选中歌曲
   }

@@ -32,6 +32,16 @@ const router = createRouter({
       component: () => import('../views/VideoView.vue'),
     },
     {
+      path: '/playlist/:key',
+      name: 'playlist-view',
+      component: () => import('../views/PlaylistView.vue'),
+    },
+    {
+      path: '/user/:key',
+      name: 'user-view',
+      component: () => import('../views/UserView.vue'),
+    },
+    {
       path: '/auth/login',
       name: 'login',
       component: () => import('../views/LoginView.vue'),

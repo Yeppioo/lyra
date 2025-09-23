@@ -6,7 +6,14 @@
         <img :src="songDetail.al.picUrl" alt="Album Cover" />
       </div>
       <div class="song-info">
-        <h1 class="song-name-title">{{ songDetail.name }}</h1>
+        <h1 class="song-name-title">
+          <span>
+            {{ songDetail.name }}
+          </span>
+          <div class="vip-tag tag" v-if="songDetail.fee === 1">
+            <span>VIP</span>
+          </div>
+        </h1>
         <div class="artist-info">
           <font-awesome-icon class="icon user" :icon="['fas', 'user']" />
           <div class="ar-name-container">
@@ -21,13 +28,19 @@
             {{ songDetail.al.name }}
           </a>
         </div>
+        <div class="mv-info" v-if="songDetail.mv">
+          <font-awesome-icon class="icon mv-icon" :icon="['fas', 'video']" />
+          <a @click="jumpVideo(songDetail.mv)" class="link">
+            {{ songDetail.name }}
+          </a>
+        </div>
         <div class="buttons">
           <button @click="playCurrent" class="nth-1 play-button">
-          <font-awesome-icon class="icon" :icon="['fas', 'play']" />播放
-        </button>
-        <button @click="jumpCustom(`/song/${currentId}/comment`)" class="play-button">
-          <font-awesome-icon class="icon" :icon="['fas', 'message']" />评论
-        </button>
+            <font-awesome-icon class="icon" :icon="['fas', 'play']" />播放
+          </button>
+          <button @click="jumpCustom(`/song/${currentId}/comment`)" class="play-button">
+            <font-awesome-icon class="icon" :icon="['fas', 'message']" />评论
+          </button>
         </div>
       </div>
     </div>
@@ -113,7 +126,7 @@
 import { onMounted, ref, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { getSong, comment, simi } from '@/api/netease';
-import { jumpArtist, jumpAlbum , jumpCustom } from '@/utils/jumper'; // Keep jumpArtist, jumpAlbum for songDetail section
+import { jumpArtist, jumpAlbum, jumpCustom, jumpVideo } from '@/utils/jumper'; // Keep jumpArtist, jumpAlbum for songDetail section
 import type { SongDetail } from '@/api/netease/getSong';
 import type { HotComment } from '@/api/netease/comment';
 import type { SimiSong } from '@/api/netease/simi';
@@ -270,10 +283,24 @@ const playCurrent = () => {
   color: var(--y-text);
   line-height: 1.3;
   margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.song-name-title span {
+    display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  word-wrap: break-word;
+  text-wrap: auto;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .artist-info,
-.album-info {
+.album-info,
+.mv-info {
   font-size: 18px;
   color: var(--y-text);
   display: flex;
@@ -282,7 +309,8 @@ const playCurrent = () => {
 }
 
 .artist-info .link,
-.album-info .link {
+.album-info .link ,
+.mv-info .link {
   color: var(--y-text);
   text-decoration: none;
   transition: color 0.2s ease-in-out;
@@ -311,16 +339,14 @@ const playCurrent = () => {
     transform 0.2s ease;
   display: flex;
   align-items: center;
-
 }
 
-.buttons{
-    position: absolute;
+.buttons {
+  position: absolute;
   bottom: 10px;
-  display: flex
-
+  display: flex;
 }
-.nth-1{
+.nth-1 {
   margin-right: 10px;
 }
 
@@ -331,9 +357,12 @@ const playCurrent = () => {
 .play-button i {
   font-size: 20px;
 }
-
+.mv-info{
+  margin-top: 2px;
+}
 .ar-name,
-.album-info > a {
+.album-info > a ,
+.mv-info>a{
   margin-top: 2px;
   font-size: 14px;
   color: #909092 !important;
@@ -368,13 +397,19 @@ const playCurrent = () => {
 }
 .icon.album-icon {
   color: #faad14;
-  width: 22px;
-  margin-left: 2px;
-  margin-right: 2px;
+  width: 20px;
+  margin-left: 3px;
+  margin-right: 7px;
 }
+.icon.mv-icon {
+  color: #1890FF;
+    width: 18px;
+      margin-left: 4px;
+  margin-right: 8px;}
 .icon.user {
   color: #ff4d4f;
   width: 26px;
+  margin-right: 4px;
 }
 
 @media (max-width: 784px) {
@@ -383,7 +418,9 @@ const playCurrent = () => {
     align-items: center;
     text-align: center;
   }
-
+  .buttons {
+    position: relative !important;
+  }
   .song-info {
     height: auto;
     align-items: center;
@@ -607,17 +644,16 @@ const playCurrent = () => {
 }
 .tag span {
   line-height: 1;
-  font-size: 10px;
+  font-size: 14px;
 }
 .tag {
   padding: 0 7.3px;
   border-radius: 91px;
-  height: 17px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-left: 8px;
-  margin-top: 4px;
 }
 .ar-name-container {
   display: flex;

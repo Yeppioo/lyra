@@ -1,20 +1,18 @@
 <template>
   <div class="container">
-    <SongList :songs="displayedSong" :loading="loading" :loadingCount="1"/>
-    <div style="margin-top: 20px;" class="title">
-      <span style="font-size: 22px;">全部评论</span>
-      <sup style="font-size: 16px;margin-left: 2px;">{{ commentCount }}</sup>
+    <SongList :songs="displayedSong" :loading="loading" :loadingCount="1" />
+    <div style="margin-top: 20px" class="title">
+      <span style="font-size: 22px">全部评论</span>
+      <sup style="font-size: 16px; margin-left: 2px">{{ commentCount }}</sup>
     </div>
-    <div style="margin: 20px 0;margin-bottom: 40px;" class="comment-container">
+    <div style="margin: 20px 0; margin-bottom: 40px" class="comment-container">
       <CommentList :comments="comments" />
     </div>
     <div v-if="commentsLoading" class="loading-more">加载中...</div>
     <div v-if="!hasMoreComments && comments.length > 0" class="no-more-comments">
       没有更多评论了
     </div>
-    <div v-if="comments.length === 0 && !commentsLoading" class="no-comments">
-      暂无评论
-    </div>
+    <div v-if="comments.length === 0 && !commentsLoading" class="no-comments">暂无评论</div>
   </div>
 </template>
 
@@ -141,8 +139,11 @@ const handleScroll = () => {
   const scrollTop = targetElement.scrollTop;
   const clientHeight = targetElement.clientHeight;
 
-
-  if (scrollTop + clientHeight >= scrollHeight - 200 && hasMoreComments.value && !commentsLoading.value) {
+  if (
+    scrollTop + clientHeight >= scrollHeight - 200 &&
+    hasMoreComments.value &&
+    !commentsLoading.value
+  ) {
     fetchComments();
   }
 };
@@ -157,12 +158,15 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-span,sup{
+span,
+sup {
   color: var(--y-text);
   font-family: var(--y-font);
 }
 
-.loading-more, .no-more-comments, .no-comments {
+.loading-more,
+.no-more-comments,
+.no-comments {
   text-align: center;
   padding: 20px;
   color: var(--y-text);

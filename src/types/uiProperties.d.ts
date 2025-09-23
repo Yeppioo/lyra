@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { PersonalizedEntry } from '../api/netease/personlized';
 
 export interface UIPropertiesState {
@@ -27,7 +28,7 @@ export interface SearchTipGroup {
 export interface SearchTipEntry {
   key: string;
   type: 'hot' | 'album' | 'artist' | 'song' | 'playlist' | 'string' | 'keyword';
-  obj?: unknown;
+  obj?: any;
   iconType?: number;
   rank?: number;
 }

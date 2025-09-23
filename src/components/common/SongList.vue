@@ -2,7 +2,7 @@
   <div class="songs-list-container">
     <a-menu :disabled="loading" v-model:selectedKeys="current" mode="vertical">
       <template v-if="loading">
-        <a-menu-item v-for="i in (loadingCount ?? 3)" :key="`skeleton-${i}`">
+        <a-menu-item v-for="i in loadingCount ?? 3" :key="`skeleton-${i}`">
           <a-skeleton avatar :title="false" active>
             <a-list-item-meta>
               <template #avatar>

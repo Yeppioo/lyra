@@ -97,6 +97,7 @@ import { useUIPropertiesStore } from '../../stores/uiProperties';
 import { storeToRefs } from 'pinia';
 import type { SearchTipGroup, SearchTipEntry } from '../../types/uiProperties';
 import { useRouter } from 'vue-router'; // 引入 useRouter
+import * as jum from '@/utils/jumper';
 
 const router = useRouter(); // 获取 router 实例
 const current = ref<SearchTipEntry[] | null>(null);
@@ -150,6 +151,23 @@ const openModal = () => {
 const debouncedOnTextChange = debounce(handleSearchKey, 200);
 
 const handleMenuSelect = (key: SearchTipEntry) => {
+  if (key.type === 'album') {
+    jum.jumpAlbum(key.obj.id);
+    return;
+  }
+  if (key.type === 'artist') {
+    jum.jumpArtist(key.obj.id);
+    return;
+  }
+  if (key.type === 'song') {
+    jum.jumpSong(key.obj.id);
+    return;
+  }
+  if (key.type === 'playlist') {
+    jum.jumpPlaylist(key.obj.id);
+    return;
+  }
+
   current.value = null;
   searchValue.value = key.key;
   handleSearch(key);

@@ -23,3 +23,6 @@ export function jumpUser(id: string | number) {
 export function jumpCustom(path: string) {
   router.push(path);
 }
+export function jumpPlaylist(id: string | number) {
+  router.push(`/playlist/${id}`);
+}
