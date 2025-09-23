@@ -39,7 +39,7 @@ const handleMenuSelect = ({ key }: { key: string }) => {
 };
 
 watch(
-  () => route.params.type,
+  () => route.path,
   () => {
     updateSelectedKeys();
   },

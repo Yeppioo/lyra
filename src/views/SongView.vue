@@ -149,31 +149,31 @@ const loading = ref(true); // Added for similar songs section
 
 const displayedComments = computed(() => {
   if (showAllComments.value) {
-    return hotComments.value.map(a => ({
-        commentId: a.commentId,
-        user: {
-          userId: a.user.userId,
-          nickname: a.user.nickname,
-          avatarUrl: a.user.avatarUrl,
-        },
-        timeStr: a.timeStr,
-        likedCount: a.likedCount,
-        content: a.content,
-        location: a.ipLocation.location,
-      })) as unknown as CommentItem[];
+    return hotComments.value.map((a) => ({
+      commentId: a.commentId,
+      user: {
+        userId: a.user.userId,
+        nickname: a.user.nickname,
+        avatarUrl: a.user.avatarUrl,
+      },
+      timeStr: a.timeStr,
+      likedCount: a.likedCount,
+      content: a.content,
+      location: a.ipLocation.location,
+    })) as unknown as CommentItem[];
   }
-  return hotComments.value.slice(0, 1).map(a => ({
-        commentId: a.commentId,
-        user: {
-          userId: a.user.userId,
-          nickname: a.user.nickname,
-          avatarUrl: a.user.avatarUrl,
-        },
-        timeStr: a.timeStr,
-        likedCount: a.likedCount,
-        content: a.content,
-        location: a.ipLocation.location,
-      })); // 默认只显示第一条评论
+  return hotComments.value.slice(0, 1).map((a) => ({
+    commentId: a.commentId,
+    user: {
+      userId: a.user.userId,
+      nickname: a.user.nickname,
+      avatarUrl: a.user.avatarUrl,
+    },
+    timeStr: a.timeStr,
+    likedCount: a.likedCount,
+    content: a.content,
+    location: a.ipLocation.location,
+  })); // 默认只显示第一条评论
 });
 
 const displayedSimiSongs = computed(() => {

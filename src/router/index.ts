@@ -40,6 +40,39 @@ const router = createRouter({
       path: '/user/:key',
       name: 'user-view',
       component: () => import('../views/UserView.vue'),
+      props: true,
+      children: [
+        {
+          path: '',
+          redirect: (to) => {
+            return { path: `/user/${to.params.key}/created-playlists` };
+          },
+        },
+        {
+          path: 'created-playlists',
+          name: 'created-playlists',
+          component: () => import('../components/common/PlaylistGrid.vue'), // Placeholder, actual component will be in UserView
+          props: true,
+        },
+        {
+          path: 'subscribed-playlists',
+          name: 'subscribed-playlists',
+          component: () => import('../components/common/PlaylistGrid.vue'), // Placeholder, actual component will be in UserView
+          props: true,
+        },
+        {
+          path: 'notes',
+          name: 'notes',
+          component: () => import('../views/UserView.vue'), // Placeholder, actual component will be in UserView
+          props: true,
+        },
+        {
+          path: 'podcasts',
+          name: 'podcasts',
+          component: () => import('../views/UserView.vue'), // Placeholder, actual component will be in UserView
+          props: true,
+        },
+      ],
     },
     {
       path: '/auth/login',
@@ -52,6 +85,12 @@ const router = createRouter({
       component: () => import('../views/SearchView.vue'),
       props: true,
       children: [
+        {
+          path: '',
+          redirect: (to) => {
+            return { path: `/search/songs/${to.params.key}` };
+          },
+        },
         {
           path: 'songs/:key',
           name: 'search-songs',
@@ -90,6 +129,12 @@ const router = createRouter({
       component: () => import('../views/ArtistView.vue'),
       props: true,
       children: [
+        {
+          path: '',
+          redirect: (to) => {
+            return { path: `/artist/${to.params.key}/song` };
+          },
+        },
         {
           path: 'song',
           name: 'song',

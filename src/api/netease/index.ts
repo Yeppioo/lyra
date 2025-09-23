@@ -12,6 +12,7 @@ import * as simi from './simi';
 import * as mv from './mv';
 import * as album from './album';
 import * as playlist from './playlist';
+import * as user from './user';
 
 export {
   artist,
@@ -28,4 +29,5 @@ export {
   mv,
   album,
   playlist,
+  user,
 };

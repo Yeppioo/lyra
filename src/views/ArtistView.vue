@@ -85,14 +85,16 @@ const handleMenuSelect = ({ key }: { key: string }) => {
 };
 
 watch(
-  () => route.params.key,
-  (newId) => {
+  () => route.path,
+  () => {
     updateSelectedKeys();
-    if (newId) {
-      artistId.value = parseInt(newId as string);
+    const id = route.params.key as string;
+    if (id) {
+      artistId.value = parseInt(id);
       fetchArtistData(artistId.value);
     }
-  }
+  },
+  { immediate: true }
 );
 
 const fetchArtistData = async (id: number) => {

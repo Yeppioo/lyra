@@ -10,7 +10,7 @@
       <span class="liked-count">
         <font-awesome-icon :icon="['fas', 'thumbs-up']" /> {{ comment.likedCount }}
       </span>
-      <span v-if="comment.location" style="margin-left: 16px;" class="liked-count">
+      <span v-if="comment.location" style="margin-left: 16px" class="liked-count">
         <font-awesome-icon :icon="['fas', 'location-dot']" /> {{ comment.location }}
       </span>
     </div>
