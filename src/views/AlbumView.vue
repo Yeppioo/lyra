@@ -120,21 +120,19 @@ function playAllSongs() {
     songIndex: 0,
     canDelete: true,
   });
+  playerstore.state.groupIndex = playerstore.state.playListGroup.length - 1;
+  playerstore.currentSongId = null;
   setTimeout(() => {
-    playerstore.state.groupIndex = playerstore.state.playListGroup.length - 1;
-    setTimeout(() => {
-      playerstore.currentSong = null;
-      setCurrentSong(
-        {
-          id: songList.value[0].id,
-          duration: songList.value[0].duration,
-          name: songList.value[0].name,
-          artist: songList.value[0].artists,
-          cover: songList.value[0].picUrl,
-        },
-        playerstore
-      );
-    }, 1);
+    setCurrentSong(
+      {
+        id: songList.value[0].id,
+        duration: songList.value[0].duration,
+        name: songList.value[0].name,
+        artist: songList.value[0].artists,
+        cover: songList.value[0].picUrl,
+      },
+      playerstore
+    );
   }, 1);
 }
 </script>
@@ -143,13 +141,11 @@ function playAllSongs() {
 * {
   color: var(--y-text);
 }
-.album-view-container {
-  padding: 20px;
+.songs-list-container{
+  margin-bottom: 40px;
 }
-
 .album-content-wrapper {
   display: flex;
-  align-items: flex-start;
   flex-direction: column;
   flex-wrap: wrap; /* Allow items to wrap to the next line */
   gap: 30px; /* Space between album info and song list */
@@ -159,7 +155,6 @@ function playAllSongs() {
   display: flex;
   margin-bottom: 30px;
   flex: 1; /* Allow album header to take available space */
-  min-width: 300px; /* Minimum width for album header before wrapping */
 }
 .album-header:deep(img) {
   width: 200px;
@@ -246,12 +241,21 @@ function playAllSongs() {
 .song-list-section {
   margin-top: 0; /* Reset margin-top for flex layout */
   flex: 2; /* Allow song list to take more space */
-  min-width: 400px; /* Minimum width for song list before wrapping */
 }
 
 .song-list-section h2 {
   font-size: 22px;
   font-weight: bold;
   margin-bottom: 20px;
+}
+@media (max-width: 768px) {
+  .album-header {
+    flex-direction: column;
+    align-items: center;
+  }
+  .album-info{
+    margin-left: 0;
+    margin-top: 30px;
+  }
 }
 </style>

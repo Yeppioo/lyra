@@ -96,7 +96,7 @@ const fetchMVs = async (page: number, artistId: string) => {
       })
     );
 
-    console.log(mvs);
+    // console.log(mvs);
 
     mvCount.value = mvsResult.data.count as number; // 假设MV接口返回的数据中包含总数
     cachedPages.set(page, mvs);

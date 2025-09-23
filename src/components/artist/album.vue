@@ -88,8 +88,6 @@ const fetchAlbums = async (page: number, artistId: string) => {
       })
     );
 
-    console.log(albums);
-
     albumCount.value = artistDetailResult.data.data.artist.albumSize as number;
     cachedPages.set(page, albums);
     albumList.value = albums;

@@ -20,21 +20,22 @@ export function setCurrentSong(
     });
     state.groupIndex = 0;
   }
-  const index = state.groupIndex;
-  if (!state.playListGroup[index].songs) {
-    state.playListGroup[index].songs = [];
+
+  if (!state.playListGroup[state.groupIndex].songs) {
+    state.playListGroup[state.groupIndex].songs = [];
   }
+
   // 检查是否已存在该歌曲
-  const existIdx = state.playListGroup[index].songs.findIndex(
+  const existIdx = state.playListGroup[state.groupIndex].songs.findIndex(
     (s: PlayingSongInfo) => s.id === song.id
   );
   if (existIdx === -1) {
-    state.playListGroup[index].songs.push(song);
-    state.playListGroup[index].songIndex = state.playListGroup[index].songs.length - 1;
+    state.playListGroup[state.groupIndex].songs.push(song);
+    state.playListGroup[state.groupIndex].songIndex =
+      state.playListGroup[state.groupIndex].songs.length - 1;
   } else {
-    state.playListGroup[index].songIndex = existIdx;
+    state.playListGroup[state.groupIndex].songIndex = existIdx;
   }
-  state.groupIndex = 0;
   playerStore.currentSongId = song.id; // 设置当前歌曲ID，触发异步获取URL和歌词
 }
 
@@ -71,6 +72,28 @@ export const usePlayerStore = defineStore('player', () => {
   const volume = ref(loadedState.volume ?? defaultPlayerState.volume); // 音量
   const isPlaying = ref(false); // 播放状态
   const audioElement = shallowRef<HTMLAudioElement | null>(null); // 新增：用于存储 audio 元素的引用
+
+  watch(
+    () => state.value.groupIndex,
+    (newIndex) => {
+      setTimeout(() => {
+        const song = state.value.playListGroup[newIndex].songs[0];
+        if (song) {
+          setCurrentSong(
+            {
+              id: song.id,
+              duration: song.duration,
+              name: song.name,
+              artist: song.artist,
+              cover: song.cover,
+            },
+            usePlayerStore()
+          );
+        }
+      }, 1);
+    },
+    { deep: true }
+  );
 
   // 页面加载时，如果 localStorage 中有歌曲，设置 currentSongId
   if (loadedState.playListGroup && loadedState.playListGroup.length > 0) {
@@ -202,9 +225,6 @@ export const usePlayerStore = defineStore('player', () => {
       JSON.stringify({ playListGroup, groupIndex, playMode, volume: newVolume })
     );
   });
-
-  // currentSong 现在是 ref，不再是 computed
-  // 播放/暂停由组件管理
 
   function play() {
     if (audioElement.value) {
