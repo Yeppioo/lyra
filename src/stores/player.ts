@@ -16,19 +16,23 @@ export function setCurrentSong(
       name: '默认歌单',
       songs: [],
       songIndex: 0,
-      canDelete: true, // 将默认歌单的 canDelete 设置为 true
+      canDelete: true,
     });
+    state.groupIndex = 0;
   }
-  if (!state.playListGroup[0].songs) {
-    state.playListGroup[0].songs = [];
+  const index = state.groupIndex;
+  if (!state.playListGroup[index].songs) {
+    state.playListGroup[index].songs = [];
   }
   // 检查是否已存在该歌曲
-  const existIdx = state.playListGroup[0].songs.findIndex((s: PlayingSongInfo) => s.id === song.id);
+  const existIdx = state.playListGroup[index].songs.findIndex(
+    (s: PlayingSongInfo) => s.id === song.id
+  );
   if (existIdx === -1) {
-    state.playListGroup[0].songs.push(song);
-    state.playListGroup[0].songIndex = state.playListGroup[0].songs.length - 1;
+    state.playListGroup[index].songs.push(song);
+    state.playListGroup[index].songIndex = state.playListGroup[index].songs.length - 1;
   } else {
-    state.playListGroup[0].songIndex = existIdx;
+    state.playListGroup[index].songIndex = existIdx;
   }
   state.groupIndex = 0;
   playerStore.currentSongId = song.id; // 设置当前歌曲ID，触发异步获取URL和歌词

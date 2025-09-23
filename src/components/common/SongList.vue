@@ -16,10 +16,11 @@
         <a-menu-item
           @click="handleMenuItemClick(item.id, item.picUrl)"
           :disabled="loading"
-          v-for="item in songs"
+          v-for="(item, index) in songs"
           :key="item.id">
           <div class="item">
             <a-image
+              v-if="!showRank"
               :fallback="fallbackImg"
               :placeholder="true"
               class="icon-img"
@@ -28,6 +29,9 @@
               :height="48"
               :src="item.picUrl">
             </a-image>
+            <div v-else class="rank">
+              <span>{{ index + 1 }}</span>
+            </div>
             <div class="info">
               <div class="basic-info">
                 <div class="song-name-container">
@@ -50,9 +54,12 @@
                   </template>
                 </div>
               </div>
-              <a @click.stop="jumper.jumpAlbum(item.album.id)" class="album no-before">{{
-                item.album.name
-              }}</a>
+              <a
+                v-if="!hideAlbum"
+                @click.stop="jumper.jumpAlbum(item.album.id)"
+                class="album no-before"
+                >{{ item.album.name }}</a
+              >
               <span class="duration">{{ formatSecondsToMinutes(item.duration / 1000) }}</span>
               <font-awesome-icon class="more-button" size="xl" :icon="['fas', 'ellipsis']" />
             </div>
@@ -108,6 +115,8 @@ interface SongListProps {
   songs: SongListItem[];
   loading?: boolean;
   showPagination?: boolean;
+  showRank?: boolean;
+  hideAlbum?: boolean;
   totalSongs?: number;
   currentPage?: number;
   pageSize?: number;
@@ -174,6 +183,9 @@ const onPageChange = (page: number) => {
 }
 .songs-list-container :deep(.ant-pagination-options) {
   display: none;
+}
+* {
+  user-select: none;
 }
 .songs-list-container :deep(.icon-img) {
   width: 48px;
@@ -362,5 +374,14 @@ const onPageChange = (page: number) => {
   .more-button {
     display: unset;
   }
+}
+.rank span {
+  font-size: 17px;
+}
+.rank {
+  width: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

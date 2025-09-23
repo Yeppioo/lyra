@@ -288,7 +288,7 @@ const playCurrent = () => {
 }
 
 .song-name-title span {
-    display: -webkit-box;
+  display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -309,7 +309,7 @@ const playCurrent = () => {
 }
 
 .artist-info .link,
-.album-info .link ,
+.album-info .link,
 .mv-info .link {
   color: var(--y-text);
   text-decoration: none;
@@ -357,12 +357,12 @@ const playCurrent = () => {
 .play-button i {
   font-size: 20px;
 }
-.mv-info{
+.mv-info {
   margin-top: 2px;
 }
 .ar-name,
-.album-info > a ,
-.mv-info>a{
+.album-info > a,
+.mv-info > a {
   margin-top: 2px;
   font-size: 14px;
   color: #909092 !important;
@@ -402,10 +402,11 @@ const playCurrent = () => {
   margin-right: 7px;
 }
 .icon.mv-icon {
-  color: #1890FF;
-    width: 18px;
-      margin-left: 4px;
-  margin-right: 8px;}
+  color: #1890ff;
+  width: 18px;
+  margin-left: 4px;
+  margin-right: 8px;
+}
 .icon.user {
   color: #ff4d4f;
   width: 26px;

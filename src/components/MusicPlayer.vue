@@ -7,7 +7,7 @@
       @timeupdate="onTimeUpdate"
       @canplay="onCanPlay"
       style="display: none"></audio>
-    <div v-if="playerStore.currentSong" class="control-container">
+    <div v-if="playerStore.currentSong || true" class="control-container">
       <div class="progress">
         <span class="progress-text current-time">
           {{ formatSecondsToMinutes(playerStore.currentSong?.currentTime) }}
@@ -53,7 +53,7 @@
           </div>
           <div class="info-text">
             <a
-              @click.stop="jumper.jumpSong(playerStore.currentSong?.id)"
+              @click.stop="jumper.jumpSong(playerStore.currentSong?.id as unknown as string)"
               class="song-name no-before">
               {{ playerStore.currentSong?.name }}
             </a>
@@ -143,13 +143,30 @@
     <div v-if="showPlaylistPopup" class="playlist-popup">
       <div class="playlist-header">
         <h3 class="playlist-title">播放列表</h3>
-        <a-select
-          v-model:value="playerStore.state.groupIndex"
-          style="width: 120px"
-          @change="playerStore.switchPlaylist"
-          :options="
-            playerStore.state.playListGroup.map((group, idx) => ({ value: idx, label: group.name }))
-          "></a-select>
+        <div>
+          <font-awesome-icon
+            class="del-icon"
+            style="margin-right: 8px"
+            :icon="['fas', 'trash']"
+            @click.stop="
+              if (
+                playerStore.state.playListGroup.length >= 1 &&
+                playerStore.state.playListGroup[playerStore.state.groupIndex]
+              ) {
+                openBox = true;
+              }
+            " />
+          <a-select
+            v-model:value="playerStore.state.groupIndex"
+            style="width: 120px"
+            @change="playerStore.switchPlaylist"
+            :options="
+              playerStore.state.playListGroup.map((group, idx) => ({
+                value: idx,
+                label: group.name,
+              }))
+            "></a-select>
+        </div>
       </div>
       <ul class="song-list">
         <li
@@ -176,8 +193,18 @@
   </div>
   <!-- 蒙版 -->
   <div v-if="showOverlay" class="overlay" @click="closeAllPopups"></div>
+  <a-modal v-model:open="openBox" title="提示" @ok="handleDel">
+    <template #footer>
+      <a-button @click="openBox = false" class="cancel-button">取消</a-button>
+      <a-button @click="handleDel" class="highlight-button">删除</a-button>
+    </template>
+    <p>
+      确认删除歌单: "{{ playerStore.state.playListGroup[playerStore.state.groupIndex].name }}" ?<br />歌单内容将被永久移除
+    </p>
+  </a-modal>
 </template>
 <script setup lang="ts">
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { ref, watch, computed } from 'vue';
 import { usePlayerStore } from '@/stores/player';
 import { useUIPropertiesStore } from '@/stores/uiProperties'; // 引入 uiPropertiesStore
@@ -189,6 +216,9 @@ const uiPropertiesStore = useUIPropertiesStore(); // 使用 uiPropertiesStore
 const audioRef = ref<HTMLAudioElement | null>(null);
 const showVolumePopup = ref(false);
 const showPlayModePopup = ref(false);
+
+const openBox = ref(false);
+
 const showPlaylistPopup = ref(false);
 const hoveredSongId = ref<number | null>(null); // 新增：用于跟踪鼠标悬停的歌曲ID
 // 移除 showFullScreenLyrics，因为它现在由 uiPropertiesStore 管理
@@ -198,6 +228,25 @@ const hoveredSongId = ref<number | null>(null); // 新增：用于跟踪鼠标�
 const showOverlay = computed(() => {
   return showVolumePopup.value || showPlayModePopup.value || showPlaylistPopup.value;
 });
+
+const handleDel = () => {
+  openBox.value = false;
+  message.success(`已删除: ${playerStore.state.playListGroup[playerStore.state.groupIndex].name}`);
+
+  setTimeout(() => {
+    playerStore.currentSong = null;
+    playerStore.state.playListGroup.splice(playerStore.state.groupIndex, 1);
+    if (playerStore.state.playListGroup.length === 0) {
+      playerStore.state.playListGroup.push({
+        name: '默认歌单',
+        songs: [],
+        songIndex: 0,
+        canDelete: true,
+      });
+    }
+    playerStore.state.groupIndex = 0;
+  }, 1);
+};
 
 // 计算属性，根据播放模式返回不同的图标
 const playModeIcon = computed(() => {
@@ -251,7 +300,6 @@ function onAudioEnded() {
 function onTimeUpdate(e: Event) {
   const audio = e.target as HTMLAudioElement;
   if (playerStore.currentSong) {
-    // 创建一个新的对象来触发 shallowRef 的更新
     playerStore.currentSong = {
       ...playerStore.currentSong,
       currentTime: audio.currentTime * 1000,
@@ -262,6 +310,7 @@ function onTimeUpdate(e: Event) {
 // 监听 audio 的 play/pause 事件，自动同步 isPlaying
 import { onMounted, onBeforeUnmount } from 'vue';
 import * as jumper from '@/utils/jumper';
+import { message } from 'ant-design-vue';
 onMounted(() => {
   if (audioRef.value) {
     playerStore.setAudioElement(audioRef.value); // 设置 audio 元素
@@ -362,6 +411,7 @@ watch(currentTime, (val) => {
 });
 
 function toggleFullScreenLyrics() {
+  if (!playerStore.currentSong) return;
   uiPropertiesStore.toggleFullScreenLyrics(); // 调用 uiPropertiesStore 中的方法
 }
 </script>
@@ -629,7 +679,10 @@ function toggleFullScreenLyrics() {
   border-radius: 50%;
   outline: none; /* 移除蓝色圈圈 */
 }
-
+.del-icon:hover {
+  color: #70baff;
+  cursor: pointer;
+}
 .sub-control-button:hover svg {
   color: #70baff !important;
 }

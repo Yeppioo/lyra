@@ -34,15 +34,7 @@
               @ok="handleClear">
               <template #footer>
                 <a-button @click="open = false" class="cancel-button">取消</a-button>
-                <a-button
-                  @click="
-                    settingsStore.settings.searchHistory = [];
-                    message.success('已清空');
-                    open = false;
-                  "
-                  class="highlight-button"
-                  >删除</a-button
-                >
+                <a-button @click="handleClear" class="highlight-button">删除</a-button>
               </template>
               <p>确认删除所有搜索历史记录?</p>
             </a-modal>
@@ -174,6 +166,8 @@ const handleMenuSelect = (key: SearchTipEntry) => {
 };
 const handleClear = () => {
   settingsStore.settings.searchHistory = [];
+  message.success('已清空');
+  open.value = false;
 };
 const handleSearch = (key: SearchTipEntry) => {
   const word = key.key.trim();
