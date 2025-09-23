@@ -166,8 +166,8 @@ watch(
   margin-right: 15px;
 }
 @media (max-width: 632px) {
-.video-view{
-  padding: 0;
-}
+  .video-view {
+    padding: 0;
+  }
 }
 </style>

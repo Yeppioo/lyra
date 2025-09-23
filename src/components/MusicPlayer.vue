@@ -174,6 +174,8 @@
       </ul>
     </div>
   </div>
+    <!-- 蒙版 -->
+    <div v-if="showOverlay" class="overlay" @click="closeAllPopups"></div>
 </template>
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
@@ -191,6 +193,11 @@ const showPlaylistPopup = ref(false);
 const hoveredSongId = ref<number | null>(null); // 新增：用于跟踪鼠标悬停的歌曲ID
 // 移除 showFullScreenLyrics，因为它现在由 uiPropertiesStore 管理
 // 移除 isPlaying，因为它现在由 playerStore 管理
+
+// 计算属性，判断是否有任何弹出框显示
+const showOverlay = computed(() => {
+  return showVolumePopup.value || showPlayModePopup.value || showPlaylistPopup.value;
+});
 
 // 计算属性，根据播放模式返回不同的图标
 const playModeIcon = computed(() => {
@@ -283,22 +290,25 @@ watch(
 // 监听音量变化，同步到 audio 元素
 // 移除对 playerStore.volume 的监听，因为现在由 playerStore 内部管理
 
-function toggleVolumePopup() {
-  showVolumePopup.value = !showVolumePopup.value;
+function closeAllPopups() {
+  showVolumePopup.value = false;
   showPlayModePopup.value = false;
   showPlaylistPopup.value = false;
+}
+
+function toggleVolumePopup() {
+  closeAllPopups(); // 关闭所有弹出框
+  showVolumePopup.value = !showVolumePopup.value;
 }
 
 function togglePlayModePopup() {
+  closeAllPopups(); // 关闭所有弹出框
   showPlayModePopup.value = !showPlayModePopup.value;
-  showVolumePopup.value = false;
-  showPlaylistPopup.value = false;
 }
 
 function togglePlaylistPopup() {
+  closeAllPopups(); // 关闭所有弹出框
   showPlaylistPopup.value = !showPlaylistPopup.value;
-  showVolumePopup.value = false;
-  showPlayModePopup.value = false;
 }
 
 function onVolumeChange(value: number) {
@@ -805,4 +815,13 @@ function toggleFullScreenLyrics() {
   text-wrap-mode: wrap;
   overflow-wrap: break-word;
 } */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色 */
+  z-index: 999; /* 确保在弹出框之下，但在其他内容之上 */
+}
 </style>

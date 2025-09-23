@@ -258,7 +258,6 @@ const play = async () => {
   max-height: 90px;
 }
 .song-name {
-  color: #c9cdd4;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   font-size: 26px;
@@ -268,6 +267,8 @@ const play = async () => {
   word-break: break-all;
   overflow: hidden;
   font-family: var(--y-font);
+  color: #fff;
+  opacity: 0.85;
   line-height: 1.35;
 }
 .song-name::before {
@@ -275,6 +276,7 @@ const play = async () => {
 }
 .song-name:hover {
   color: #fff;
+  opacity: 1;
 }
 .info-box {
   margin-left: 20px;
