@@ -19,14 +19,14 @@ import { defineProps } from 'vue';
 import { jumpUser } from '@/utils/jumper';
 
 export interface Comment {
-  commentId: string;
+  commentId: number;
   user: {
-    userId: string;
+    userId: number;
     nickname: string;
     avatarUrl: string;
   };
   timeStr: string;
-  likedCount: string;
+  likedCount: number;
   content: string;
 }
 
