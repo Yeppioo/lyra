@@ -141,7 +141,7 @@ function playAllSongs() {
 * {
   color: var(--y-text);
 }
-.songs-list-container{
+.songs-list-container {
   margin-bottom: 40px;
 }
 .album-content-wrapper {
@@ -253,7 +253,7 @@ function playAllSongs() {
     flex-direction: column;
     align-items: center;
   }
-  .album-info{
+  .album-info {
     margin-left: 0;
     margin-top: 30px;
   }

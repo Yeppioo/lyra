@@ -81,8 +81,11 @@
           </div>
         </div>
         <div class="right-section">
+          <button class="sub-control-button download-btn" @click="downloadCurrentSong">
+            <font-awesome-icon style="height: 16px" size="1x" :icon="['fas', 'download']" />
+          </button>
           <button class="sub-control-button" @click="toggleVolumePopup">
-            <font-awesome-icon size="1x" :icon="['fas', 'volume-high']" />
+            <font-awesome-icon size="1x" :icon="['fas', 'volume-low']" />
           </button>
           <button class="sub-control-button" @click="togglePlayModePopup">
             <font-awesome-icon size="1x" :icon="playModeIcon" />
@@ -203,6 +206,7 @@
     </p>
   </a-modal>
 </template>
+
 <script setup lang="ts">
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { ref, watch, computed } from 'vue';
@@ -348,6 +352,32 @@ function closeAllPopups() {
 function toggleVolumePopup() {
   closeAllPopups(); // 关闭所有弹出框
   showVolumePopup.value = !showVolumePopup.value;
+}
+
+function downloadCurrentSong() {
+  if (!playerStore.currentSong?.url) {
+    message.error('当前歌曲没有下载地址');
+    return;
+  }
+  const fileUrl = playerStore.currentSong?.url;
+  const fileName = `${playerStore.currentSong.name} - ${playerStore.currentSong.artist.map((a) => a.name).join(',')}.mp3`;
+  message.info('开始下载: ' + fileName);
+
+  fetch(fileUrl)
+    .then((response) => response.blob())
+    .then((blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    })
+    .catch(() => {
+      message.error('下载歌曲失败');
+    });
 }
 
 function togglePlayModePopup() {
@@ -843,7 +873,11 @@ function toggleFullScreenLyrics() {
   opacity: 0; /* 默认隐藏 */
   transition: opacity 0.2s;
 }
-
+@media (max-width: 500px) {
+  .download-btn {
+    display: none;
+  }
+}
 .playlist-popup li .delete-icon {
   display: none;
   opacity: 1;

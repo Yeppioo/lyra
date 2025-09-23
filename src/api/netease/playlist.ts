@@ -3,7 +3,6 @@ import { apiSettings } from '../config';
 const { neteaseApiBase: apiBase, realIP } = apiSettings;
 const realIpParam = realIP ? `realIP=${realIP}` : '';
 
-
 interface PlaylistDetailResponse {
   code: number;
   playlist: {

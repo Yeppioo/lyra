@@ -19,11 +19,17 @@
           </div>
           <div class="publish-time">
             <font-awesome-icon :icon="['fas', 'clock']" />
-            <span>{{ formatTimestampToDate(playlist.createTime) }} | {{ formatTimestampToDate(playlist.updateTime) }}</span>
+            <span
+              >{{ formatTimestampToDate(playlist.createTime) }} |
+              {{ formatTimestampToDate(playlist.updateTime) }}</span
+            >
           </div>
           <div class="publish-time">
             <font-awesome-icon :icon="['fas', 'earth-americas']" />
-            <span>{{ formatNumber(playlist.trackCount) }}首音乐 | {{ formatNumber(playlist.playCount) }}次播放</span>
+            <span
+              >{{ formatNumber(playlist.trackCount) }}首音乐 |
+              {{ formatNumber(playlist.playCount) }}次播放</span
+            >
           </div>
           <div class="description">
             <p>{{ playlist.description || '太懒了吧，连简介都不写' }}</p>
@@ -42,13 +48,13 @@
       </div>
       <div class="song-list-section">
         <SongList
-        :songs="songs"
-        :loading="loading"
-        :show-pagination="true"
-        :total-songs="totalSongs"
-        :current-page="currentPage"
-        @page-change="onPageChange"
-        @update:currentPage="onPageChange" />
+          :songs="songs"
+          :loading="loading"
+          :show-pagination="true"
+          :total-songs="totalSongs"
+          :current-page="currentPage"
+          @page-change="onPageChange"
+          @update:currentPage="onPageChange" />
       </div>
     </div>
   </main>
@@ -278,7 +284,7 @@ const onPageChange = (page: number) => {
 * {
   color: var(--y-text);
 }
-.songs-list-container{
+.songs-list-container {
   margin-bottom: 40px;
 }
 .album-content-wrapper {
@@ -390,7 +396,7 @@ const onPageChange = (page: number) => {
     flex-direction: column;
     align-items: center;
   }
-  .album-info{
+  .album-info {
     margin-left: 0;
     margin-top: 30px;
   }

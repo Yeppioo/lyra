@@ -31,6 +31,11 @@
         </div>
         <div class="header-right">
           <font-awesome-icon
+            style="height: 22px"
+            :icon="['fas', 'arrow-down']"
+            class="fullscreen-icon"
+            @click="downloadCurrentSong" />
+          <font-awesome-icon
             :icon="['fas', 'expand']"
             class="fullscreen-icon"
             @click="toggleFullScreen" />
@@ -185,6 +190,7 @@ import { ref, watch, computed, onMounted, onBeforeUnmount } from 'vue';
 import { usePlayerStore } from '@/stores/player';
 import { useUIPropertiesStore } from '@/stores/uiProperties';
 import * as jumper from '@/utils/jumper';
+import { message } from 'ant-design-vue';
 
 interface Word {
   time: number;
@@ -296,6 +302,33 @@ onBeforeUnmount(() => {
   }
 });
 
+function downloadCurrentSong() {
+  if (!playerStore.currentSong?.url) {
+    message.error('当前歌曲没有下载地址');
+    return;
+  }
+  const fileUrl = playerStore.currentSong?.url;
+  const fileName = `${playerStore.currentSong.name} - ${playerStore.currentSong.artist.map((a) => a.name).join(',')}.mp3`;
+
+  message.info('开始下载: ' + fileName);
+
+  fetch(fileUrl)
+    .then((response) => response.blob())
+    .then((blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    })
+    .catch(() => {
+      message.error('下载歌曲失败');
+    });
+}
+
 async function updateLyricsPosition() {
   const newTime = playerStore.currentSong?.currentTime;
   if (!props.visible || newTime === undefined || newTime === null) {
@@ -398,7 +431,7 @@ function onProgressChange(value: number) {
   width: 100vw;
   height: 100vh;
   background-color: var(--y-bg); /* 使用主题背景色 */
-  z-index: 9999;
+  z-index: 110;
   display: flex;
   flex-direction: column;
   color: #fefefe;
