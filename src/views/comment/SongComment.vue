@@ -22,14 +22,14 @@ import { getSong, comment } from '@/api/netease';
 import { onMounted, ref, watch, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import SongList, { type SongListItem } from '@/components/common/SongList.vue';
-import CommentList, { type Comment } from '@/components/common/CommentList.vue';
+import CommentList, { type CommentItem } from '@/components/common/CommentList.vue';
 
 const route = useRoute();
 const currentId = ref('');
 const displayedSong = ref<SongListItem[]>([]);
 const loading = ref(false);
 const commentCount = ref(0);
-const comments = ref<Comment[]>([]);
+const comments = ref<CommentItem[]>([]);
 const currentPage = ref(1);
 const hasMoreComments = ref(true);
 const commentsLoading = ref(false);
@@ -115,12 +115,16 @@ const fetchComments = async (reset = false) => {
     const data = response.data;
 
     if (data.comments && data.comments.length > 0) {
+      data.comments.forEach((comment) => {
+        (comment as any).location = comment.ipLocation.location;
+      });
+
       comments.value = [...comments.value, ...data.comments];
       commentCount.value = data.totalCount;
       hasMoreComments.value = data.hasMore;
-      if (data.comments.length > 0) {
-        currentCursor.value = data.comments[data.comments.length - 1].time;
-      }
+      // if (data.comments.length > 0) {
+      //   currentCursor.value = data.comments[data.comments.length - 1].time;
+      // }
       currentPage.value++;
     } else {
       hasMoreComments.value = false;

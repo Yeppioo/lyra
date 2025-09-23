@@ -10,6 +10,9 @@
       <span class="liked-count">
         <font-awesome-icon :icon="['fas', 'thumbs-up']" /> {{ comment.likedCount }}
       </span>
+      <span v-if="comment.location" style="margin-left: 16px;" class="liked-count">
+        <font-awesome-icon :icon="['fas', 'location-dot']" /> {{ comment.location }}
+      </span>
     </div>
   </div>
 </template>
@@ -18,7 +21,7 @@
 import { defineProps } from 'vue';
 import { jumpUser } from '@/utils/jumper';
 
-export interface Comment {
+export interface CommentItem {
   commentId: number;
   user: {
     userId: number;
@@ -28,10 +31,11 @@ export interface Comment {
   timeStr: string;
   likedCount: number;
   content: string;
+  location?: string;
 }
 
 defineProps<{
-  comments: Comment[];
+  comments: CommentItem[];
 }>();
 </script>
 

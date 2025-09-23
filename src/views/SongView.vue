@@ -96,7 +96,7 @@
 
     <div v-if="hotComments.length > 0" class="hot-comments-section">
       <h2 class="section-title">热门评论</h2>
-      <CommentList :comments="displayedComments as any[]" />
+      <CommentList :comments="displayedComments as CommentItem[]" />
       <div v-if="hotComments.length > 1" class="comment-toggle-buttons">
         <button v-if="!showAllComments" @click="showAllComments = true" class="toggle-button">
           <font-awesome-icon :icon="['fas', 'chevron-down']" /> 展开评论
@@ -133,7 +133,7 @@ import type { SimiSong } from '@/api/netease/simi';
 import { setCurrentSong, usePlayerStore } from '@/stores/player'; // Re-added setCurrentSong
 import type { SongWikiSummaryResponseData } from '@/api/netease/songWiki';
 import SongList, { type SongListItem } from '@/components/common/SongList.vue';
-import CommentList from '@/components/common/CommentList.vue';
+import CommentList, { type CommentItem } from '@/components/common/CommentList.vue';
 
 const route = useRoute();
 
@@ -149,9 +149,31 @@ const loading = ref(true); // Added for similar songs section
 
 const displayedComments = computed(() => {
   if (showAllComments.value) {
-    return hotComments.value;
+    return hotComments.value.map(a => ({
+        commentId: a.commentId,
+        user: {
+          userId: a.user.userId,
+          nickname: a.user.nickname,
+          avatarUrl: a.user.avatarUrl,
+        },
+        timeStr: a.timeStr,
+        likedCount: a.likedCount,
+        content: a.content,
+        location: a.ipLocation.location,
+      })) as unknown as CommentItem[];
   }
-  return hotComments.value.slice(0, 1); // 默认只显示第一条评论
+  return hotComments.value.slice(0, 1).map(a => ({
+        commentId: a.commentId,
+        user: {
+          userId: a.user.userId,
+          nickname: a.user.nickname,
+          avatarUrl: a.user.avatarUrl,
+        },
+        timeStr: a.timeStr,
+        likedCount: a.likedCount,
+        content: a.content,
+        location: a.ipLocation.location,
+      })); // 默认只显示第一条评论
 });
 
 const displayedSimiSongs = computed(() => {
