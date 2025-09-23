@@ -39,7 +39,8 @@ export function setCurrentSong(
   playerStore.currentSongId = song.id; // 设置当前歌曲ID，触发异步获取URL和歌词
 }
 
-import type { PlayerState, PlayingSongInfo, CurrentSong } from '@/types/player';
+import type { PlayerState, CurrentSong, PlayingSongInfo } from '@/types/player';
+export type { PlayingSongInfo };
 import { defineStore } from 'pinia';
 import { ref, watch, shallowRef } from 'vue';
 

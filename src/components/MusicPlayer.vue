@@ -244,7 +244,7 @@ const handleDel = () => {
         canDelete: true,
       });
     }
-    playerStore.state.groupIndex = 0;
+    playerStore.state.groupIndex = playerStore.state.playListGroup.length - 1;
   }, 1);
 };
 
@@ -796,7 +796,7 @@ function toggleFullScreenLyrics() {
   padding: 0 10px 10px 10px; /* 列表内边距，底部留出空间 */
   margin: 0;
   flex-grow: 1;
-  max-height: 363px; /* 调整最大高度，留出头部空间 */
+  height: 363px; /* 调整最大高度，留出头部空间 */
   overflow-y: auto;
 }
 

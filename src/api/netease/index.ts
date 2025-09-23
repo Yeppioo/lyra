@@ -11,6 +11,7 @@ import * as songWiki from './songWiki';
 import * as simi from './simi';
 import * as mv from './mv';
 import * as album from './album';
+import * as playlist from './playlist';
 
 export {
   artist,
@@ -26,4 +27,5 @@ export {
   simi,
   mv,
   album,
+  playlist,
 };
