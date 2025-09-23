@@ -103,60 +103,7 @@
 
     <div v-if="simiSongs.length > 0" class="songs-search-result">
       <h2 class="section-title">相似推荐</h2>
-      <a-menu :disabled="loading" v-model:selectedKeys="current" mode="vertical">
-        <a-menu-item
-          @click="handleMenuItemClick(item.id, item.picUrl)"
-          :disabled="loading"
-          v-for="item in displayedSimiSongs"
-          :key="item.id">
-          <a-skeleton avatar :title="false" v-if="loading" active>
-            <a-list-item-meta>
-              <template #avatar>
-                <a-avatar />
-              </template>
-            </a-list-item-meta>
-          </a-skeleton>
-          <div class="item" v-else>
-            <a-image
-              :fallback="fallbackImg"
-              :placeholder="true"
-              class="icon-img"
-              :width="48"
-              :preview="false"
-              :height="48"
-              :src="item.picUrl">
-            </a-image>
-            <div class="info">
-              <div class="basic-info">
-                <div class="song-name-container">
-                  <a @click.stop="jumpSong(item.id)" class="song-name no-before">
-                    {{ item.name }}
-                  </a>
-                  <div v-if="item.requireVip" class="vip-tag tag">
-                    <span>VIP</span>
-                  </div>
-                  <a
-                    @click.stop="jumpVideo(item.mvId)"
-                    v-if="item.hasMv"
-                    class="mv-tag tag no-before">
-                    <span>MV</span>
-                  </a>
-                </div>
-                <div class="ar-name-container">
-                  <template v-for="a in item.artists" :key="a.id">
-                    <a @click.stop="jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
-                  </template>
-                </div>
-              </div>
-              <a @click.stop="jumpAlbum(item.album.id)" class="album no-before">{{
-                item.album.name
-              }}</a>
-              <span class="duration">{{ formatSecondsToMinutes(item.duration / 1000) }}</span>
-              <font-awesome-icon class="more-button" size="xl" :icon="['fas', 'ellipsis']" />
-            </div>
-          </div>
-        </a-menu-item>
-      </a-menu>
+      <SongList :songs="displayedSimiSongs" :loading="loading" />
       <div v-if="simiSongs.length > 1" class="comment-toggle-buttons">
         <button v-if="!showAllSimiSongs" @click="showAllSimiSongs = true" class="toggle-button">
           <font-awesome-icon :icon="['fas', 'chevron-down']" /> 展开推荐
@@ -173,21 +120,13 @@
 import { onMounted, ref, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { getSong, comment, simi } from '@/api/netease';
-import { jumpArtist, jumpAlbum, jumpSong, jumpVideo } from '@/utils/jumper';
+import { jumpArtist, jumpAlbum } from '@/utils/jumper'; // Keep jumpArtist, jumpAlbum for songDetail section
 import type { SongDetail } from '@/api/netease/getSong';
 import type { HotComment } from '@/api/netease/comment';
 import type { SimiSong } from '@/api/netease/simi';
-import { setCurrentSong, usePlayerStore } from '@/stores/player';
+import { setCurrentSong, usePlayerStore } from '@/stores/player'; // Re-added setCurrentSong
 import type { SongWikiSummaryResponseData } from '@/api/netease/songWiki';
-import { message } from 'ant-design-vue';
-import { fallbackImg } from '@/stores/constant';
-
-interface FormattedSimiSong extends SimiSong {
-  picUrl: string;
-  hasMv: boolean;
-  mvId: number;
-  requireVip: boolean;
-}
+import SongList, { type SongListItem } from '@/components/common/SongList.vue';
 
 const route = useRoute();
 
@@ -195,12 +134,11 @@ const currentId = ref('');
 const songDetail = ref<SongDetail | null>(null);
 const hotComments = ref<HotComment[]>([]);
 const songWikiSummary = ref<SongWikiSummaryResponseData | null>(null);
-const simiSongs = ref<FormattedSimiSong[]>([]);
+const simiSongs = ref<SongListItem[]>([]);
 const showAllComments = ref(false); // 新增：控制评论展开/收起状态
 const showAllSimiSongs = ref(false); // 新增：控制相似推荐展开/收起状态
 const playerStore = usePlayerStore();
 const loading = ref(true); // Added for similar songs section
-const current = ref<string[]>([]); // Added for similar songs section
 
 const displayedComments = computed(() => {
   if (showAllComments.value) {
@@ -215,13 +153,6 @@ const displayedSimiSongs = computed(() => {
   }
   return simiSongs.value.slice(0, 1); // 默认只显示前3条相似推荐
 });
-
-const formatSecondsToMinutes = (seconds: number) => {
-  const totalSeconds = Math.floor(seconds);
-  const minutes = Math.floor(totalSeconds / 60);
-  const remainingSeconds = totalSeconds % 60;
-  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-};
 
 const fetchInfo = async () => {
   hotComments.value = [];
@@ -246,7 +177,7 @@ const fetchInfo = async () => {
       ({
         id: s.id,
         name: s.name,
-        artists: s.artists,
+        artists: s.artists.map(a => ({ id: a.id, name: a.name })), // Map artists to match SongListItem
         duration: s.duration,
         album: {
           id: s.album.id,
@@ -289,33 +220,6 @@ const playCurrent = () => {
       },
       playerStore
     );
-  }
-};
-
-const handleMenuItemClick = async (key: number, cover: string) => {
-  const songId = key;
-  const song = simiSongs.value.find((s) => s.id == songId);
-  if (!song) return;
-  try {
-    const artists = [];
-    for (const a of song.artists) {
-      artists.push({
-        id: a.id,
-        name: a.name,
-      });
-    }
-    setCurrentSong(
-      {
-        id: songId,
-        duration: song.duration,
-        name: song.name,
-        artist: artists,
-        cover: cover,
-      },
-      playerStore
-    );
-  } catch {
-    message.error('播放失败');
   }
 };
 </script>

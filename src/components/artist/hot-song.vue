@@ -1,87 +1,55 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div class="songs-search-result">
-    <a-menu :disabled="loading" v-model:selectedKeys="current" mode="vertical">
-      <a-menu-item
-        @click="handleMenuItemClick(item.id, item.picUrl)"
-        :disabled="loading"
-        v-for="item in songsList"
-        :key="item.id">
-        <a-skeleton avatar :title="false" v-if="loading" active>
-          <a-list-item-meta>
-            <template #avatar>
-              <a-avatar />
-            </template>
-          </a-list-item-meta>
-        </a-skeleton>
-        <div class="item" v-else>
-          <a-image
-            :fallback="fallbackImg"
-            :placeholder="true"
-            class="icon-img"
-            :width="48"
-            :preview="false"
-            :height="48"
-            :src="item.picUrl">
-          </a-image>
-          <div class="info">
-            <div class="basic-info">
-              <div class="song-name-container">
-                <a @click.stop="jumper.jumpSong(item.id)" class="song-name no-before">
-                  {{ item.name }}
-                </a>
-                <div v-if="item.requireVip" class="vip-tag tag">
-                  <span>VIP</span>
-                </div>
-                <a
-                  @click.stop="jumper.jumpVideo(item.mvId)"
-                  v-if="item.hasMv"
-                  class="mv-tag tag no-before">
-                  <span>MV</span>
-                </a>
-              </div>
-              <div class="ar-name-container">
-                <template v-for="a in item.artists" :key="a.id">
-                  <a @click.stop="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
-                </template>
-              </div>
-            </div>
-            <a @click.stop="jumper.jumpAlbum(item.album.id)" class="album no-before">{{
-              item.album.name
-            }}</a>
-            <span class="duration">{{ formatSecondsToMinutes(item.duration / 1000) }}</span>
-            <font-awesome-icon class="more-button" size="xl" :icon="['fas', 'ellipsis']" />
-          </div>
-        </div>
-      </a-menu-item>
-    </a-menu>
+    <SongList :songs="songsList" :loading="loading" />
   </div>
 </template>
 
 <!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script setup lang="ts">
-import { usePlayerStore, setCurrentSong } from '@/stores/player';
 import { onMounted, ref, watch } from 'vue';
 import { artist } from '../../api/netease';
 import { useRoute } from 'vue-router';
-import { message } from 'ant-design-vue';
-import { fallbackImg } from '@/stores/constant';
-import * as jumper from '@/utils/jumper';
+import SongList, { type SongListItem } from '@/components/common/SongList.vue';
+
+interface ArtistResponse {
+  id: number;
+  name: string;
+}
+
+interface AlbumResponse {
+  id: number;
+  name: string;
+  picUrl: string;
+}
+
+interface SongResponse {
+  id: number;
+  name: string;
+  ar: ArtistResponse[];
+  dt: number;
+  al: AlbumResponse;
+  mv: number;
+  fee: number;
+}
+
+interface ArtistTopSongsResponse {
+  songs: SongResponse[];
+}
 
 const route = useRoute();
-const songsList = ref<any[]>([]);
+const songsList = ref<SongListItem[]>([]);
 const loading = ref(true);
-const current = ref<string[]>([]);
 
 const fetchSongs = async (key: string) => {
   loading.value = true;
-  songsList.value = [...new Array(3)].map(() => ({ loading: true, name: {}, picture: {} }));
+  songsList.value = []; // Clear songsList for loading state
 
-  const result = await artist.getArtistTopSongs(key);
-  songsList.value = result.data.songs.map((s: any) => ({
+  const result: { data: ArtistTopSongsResponse } = await artist.getArtistTopSongs(key);
+  songsList.value = result.data.songs.map((s: SongResponse) => ({
     id: s.id,
     name: s.name,
-    artists: s.ar,
+    artists: s.ar.map((a: ArtistResponse) => ({ id: a.id, name: a.name })),
     duration: s.dt,
     album: {
       id: s.al.id,
@@ -92,15 +60,8 @@ const fetchSongs = async (key: string) => {
     mvId: s.mv,
     requireVip: s.fee === 1,
     picUrl: s.al.picUrl,
-  }));
+  }) as SongListItem);
   loading.value = false;
-};
-
-const formatSecondsToMinutes = (seconds: number) => {
-  const totalSeconds = Math.floor(seconds);
-  const minutes = Math.floor(totalSeconds / 60);
-  const remainingSeconds = totalSeconds % 60;
-  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
 onMounted(() => {
@@ -109,34 +70,6 @@ onMounted(() => {
     fetchSongs(key);
   }
 });
-
-const playerStore = usePlayerStore();
-const handleMenuItemClick = async (key: number, cover: string) => {
-  const songId = key;
-  const song = songsList.value.find((s: any) => s.id == songId);
-  if (!song) return;
-  try {
-    const artists = [];
-    for (const a of song.artists) {
-      artists.push({
-        id: a.id,
-        name: a.name,
-      });
-    }
-    setCurrentSong(
-      {
-        id: songId,
-        duration: song.duration,
-        name: song.name,
-        artist: artists,
-        cover: cover,
-      },
-      playerStore
-    );
-  } catch {
-    message.error('播放失败');
-  }
-};
 
 watch(
   () => route.params.key,
