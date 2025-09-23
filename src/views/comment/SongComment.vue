@@ -36,10 +36,17 @@ const currentPage = ref(1);
 const hasMoreComments = ref(true);
 const commentsLoading = ref(false);
 const currentCursor = ref<number | undefined>(undefined);
+let appViewElement: HTMLElement | null = null;
 
 onMounted(() => {
   currentId.value = route.params.key as string;
+  appViewElement = document.getElementById('app-view');
+  if (appViewElement) {
+    appViewElement.addEventListener('scroll', handleScroll);
+  } else {
+    // Fallback to window if app-view is not found, though it should exist based on user feedback
     window.addEventListener('scroll', handleScroll);
+  }
   fetchInfo();
   fetchComments(true);
 });
@@ -109,7 +116,6 @@ const fetchComments = async (reset = false) => {
 
     const data = response.data;
 
-
     if (data.comments && data.comments.length > 0) {
       comments.value = [...comments.value, ...data.comments];
       commentCount.value = data.totalCount;
@@ -129,11 +135,11 @@ const fetchComments = async (reset = false) => {
 };
 
 const handleScroll = () => {
-  const scrollHeight = document.documentElement.scrollHeight;
-  const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-  const clientHeight = document.documentElement.clientHeight;
+  const targetElement = appViewElement || document.documentElement; // Fallback to document.documentElement if appViewElement is null
 
-console.log(scrollTop + clientHeight >= scrollHeight - 200 && hasMoreComments.value && !commentsLoading.value);
+  const scrollHeight = targetElement.scrollHeight;
+  const scrollTop = targetElement.scrollTop;
+  const clientHeight = targetElement.clientHeight;
 
 
   if (scrollTop + clientHeight >= scrollHeight - 200 && hasMoreComments.value && !commentsLoading.value) {
@@ -142,7 +148,11 @@ console.log(scrollTop + clientHeight >= scrollHeight - 200 && hasMoreComments.va
 };
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll);
+  if (appViewElement) {
+    appViewElement.removeEventListener('scroll', handleScroll);
+  } else {
+    window.removeEventListener('scroll', handleScroll);
+  }
 });
 </script>
 
@@ -157,5 +167,6 @@ span,sup{
   padding: 20px;
   color: var(--y-text);
   font-family: var(--y-font);
+  margin-bottom: 40px;
 }
 </style>

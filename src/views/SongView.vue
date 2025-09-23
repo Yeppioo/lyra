@@ -21,9 +21,14 @@
             {{ songDetail.al.name }}
           </a>
         </div>
-        <button @click="playCurrent" class="play-button">
+        <div class="buttons">
+          <button @click="playCurrent" class="nth-1 play-button">
           <font-awesome-icon class="icon" :icon="['fas', 'play']" />播放
         </button>
+        <button @click="jumpCustom(`/song/${currentId}/comment`)" class="play-button">
+          <font-awesome-icon class="icon" :icon="['fas', 'message']" />评论
+        </button>
+        </div>
       </div>
     </div>
 
@@ -108,7 +113,7 @@
 import { onMounted, ref, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { getSong, comment, simi } from '@/api/netease';
-import { jumpArtist, jumpAlbum } from '@/utils/jumper'; // Keep jumpArtist, jumpAlbum for songDetail section
+import { jumpArtist, jumpAlbum , jumpCustom } from '@/utils/jumper'; // Keep jumpArtist, jumpAlbum for songDetail section
 import type { SongDetail } from '@/api/netease/getSong';
 import type { HotComment } from '@/api/netease/comment';
 import type { SimiSong } from '@/api/netease/simi';
@@ -306,8 +311,17 @@ const playCurrent = () => {
     transform 0.2s ease;
   display: flex;
   align-items: center;
-  position: absolute;
+
+}
+
+.buttons{
+    position: absolute;
   bottom: 10px;
+  display: flex
+
+}
+.nth-1{
+  margin-right: 10px;
 }
 
 .play-button:hover {
