@@ -838,10 +838,10 @@ const handleMenuItemClick = async (key: number, cover: string) => {
     display: unset;
   }
 }
-.song-view{
+.song-view {
   user-select: none;
 }
-.comment-item{
-  user-select:text;
+.comment-item {
+  user-select: text;
 }
 </style>

@@ -174,8 +174,8 @@
       </ul>
     </div>
   </div>
-    <!-- 蒙版 -->
-    <div v-if="showOverlay" class="overlay" @click="closeAllPopups"></div>
+  <!-- 蒙版 -->
+  <div v-if="showOverlay" class="overlay" @click="closeAllPopups"></div>
 </template>
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
