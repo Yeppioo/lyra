@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "vite",
     "api": "node ./node_modules/NeteaseCloudMusicApi/app.js",
-    "start": "concurrently \"npm run p\" \"npm run api\"",
+    "start": "concurrently \"npm run dev\" \"npm run api\"",
     "c": "npm run lint && npm run format",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
