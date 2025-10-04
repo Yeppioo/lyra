@@ -7,6 +7,9 @@ import { useUIPropertiesStore } from './uiProperties'; // 导入 useUIProperties
 export interface SettingsState {
   theme: 'light' | 'dark';
   volume: number;
+  api: {
+    netease: string;
+  };
   searchHistory: string[];
   userinfo: {
     state: string[];
@@ -24,6 +27,9 @@ const defaultSettings: SettingsState = {
   theme: 'light',
   volume: 0.8,
   searchHistory: [],
+  api: {
+    netease: 'https://neteasemusic.api.yeppioo.vip',
+  },
   userinfo: {
     state: [],
     username: '未登录',
