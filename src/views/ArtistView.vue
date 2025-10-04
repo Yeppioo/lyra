@@ -54,7 +54,6 @@ import {
   TypographyParagraph as ATypographyParagraph,
 } from 'ant-design-vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import {} from '@fortawesome/free-solid-svg-icons';
 import router from '@/router';
 
 const route = useRoute();
@@ -93,8 +92,8 @@ watch(
       artistId.value = parseInt(id);
       fetchArtistData(artistId.value);
     }
-  },
-  { immediate: true }
+  }
+  // { immediate: true }
 );
 
 const fetchArtistData = async (id: number) => {

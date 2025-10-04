@@ -2,6 +2,7 @@
   <a-popover placement="bottomLeft" trigger="focus">
     <a-input-search
       autocomplete="off"
+      name="searchKeyword111"
       :placeholder="uiProperties.defaultSearchKey.show"
       class="search-box"
       ref="searchInput"

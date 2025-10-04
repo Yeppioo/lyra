@@ -10,6 +10,11 @@ const router = createRouter({
       component: () => import('../views/HomeView.vue'),
     },
     {
+      path: '/song30',
+      name: 'song30-view',
+      component: () => import('../views/Song30View.vue'),
+    },
+    {
       path: '/album/:key',
       name: 'album-view',
       component: () => import('../views/AlbumView.vue'),
@@ -139,7 +144,7 @@ const router = createRouter({
           path: 'song',
           name: 'song',
           component: () => import('../components/artist/hot-song.vue'),
-          props: true,
+          props: false,
         },
         {
           path: 'album',

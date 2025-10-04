@@ -154,6 +154,7 @@ function playAllSongs() {
 .album-header {
   display: flex;
   margin-bottom: 30px;
+  margin-top: 20px;
   flex: 1; /* Allow album header to take available space */
 }
 .album-header:deep(img) {

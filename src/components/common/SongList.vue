@@ -272,6 +272,7 @@ const onPageChange = (page: number) => {
 .album {
   position: absolute;
   left: 400px;
+  margin-left: 20px;
 }
 .info {
   display: flex;

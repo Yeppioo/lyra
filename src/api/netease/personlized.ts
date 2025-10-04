@@ -7,8 +7,19 @@ const realIpParam = realIP ? `realIP=${realIP}` : '';
 interface SongEntry {
   id: number;
   name: string;
-  pic: string;
-  artist: ArtistEntry[];
+  artists: {
+    id: number;
+    name: string;
+  }[];
+  album: {
+    id: number;
+    name: string;
+  };
+  hasMv: boolean;
+  mvId: number;
+  requireVip: boolean;
+  duration: number;
+  picUrl: string;
   reason: string;
 }
 
@@ -42,8 +53,17 @@ export async function getPersonalizedSongs(): Promise<SongEntry[]> {
       id: song.id,
       name: song.name,
       pic: song.al.picUrl,
-      artist: artists,
+      artists: artists,
       reason: song.reason,
+      album: {
+        id: song.al.id,
+        name: song.al.name,
+      },
+      duration: song.dt,
+      picUrl: song.al.picUrl,
+      hasMv: song.mv !== 0,
+      mvId: song.mv,
+      requireVip: song.fee === 1,
     });
   }
   return songs;

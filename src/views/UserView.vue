@@ -12,7 +12,9 @@
           }}</a-typography-title>
           <a-typography-paragraph class="more-info"
             >{{ data?.level ? 'LV.' + data?.level : '' }}
-            {{ data?.identify?.imageDesc ? ' | ' + data?.identify?.imageDesc : '' }}</a-typography-paragraph
+            {{
+              data?.identify?.imageDesc ? ' | ' + data?.identify?.imageDesc : ''
+            }}</a-typography-paragraph
           >
           <a-typography-text class="occupation">{{ data?.profile?.signature }}</a-typography-text>
           <div class="num">
@@ -298,7 +300,7 @@ h2 {
   .num {
     justify-content: center;
   }
-  .data{
+  .data {
     align-items: center;
   }
 }

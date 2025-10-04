@@ -7,7 +7,7 @@
           class="big-img"
           :src="
             uiProperties.personalized.song30.songs[uiProperties.personalized.song30.selectedindex]
-              ?.pic
+              ?.picUrl
           "
           alt="song pic" />
       </div>
@@ -31,7 +31,7 @@
             <template
               v-for="a in uiProperties.personalized.song30.songs[
                 uiProperties.personalized.song30.selectedindex
-              ]?.artist"
+              ]?.artists"
               :key="a.id">
               <a @click.stop="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
             </template>
@@ -53,11 +53,14 @@
               </svg>
             </button>
           </i>
-          <a-button @click="next" class="t-button control-button" type="text">
+          <a-button v-if="false"  @click="next" class="t-button control-button" type="text">
             <font-awesome-icon size="lg" :icon="['fas', 'forward-step']" />
           </a-button>
-          <a-button @click="dislike" class="t-button control-button" type="text">
+          <a-button v-if="false"  @click="dislike" class="t-button control-button" type="text">
             <font-awesome-icon size="lg" :icon="['fas', 'thumbs-down']" />
+          </a-button>
+          <a-button @click="jumpList" class="t-button control-button" type="text">
+            <font-awesome-icon size="lg" :icon="['fas', 'podcast']" />
           </a-button>
         </div>
       </div>
@@ -69,7 +72,7 @@
             class="small-img"
             :src="
               uiProperties.personalized.song30.songs[uiProperties.personalized.song30.selectedindex]
-                ?.pic
+                ?.picUrl
             "
             alt="song pic" />
         </div>
@@ -92,7 +95,7 @@
             <template
               v-for="a in uiProperties.personalized.song30.songs[
                 uiProperties.personalized.song30.selectedindex
-              ]?.artist"
+              ]?.artists"
               :key="a.id">
               <a @click.stop="jumper.jumpArtist(a.id)" class="ar-name">{{ a.name }}</a>
             </template>
@@ -116,11 +119,14 @@
               </svg>
             </button>
           </i>
-          <a-button @click="next" class="t-button control-button" type="text">
+          <a-button v-if="false" @click="next" class="t-button control-button" type="text">
             <font-awesome-icon size="lg" :icon="['fas', 'forward-step']" />
           </a-button>
-          <a-button @click="dislike" class="t-button control-button" type="text">
+          <a-button  v-if="false"  @click="dislike" class="t-button control-button" type="text">
             <font-awesome-icon size="lg" :icon="['fas', 'thumbs-down']" />
+          </a-button>
+          <a-button @click="jumpList" class="t-button control-button" type="text">
+            <font-awesome-icon size="lg" :icon="['fas', 'podcast']" />
           </a-button>
         </div>
       </div>
@@ -139,6 +145,7 @@ const { uiProperties } = storeToRefs(uiPropertiesStore);
 import { functions as getSongApi } from '@/api/netease/getSong';
 import { message } from 'ant-design-vue';
 import * as jumper from '@/utils/jumper';
+import router from '@/router';
 
 const dislike = () => {
   console.log('dislike');
@@ -152,6 +159,11 @@ const next = () => {
     uiProperties.value.personalized.song30.selectedindex = 0;
 };
 
+
+const jumpList = () => {
+  router.push('/song30');
+};
+
 const play = async () => {
   const song =
     uiProperties.value.personalized.song30.songs[
@@ -160,7 +172,7 @@ const play = async () => {
   try {
     const urlRes = await getSongApi.getSongUrl(song.id);
     const artists = [];
-    for (const a of song.artist) {
+    for (const a of song.artists) {
       artists.push({
         id: a.id,
         name: a.name,
@@ -172,7 +184,7 @@ const play = async () => {
         duration: urlRes.data[0].time,
         name: song.name,
         artist: artists,
-        cover: song.pic,
+        cover: song.picUrl,
       },
       usePlayerStore()
     );
